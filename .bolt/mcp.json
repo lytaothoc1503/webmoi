@@ -1,7 +1,7 @@
 {
   "mcpServers": {
     "fuli_stripemcp": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
