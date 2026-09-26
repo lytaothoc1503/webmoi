@@ -4,12 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Quản Trị Booking | Bảnh Fuli Homestay Tà Xùa</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
       :root {
@@ -21,234 +18,243 @@
         --surface: #ffffff;
         --border: #e2d3c5;
         --text: #2f251e;
+        --muted: #7a6e65;
       }
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: 'Montserrat', sans-serif;
-      }
-      body {
-        background: var(--bg);
-        color: var(--text);
-        display: flex;
-        min-height: 100vh;
-      }
+      * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+      body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
 
       aside {
-        width: 260px;
-        background: var(--primary);
-        color: #ffffff;
-        padding: 24px 16px;
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
+        width: 260px; background: var(--primary); color: #fff;
+        padding: 24px 16px; display: flex; flex-direction: column; flex-shrink: 0;
+        position: sticky; top: 0; height: 100vh; overflow-y: auto;
       }
       .brand-title {
-        font-size: 16px;
-        font-weight: 700;
-        letter-spacing: 1px;
-        color: #ffdeb4;
-        text-align: center;
-        margin-bottom: 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 14px;
+        font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #ffdeb4;
+        text-align: center; margin-bottom: 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;
       }
       .menu-item {
-        padding: 12px 16px;
-        border-radius: 8px;
-        color: #dfd3c3;
-        cursor: pointer;
-        margin-bottom: 6px;
-        font-size: 13.5px;
-        font-weight: 600;
+        padding: 12px 16px; border-radius: 8px; color: #dfd3c3;
+        cursor: pointer; margin-bottom: 6px; font-size: 13.5px; font-weight: 600;
+        transition: all 0.2s;
       }
-      .menu-item.active,
-      .menu-item:hover {
-        background: var(--accent);
-        color: #ffffff;
-      }
+      .menu-item.active, .menu-item:hover { background: var(--accent); color: #fff; }
 
-      main {
-        flex: 1;
-        padding: 28px;
-        overflow-y: auto;
-      }
-      .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-      }
+      main { flex: 1; padding: 28px; overflow-y: auto; }
+      .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
       .btn-view-web {
-        background: #ffffff;
-        border: 1px solid var(--border);
-        padding: 8px 16px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--primary);
+        background: #fff; border: 1px solid var(--border); padding: 8px 16px;
+        border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; color: var(--primary);
+      }
+      .btn-export {
+        background: var(--green); color: #fff; border: none; padding: 8px 16px;
+        border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
       }
 
-      .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 16px;
-        margin-bottom: 24px;
-      }
-      .stat-card {
-        background: #ffffff;
-        padding: 18px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-      }
-      .stat-label {
-        font-size: 11.5px;
-        color: #7a6e65;
-        text-transform: uppercase;
-        font-weight: 600;
-      }
-      .stat-num {
-        font-size: 26px;
-        font-weight: 700;
-        color: var(--primary);
-        margin-top: 4px;
-      }
+      .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+      .stat-card { background: #fff; padding: 18px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+      .stat-label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; font-weight: 600; }
+      .stat-num { font-size: 26px; font-weight: 700; color: var(--primary); margin-top: 4px; }
 
-      .table-box {
-        background: #ffffff;
-        border-radius: 14px;
-        border: 1px solid var(--border);
-        padding: 20px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.03);
-        overflow-x: auto;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-        min-width: 950px;
-      }
-      th,
-      td {
-        padding: 12px 14px;
-        text-align: left;
-        border-bottom: 1px solid var(--border);
-      }
-      th {
-        background: #faf5f0;
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 11.5px;
-        text-transform: uppercase;
-      }
+      .chart-box { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 20px; margin-bottom: 24px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
+      .chart-box canvas { max-height: 240px; }
 
-      .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 700;
+      .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+      .filter-bar input, .filter-bar select {
+        padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none;
       }
-      .badge-paid {
-        background: #dbeafe;
-        color: #1e40af;
-      }
-      .badge-approved {
-        background: #d1fae5;
-        color: #059669;
-      }
-      .badge-rejected {
-        background: #fee2e2;
-        color: #dc2626;
-      }
+      .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
 
-      .btn-act {
-        border: none;
-        padding: 6px 12px;
-        border-radius: 6px;
-        font-size: 11.5px;
-        font-weight: 600;
-        cursor: pointer;
-        margin-right: 4px;
+      .table-box { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); overflow-x: auto; margin-bottom: 24px; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 950px; }
+      th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+      th { background: #faf5f0; color: var(--primary); font-weight: 700; font-size: 11.5px; text-transform: uppercase; }
+
+      .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+      .badge-paid { background: #dbeafe; color: #1e40af; }
+      .badge-approved { background: #d1fae5; color: #059669; }
+      .badge-rejected { background: #fee2e2; color: #dc2626; }
+
+      .btn-act { border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; margin-right: 4px; }
+      .btn-confirm { background: var(--green); color: #fff; }
+      .btn-cancel { background: var(--red); color: #fff; }
+      .btn-del { background: #e5e7eb; color: #4b5563; }
+      .btn-add { background: var(--accent); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-bottom: 12px; }
+      .btn-edit { background: #3b82f6; color: #fff; }
+
+      .page-section { display: none; }
+      .page-section.active { display: block; }
+
+      .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center;
+        z-index: 2000; visibility: hidden; opacity: 0; transition: all 0.3s; padding: 20px;
       }
-      .btn-confirm {
-        background: var(--green);
-        color: #ffffff;
+      .modal-overlay.active { visibility: visible; opacity: 1; }
+      .modal-box {
+        background: #fff; width: 100%; max-width: 520px; border-radius: 16px; padding: 28px;
+        max-height: 90vh; overflow-y: auto; position: relative;
       }
-      .btn-cancel {
-        background: var(--red);
-        color: #ffffff;
+      .modal-close { position: absolute; top: 16px; right: 20px; font-size: 24px; cursor: pointer; color: var(--muted); }
+      .modal-title { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+      .form-group { margin-bottom: 14px; }
+      .form-group label { display: block; font-size: 11.5px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+      .form-group input, .form-group textarea, .form-group select {
+        width: 100%; padding: 10px 12px; border: 1px solid #d5c8be; border-radius: 8px; font-size: 14px; outline: none;
       }
-      .btn-del {
-        background: #e5e7eb;
-        color: #4b5563;
+      .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+      .form-group textarea { min-height: 80px; resize: vertical; }
+      .btn-save {
+        width: 100%; background: var(--accent); color: #fff; border: none; height: 44px;
+        border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; text-transform: uppercase;
+      }
+      .btn-save:hover { background: #b85417; }
+
+      .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+      .manage-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+      .manage-card img { width: 100%; height: 160px; object-fit: cover; }
+      .manage-card-body { padding: 14px; }
+      .manage-card-title { font-weight: 700; font-size: 14px; color: var(--primary); margin-bottom: 4px; }
+      .manage-card-sub { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+      .manage-card-actions { display: flex; gap: 6px; }
+
+      @media (max-width: 768px) {
+        aside { width: 60px; padding: 16px 8px; }
+        aside .brand-title { font-size: 10px; }
+        .menu-item { font-size: 10px; padding: 10px 8px; text-align: center; }
+        main { padding: 16px; }
       }
     </style>
   </head>
   <body>
     <aside>
       <div class="brand-title">BẢNH FULI MANAGER</div>
-      <div class="menu-item active">📋 Đơn Đặt Phòng & QR</div>
-      <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất Admin</div>
+      <div class="menu-item active" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
+      <div class="menu-item" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
+      <div class="menu-item" onclick="showPage('tours', this)">🧭 Tour Trải Nghiệm</div>
+      <div class="menu-item" onclick="showPage('reviews', this)">⭐ Đánh Giá</div>
+      <div class="menu-item" onclick="showPage('gallery', this)">📷 Thư Viện Ảnh</div>
+      <div class="menu-item" onclick="showPage('faq', this)">❓ Câu Hỏi FAQ</div>
+      <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
     <main>
-      <div class="top-bar">
-        <h2>Trung Tâm Quản Lý Booking & Duyệt Tiền Cọc</h2>
-        <a href="./index.html" target="_blank" class="btn-view-web"
-          >← Xem Trang Đặt Phòng</a
-        >
-      </div>
-
-      <div class="stat-grid">
-        <div class="stat-card">
-          <div class="stat-label">Tổng Lịch Đặt</div>
-          <div class="stat-num" id="stat-total">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Chờ Duyệt Tiền Cọc</div>
-          <div class="stat-num" id="stat-pending" style="color: var(--accent)">
-            0
+      <!-- BOOKINGS PAGE -->
+      <div class="page-section active" id="page-bookings">
+        <div class="top-bar">
+          <h2>Quản Lý Booking & Duyệt Tiền Cọc</h2>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-export" onclick="exportCSV()">📊 Xuất Excel/CSV</button>
+            <a href="./index.html" target="_blank" class="btn-view-web">← Xem Trang Web</a>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Tổng Doanh Thu Cọc</div>
-          <div class="stat-num" id="stat-revenue" style="color: var(--green)">
-            0 đ
-          </div>
+
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Tổng Lịch Đặt</div><div class="stat-num" id="stat-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">Chờ Duyệt Cọc</div><div class="stat-num" id="stat-pending" style="color: var(--accent)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Đã Duyệt</div><div class="stat-num" id="stat-approved" style="color: var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Doanh Thu Cọc</div><div class="stat-num" id="stat-revenue" style="color: var(--green)">0 đ</div></div>
+        </div>
+
+        <div class="chart-box">
+          <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--primary);">Doanh thu & số đơn theo tháng</h3>
+          <canvas id="revenue-chart"></canvas>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" id="filter-search" placeholder="Tìm theo tên, SĐT, mã đơn..." oninput="renderBookings()" style="flex: 1; min-width: 200px;" />
+          <select id="filter-status" onchange="renderBookings()">
+            <option value="">Tất cả trạng thái</option>
+            <option value="Chờ duyệt tiền cọc">Chờ duyệt</option>
+            <option value="Đã duyệt phòng">Đã duyệt</option>
+            <option value="Hủy đơn">Đã hủy</option>
+          </select>
+          <select id="filter-room" onchange="renderBookings()">
+            <option value="">Tất cả phòng/tour</option>
+          </select>
+        </div>
+
+        <div class="table-box">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã Đơn</th>
+                <th>Thời Gian Đặt</th>
+                <th>Khách Hàng & SĐT</th>
+                <th>Hạng Phòng / Tour</th>
+                <th>Số Tiền (VNĐ)</th>
+                <th>Mã Chuyển Khoản</th>
+                <th>Check-in/out</th>
+                <th>Trạng Thái</th>
+                <th>Thao Tác</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">
+              <tr><td colspan="9" style="text-align: center; color: #888;">Đang tải dữ liệu...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <div class="table-box">
-        <table>
-          <thead>
-            <tr>
-              <th>Thời Gian Đặt</th>
-              <th>Khách Hàng & SĐT</th>
-              <th>Hạng Phòng / Tour</th>
-              <th>Số Tiền (VNĐ)</th>
-              <th>Mã Chuyển Khoản</th>
-              <th>Lịch Check-in/out</th>
-              <th>Trạng Thái</th>
-              <th>Thao Tác</th>
-            </tr>
-          </thead>
-          <tbody id="bookings-tbody">
-            <tr>
-              <td colspan="8" style="text-align: center; color: #888">
-                Đang tải dữ liệu từ máy chủ đám mây...
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- ROOMS PAGE -->
+      <div class="page-section" id="page-rooms">
+        <div class="top-bar">
+          <h2>Quản Lý Hạng Phòng</h2>
+          <button class="btn-add" onclick="openRoomModal()">+ Thêm Hạng Phòng</button>
+        </div>
+        <div class="card-grid" id="rooms-manage-grid"></div>
+      </div>
+
+      <!-- TOURS PAGE -->
+      <div class="page-section" id="page-tours">
+        <div class="top-bar">
+          <h2>Quản Lý Tour Trải Nghiệm</h2>
+          <button class="btn-add" onclick="openTourModal()">+ Thêm Tour</button>
+        </div>
+        <div class="card-grid" id="tours-manage-grid"></div>
+      </div>
+
+      <!-- REVIEWS PAGE -->
+      <div class="page-section" id="page-reviews">
+        <div class="top-bar">
+          <h2>Quản Lý Đánh Giá Khách</h2>
+          <button class="btn-add" onclick="openReviewModal()">+ Thêm Đánh Giá</button>
+        </div>
+        <div class="card-grid" id="reviews-manage-grid"></div>
+      </div>
+
+      <!-- GALLERY PAGE -->
+      <div class="page-section" id="page-gallery">
+        <div class="top-bar">
+          <h2>Quản Lý Thư Viện Ảnh</h2>
+          <button class="btn-add" onclick="openGalleryModal()">+ Thêm Ảnh</button>
+        </div>
+        <div class="card-grid" id="gallery-manage-grid"></div>
+      </div>
+
+      <!-- FAQ PAGE -->
+      <div class="page-section" id="page-faq">
+        <div class="top-bar">
+          <h2>Quản Lý Câu Hỏi Thường Gặp</h2>
+          <button class="btn-add" onclick="openFaqModal()">+ Thêm Câu Hỏi</button>
+        </div>
+        <div class="card-grid" id="faq-manage-grid"></div>
       </div>
     </main>
 
+    <!-- CRUD MODAL -->
+    <div class="modal-overlay" id="crud-modal">
+      <div class="modal-box">
+        <span class="modal-close" onclick="closeCrudModal()">&times;</span>
+        <h3 class="modal-title" id="crud-modal-title">Thêm/Sửa</h3>
+        <form id="crud-form" onsubmit="return false;">
+          <div id="crud-fields"></div>
+          <button class="btn-save" onclick="saveCrudItem()">LƯU</button>
+        </form>
+      </div>
+    </div>
+
     <script>
-      // Kiểm tra cờ cấp quyền Admin từ cửa sổ bí mật
       if (localStorage.getItem('xmagic_admin_authorized') !== 'true') {
         alert('Vui lòng đăng nhập quyền quản trị viên!');
         window.location.replace('./index.html');
@@ -258,100 +264,130 @@
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      supabase
-        .from('bookings')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .then(({ data, error }) => {
-          if (error) {
-            console.error('Lỗi tải dữ liệu:', error.message);
-            return;
-          }
-          renderBookings(data || []);
+      let allBookings = [];
+      let revenueChart = null;
+      let currentCrudType = '';
+      let currentCrudId = null;
+
+      function showPage(page, el) {
+        document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        el.classList.add('active');
+        if (page === 'rooms') loadRoomsManage();
+        if (page === 'tours') loadToursManage();
+        if (page === 'reviews') loadReviewsManage();
+        if (page === 'gallery') loadGalleryManage();
+        if (page === 'faq') loadFaqManage();
+      }
+
+      /* ===== BOOKINGS ===== */
+      function loadBookings() {
+        supabase.from('bookings').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+          if (error) { console.error('Lỗi tải:', error.message); return; }
+          allBookings = data || [];
+          populateRoomFilter();
+          renderBookings();
+          renderChart();
+        });
+      }
+
+      supabase.channel('bookings-changes').on('postgres_changes', { event: '*', table: 'bookings' }, () => {
+        loadBookings();
+      }).subscribe();
+
+      function populateRoomFilter() {
+        const select = document.getElementById('filter-room');
+        const rooms = [...new Set(allBookings.map(b => b.room))];
+        select.innerHTML = '<option value="">Tất cả phòng/tour</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+      }
+
+      function renderBookings() {
+        const tbody = document.getElementById('bookings-tbody');
+        const search = (document.getElementById('filter-search').value || '').toLowerCase();
+        const statusFilter = document.getElementById('filter-status').value;
+        const roomFilter = document.getElementById('filter-room').value;
+
+        let filtered = allBookings.filter(b => {
+          if (search && !((b.fullname || '').toLowerCase().includes(search) || (b.phone || '').includes(search) || (b.booking_code || '').toLowerCase().includes(search) || (b.transfer_code || '').toLowerCase().includes(search))) return false;
+          if (statusFilter && b.status !== statusFilter) return false;
+          if (roomFilter && b.room !== roomFilter) return false;
+          return true;
         });
 
-      supabase
-        .channel('bookings-changes')
-        .on('postgres_changes', { event: '*', table: 'bookings' }, () => {
-          supabase
-            .from('bookings')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .then(({ data }) => renderBookings(data || []));
-        })
-        .subscribe();
+        let pending = 0, approved = 0, revenue = 0;
+        allBookings.forEach(b => {
+          if (b.status && b.status.includes('Chờ')) pending++;
+          if (b.status === 'Đã duyệt phòng') { approved++; revenue += Number(b.total_price || 0); }
+        });
+        document.getElementById('stat-total').textContent = allBookings.length;
+        document.getElementById('stat-pending').textContent = pending;
+        document.getElementById('stat-approved').textContent = approved;
+        document.getElementById('stat-revenue').textContent = revenue.toLocaleString('vi-VN') + ' đ';
 
-      function renderBookings(list) {
-        const tbody = document.getElementById('bookings-tbody');
-        tbody.innerHTML = '';
-
-        let total = list.length;
-        let pending = 0;
-        let revenue = 0;
-
-        if (list.length === 0) {
-          tbody.innerHTML =
-            '<tr><td colspan="8" style="text-align: center; padding: 25px; color: #888;">Chưa có đơn đặt phòng nào.</td></tr>';
+        if (filtered.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 25px; color: #888;">Không có đơn đặt phòng phù hợp.</td></tr>';
+          return;
         }
 
-        list.forEach((item) => {
+        tbody.innerHTML = filtered.map(item => {
           const isPending = item.status && item.status.includes('Chờ');
           const isApproved = item.status === 'Đã duyệt phòng';
+          return `
+          <tr>
+            <td><span style="font-family:monospace; font-weight:700; color:var(--accent); font-size:12px;">${item.booking_code || 'N/A'}</span></td>
+            <td><small>${new Date(item.created_at).toLocaleString('vi-VN')}</small></td>
+            <td><strong>${item.fullname}</strong><br><a href="tel:${item.phone}" style="color:var(--accent); font-weight:700; text-decoration:none;">${item.phone}</a></td>
+            <td><strong style="color:var(--primary);">${item.room}</strong></td>
+            <td style="font-weight:700; color:#10b981;">${Number(item.total_price || 0).toLocaleString('vi-VN')} đ</td>
+            <td><span style="font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px; font-weight:bold; font-size:11px;">${item.transfer_code || 'N/A'}</span></td>
+            <td><small>${item.checkin} → ${item.checkout}<br>(${item.guests || '2 khách'})</small></td>
+            <td><span class="status-badge ${isPending ? 'badge-paid' : isApproved ? 'badge-approved' : 'badge-rejected'}">${item.status}</span></td>
+            <td>
+              <button class="btn-act btn-confirm" onclick="updateStatus('${item.id}', 'Đã duyệt phòng')">Duyệt</button>
+              <button class="btn-act btn-cancel" onclick="updateStatus('${item.id}', 'Hủy đơn')">Hủy</button>
+              <button class="btn-act btn-del" onclick="deleteBooking('${item.id}')">Xóa</button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
 
-          if (isPending) pending++;
-          if (isApproved) revenue += Number(item.total_price || 0);
-
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-          <td><small>${new Date(item.created_at).toLocaleString('vi-VN') || ''}</small></td>
-          <td>
-            <strong>${item.fullname}</strong><br>
-            <a href="tel:${
-              item.phone
-            }" style="color:var(--accent); font-weight:700; text-decoration:none;">${
-            item.phone
-          }</a>
-          </td>
-          <td><strong style="color:var(--primary);">${item.room}</strong></td>
-          <td style="font-weight:700; color:#10b981;">${Number(
-            item.total_price || 0
-          ).toLocaleString('vi-VN')} đ</td>
-          <td><span style="font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px; font-weight:bold;">${
-            item.transfer_code || 'N/A'
-          }</span></td>
-          <td><small>${item.checkin} → ${item.checkout} (${
-            item.guests || '2 khách'
-          })</small></td>
-          <td>
-            <span class="status-badge ${
-              isPending
-                ? 'badge-paid'
-                : isApproved
-                ? 'badge-approved'
-                : 'badge-rejected'
-            }">
-              ${item.status}
-            </span>
-          </td>
-          <td>
-            <button class="btn-act btn-confirm" onclick="updateStatus('${
-              item.id
-            }', 'Đã duyệt phòng')">Duyệt Tiền</button>
-            <button class="btn-act btn-cancel" onclick="updateStatus('${
-              item.id
-            }', 'Hủy đơn')">Hủy</button>
-            <button class="btn-act btn-del" onclick="deleteBooking('${
-              item.id
-            }')">Xóa</button>
-          </td>
-        `;
-          tbody.appendChild(tr);
+      function renderChart() {
+        const months = {};
+        allBookings.forEach(b => {
+          if (b.status === 'Đã duyệt phòng') {
+            const d = new Date(b.created_at);
+            const key = String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+            if (!months[key]) months[key] = { revenue: 0, count: 0 };
+            months[key].revenue += Number(b.total_price || 0);
+            months[key].count += 1;
+          }
         });
+        const sortedKeys = Object.keys(months).sort();
+        const labels = sortedKeys;
+        const revenueData = sortedKeys.map(k => months[k].revenue);
+        const countData = sortedKeys.map(k => months[k].count);
 
-        document.getElementById('stat-total').textContent = total;
-        document.getElementById('stat-pending').textContent = pending;
-        document.getElementById('stat-revenue').textContent =
-          revenue.toLocaleString('vi-VN') + ' đ';
+        const ctx = document.getElementById('revenue-chart').getContext('2d');
+        if (revenueChart) revenueChart.destroy();
+        revenueChart = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              { label: 'Doanh thu (VNĐ)', data: revenueData, backgroundColor: '#d96b27', yAxisID: 'y' },
+              { label: 'Số đơn', data: countData, type: 'line', borderColor: '#10b981', backgroundColor: '#10b981', yAxisID: 'y1', tension: 0.3 }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+              y: { type: 'linear', position: 'left', title: { display: true, text: 'Doanh thu (đ)' } },
+              y1: { type: 'linear', position: 'right', title: { display: true, text: 'Số đơn' }, grid: { drawOnChartArea: false } }
+            }
+          }
+        });
       }
 
       function updateStatus(id, newStatus) {
@@ -368,10 +404,347 @@
         }
       }
 
+      function exportCSV() {
+        if (allBookings.length === 0) { alert('Không có dữ liệu để xuất.'); return; }
+        const headers = ['Mã Đơn', 'Thời Gian', 'Họ Tên', 'SĐT', 'Phòng/Tour', 'Check-in', 'Check-out', 'Số Khách', 'Tổng Tiền', 'Mã CK', 'Trạng Thái', 'Ghi Chú'];
+        const rows = allBookings.map(b => [
+          b.booking_code || '', new Date(b.created_at).toLocaleString('vi-VN'),
+          b.fullname, b.phone, b.room, b.checkin, b.checkout, b.guests || '',
+          b.total_price, b.transfer_code || '', b.status, b.notes || ''
+        ]);
+        let csv = headers.join(',') + '\n';
+        rows.forEach(r => { csv += r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
+        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'booking_export_' + new Date().toISOString().split('T')[0] + '.csv';
+        link.click();
+      }
+
+      /* ===== ROOMS CRUD ===== */
+      async function loadRoomsManage() {
+        const { data } = await supabase.from('rooms').select('*').order('sort_order');
+        const grid = document.getElementById('rooms-manage-grid');
+        if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có hạng phòng.</p>'; return; }
+        grid.innerHTML = data.map(r => `
+          <div class="manage-card">
+            <img src="${r.image_url || ''}" alt="${r.name}" />
+            <div class="manage-card-body">
+              <div class="manage-card-title">${r.name}</div>
+              <div class="manage-card-sub">${r.price.toLocaleString('vi-VN')} đ/đêm • Thứ tự: ${r.sort_order} • ${r.is_active ? 'Hiển thị' : 'Ẩn'}</div>
+              <div class="manage-card-actions">
+                <button class="btn-act btn-edit" onclick="openRoomModal('${r.id}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('rooms', '${r.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      function openRoomModal(id) {
+        currentCrudType = 'rooms';
+        currentCrudId = id || null;
+        document.getElementById('crud-modal-title').textContent = id ? 'Sửa Hạng Phòng' : 'Thêm Hạng Phòng';
+        document.getElementById('crud-fields').innerHTML = `
+          <div class="form-group"><label>Tên hạng phòng:</label><input type="text" id="f-name" required /></div>
+          <div class="form-group"><label>Giá / đêm (VNĐ):</label><input type="number" id="f-price" required /></div>
+          <div class="form-group"><label>URL ảnh:</label><input type="text" id="f-image" placeholder="https://..." /></div>
+          <div class="form-group"><label>Tiện ích (mỗi dòng 1 mục):</label><textarea id="f-perks" placeholder="Giường đôi King size&#10;Bồn tắm thảo dược"></textarea></div>
+          <div class="form-group"><label>Mô tả:</label><textarea id="f-desc"></textarea></div>
+          <div class="form-group"><label>Thứ tự hiển thị:</label><input type="number" id="f-sort" value="1" /></div>
+          <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
+        `;
+        if (id) {
+          supabase.from('rooms').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+            if (!data) return;
+            document.getElementById('f-name').value = data.name;
+            document.getElementById('f-price').value = data.price;
+            document.getElementById('f-image').value = data.image_url || '';
+            document.getElementById('f-perks').value = (data.perks || []).join('\n');
+            document.getElementById('f-desc').value = data.description || '';
+            document.getElementById('f-sort').value = data.sort_order;
+            document.getElementById('f-active').value = String(data.is_active);
+          });
+        }
+        document.getElementById('crud-modal').classList.add('active');
+      }
+
+      /* ===== TOURS CRUD ===== */
+      async function loadToursManage() {
+        const { data } = await supabase.from('tours').select('*').order('sort_order');
+        const grid = document.getElementById('tours-manage-grid');
+        if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có tour.</p>'; return; }
+        grid.innerHTML = data.map(t => `
+          <div class="manage-card">
+            <img src="${t.image_url || ''}" alt="${t.name}" />
+            <div class="manage-card-body">
+              <div class="manage-card-title">${t.name}</div>
+              <div class="manage-card-sub">${t.price.toLocaleString('vi-VN')} đ • Thứ tự: ${t.sort_order} • ${t.is_active ? 'Hiển thị' : 'Ẩn'}</div>
+              <div class="manage-card-actions">
+                <button class="btn-act btn-edit" onclick="openTourModal('${t.id}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('tours', '${t.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      function openTourModal(id) {
+        currentCrudType = 'tours';
+        currentCrudId = id || null;
+        document.getElementById('crud-modal-title').textContent = id ? 'Sửa Tour' : 'Thêm Tour';
+        document.getElementById('crud-fields').innerHTML = `
+          <div class="form-group"><label>Tên tour:</label><input type="text" id="f-name" required /></div>
+          <div class="form-group"><label>Giá (VNĐ):</label><input type="number" id="f-price" required /></div>
+          <div class="form-group"><label>URL ảnh:</label><input type="text" id="f-image" placeholder="https://..." /></div>
+          <div class="form-group"><label>Mô tả:</label><textarea id="f-desc"></textarea></div>
+          <div class="form-group"><label>Thứ tự hiển thị:</label><input type="number" id="f-sort" value="1" /></div>
+          <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
+        `;
+        if (id) {
+          supabase.from('tours').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+            if (!data) return;
+            document.getElementById('f-name').value = data.name;
+            document.getElementById('f-price').value = data.price;
+            document.getElementById('f-image').value = data.image_url || '';
+            document.getElementById('f-desc').value = data.description || '';
+            document.getElementById('f-sort').value = data.sort_order;
+            document.getElementById('f-active').value = String(data.is_active);
+          });
+        }
+        document.getElementById('crud-modal').classList.add('active');
+      }
+
+      /* ===== REVIEWS CRUD ===== */
+      async function loadReviewsManage() {
+        const { data } = await supabase.from('reviews').select('*').order('sort_order');
+        const grid = document.getElementById('reviews-manage-grid');
+        if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có đánh giá.</p>'; return; }
+        grid.innerHTML = data.map(r => `
+          <div class="manage-card">
+            <div class="manage-card-body">
+              <div class="manage-card-title">${r.author_name}</div>
+              <div class="manage-card-sub">${'★'.repeat(r.rating || 5)} • ${r.is_published ? 'Đã đăng' : 'Ẩn'} • Thứ tự: ${r.sort_order}</div>
+              <p style="font-size:12px; color:var(--muted); margin-bottom:8px; font-style:italic;">"${r.content}"</p>
+              <div class="manage-card-actions">
+                <button class="btn-act btn-edit" onclick="openReviewModal('${r.id}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('reviews', '${r.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      function openReviewModal(id) {
+        currentCrudType = 'reviews';
+        currentCrudId = id || null;
+        document.getElementById('crud-modal-title').textContent = id ? 'Sửa Đánh Giá' : 'Thêm Đánh Giá';
+        document.getElementById('crud-fields').innerHTML = `
+          <div class="form-group"><label>Tên khách:</label><input type="text" id="f-name" required /></div>
+          <div class="form-group"><label>URL ảnh đại diện:</label><input type="text" id="f-avatar" placeholder="https://..." /></div>
+          <div class="form-group"><label>Số sao (1-5):</label><input type="number" id="f-rating" min="1" max="5" value="5" required /></div>
+          <div class="form-group"><label>Nội dung đánh giá:</label><textarea id="f-content" required></textarea></div>
+          <div class="form-group"><label>Thứ tự:</label><input type="number" id="f-sort" value="1" /></div>
+          <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
+        `;
+        if (id) {
+          supabase.from('reviews').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+            if (!data) return;
+            document.getElementById('f-name').value = data.author_name;
+            document.getElementById('f-avatar').value = data.author_avatar || '';
+            document.getElementById('f-rating').value = data.rating;
+            document.getElementById('f-content').value = data.content;
+            document.getElementById('f-sort').value = data.sort_order;
+            document.getElementById('f-active').value = String(data.is_published);
+          });
+        }
+        document.getElementById('crud-modal').classList.add('active');
+      }
+
+      /* ===== GALLERY CRUD ===== */
+      async function loadGalleryManage() {
+        const { data } = await supabase.from('gallery').select('*').order('sort_order');
+        const grid = document.getElementById('gallery-manage-grid');
+        if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có ảnh.</p>'; return; }
+        grid.innerHTML = data.map(g => `
+          <div class="manage-card">
+            <img src="${g.image_url}" alt="${g.caption || ''}" />
+            <div class="manage-card-body">
+              <div class="manage-card-title">${g.caption || 'Không có chú thích'}</div>
+              <div class="manage-card-sub">Danh mục: ${g.category || 'N/A'} • Thứ tự: ${g.sort_order} • ${g.is_active ? 'Hiển thị' : 'Ẩn'}</div>
+              <div class="manage-card-actions">
+                <button class="btn-act btn-edit" onclick="openGalleryModal('${g.id}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('gallery', '${g.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      function openGalleryModal(id) {
+        currentCrudType = 'gallery';
+        currentCrudId = id || null;
+        document.getElementById('crud-modal-title').textContent = id ? 'Sửa Ảnh' : 'Thêm Ảnh';
+        document.getElementById('crud-fields').innerHTML = `
+          <div class="form-group"><label>URL ảnh:</label><input type="text" id="f-image" required placeholder="https://..." /></div>
+          <div class="form-group"><label>Chú thích:</label><input type="text" id="f-caption" /></div>
+          <div class="form-group"><label>Danh mục:</label><input type="text" id="f-category" placeholder="Săn Mây, Homestay, Phòng, Tour..." /></div>
+          <div class="form-group"><label>Thứ tự:</label><input type="number" id="f-sort" value="1" /></div>
+          <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
+        `;
+        if (id) {
+          supabase.from('gallery').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+            if (!data) return;
+            document.getElementById('f-image').value = data.image_url;
+            document.getElementById('f-caption').value = data.caption || '';
+            document.getElementById('f-category').value = data.category || '';
+            document.getElementById('f-sort').value = data.sort_order;
+            document.getElementById('f-active').value = String(data.is_active);
+          });
+        }
+        document.getElementById('crud-modal').classList.add('active');
+      }
+
+      /* ===== FAQ CRUD ===== */
+      async function loadFaqManage() {
+        const { data } = await supabase.from('faq').select('*').order('sort_order');
+        const grid = document.getElementById('faq-manage-grid');
+        if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có câu hỏi.</p>'; return; }
+        grid.innerHTML = data.map(f => `
+          <div class="manage-card">
+            <div class="manage-card-body">
+              <div class="manage-card-title">${f.question}</div>
+              <div class="manage-card-sub">${f.is_active ? 'Hiển thị' : 'Ẩn'} • Thứ tự: ${f.sort_order}</div>
+              <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">${f.answer}</p>
+              <div class="manage-card-actions">
+                <button class="btn-act btn-edit" onclick="openFaqModal('${f.id}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('faq', '${f.id}')">Xóa</button>
+              </div>
+            </div>
+          </div>`).join('');
+      }
+
+      function openFaqModal(id) {
+        currentCrudType = 'faq';
+        currentCrudId = id || null;
+        document.getElementById('crud-modal-title').textContent = id ? 'Sửa Câu Hỏi' : 'Thêm Câu Hỏi';
+        document.getElementById('crud-fields').innerHTML = `
+          <div class="form-group"><label>Câu hỏi:</label><input type="text" id="f-question" required /></div>
+          <div class="form-group"><label>Câu trả lời:</label><textarea id="f-answer" required></textarea></div>
+          <div class="form-group"><label>Thứ tự:</label><input type="number" id="f-sort" value="1" /></div>
+          <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
+        `;
+        if (id) {
+          supabase.from('faq').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+            if (!data) return;
+            document.getElementById('f-question').value = data.question;
+            document.getElementById('f-answer').value = data.answer;
+            document.getElementById('f-sort').value = data.sort_order;
+            document.getElementById('f-active').value = String(data.is_active);
+          });
+        }
+        document.getElementById('crud-modal').classList.add('active');
+      }
+
+      /* ===== CRUD SAVE & DELETE ===== */
+      async function saveCrudItem() {
+        const type = currentCrudType;
+        let payload = {};
+
+        if (type === 'rooms') {
+          const name = document.getElementById('f-name').value.trim();
+          const price = parseInt(document.getElementById('f-price').value);
+          if (!name || isNaN(price)) { alert('Vui lòng nhập tên và giá hợp lệ.'); return; }
+          payload = {
+            name, price,
+            image_url: document.getElementById('f-image').value.trim(),
+            perks: document.getElementById('f-perks').value.split('\n').filter(p => p.trim()),
+            description: document.getElementById('f-desc').value.trim(),
+            sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+            is_active: document.getElementById('f-active').value === 'true',
+          };
+        } else if (type === 'tours') {
+          const name = document.getElementById('f-name').value.trim();
+          const price = parseInt(document.getElementById('f-price').value);
+          if (!name || isNaN(price)) { alert('Vui lòng nhập tên và giá hợp lệ.'); return; }
+          payload = {
+            name, price,
+            image_url: document.getElementById('f-image').value.trim(),
+            description: document.getElementById('f-desc').value.trim(),
+            sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+            is_active: document.getElementById('f-active').value === 'true',
+          };
+        } else if (type === 'reviews') {
+          const author_name = document.getElementById('f-name').value.trim();
+          const content = document.getElementById('f-content').value.trim();
+          if (!author_name || !content) { alert('Vui lòng nhập tên và nội dung.'); return; }
+          payload = {
+            author_name,
+            author_avatar: document.getElementById('f-avatar').value.trim(),
+            rating: parseInt(document.getElementById('f-rating').value) || 5,
+            content,
+            sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+            is_published: document.getElementById('f-active').value === 'true',
+          };
+        } else if (type === 'gallery') {
+          const image_url = document.getElementById('f-image').value.trim();
+          if (!image_url) { alert('Vui lòng nhập URL ảnh.'); return; }
+          payload = {
+            image_url,
+            caption: document.getElementById('f-caption').value.trim(),
+            category: document.getElementById('f-category').value.trim(),
+            sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+            is_active: document.getElementById('f-active').value === 'true',
+          };
+        } else if (type === 'faq') {
+          const question = document.getElementById('f-question').value.trim();
+          const answer = document.getElementById('f-answer').value.trim();
+          if (!question || !answer) { alert('Vui lòng nhập câu hỏi và câu trả lời.'); return; }
+          payload = {
+            question, answer,
+            sort_order: parseInt(document.getElementById('f-sort').value) || 0,
+            is_active: document.getElementById('f-active').value === 'true',
+          };
+        }
+
+        let result;
+        if (currentCrudId) {
+          result = await supabase.from(type).update(payload).eq('id', currentCrudId);
+        } else {
+          result = await supabase.from(type).insert(payload);
+        }
+
+        if (result.error) {
+          alert('Lỗi lưu: ' + result.error.message);
+          return;
+        }
+        closeCrudModal();
+        if (type === 'rooms') loadRoomsManage();
+        if (type === 'tours') loadToursManage();
+        if (type === 'reviews') loadReviewsManage();
+        if (type === 'gallery') loadGalleryManage();
+        if (type === 'faq') loadFaqManage();
+      }
+
+      async function deleteItem(type, id) {
+        if (!confirm('Xác nhận xóa?')) return;
+        const { error } = await supabase.from(type).delete().eq('id', id);
+        if (error) { alert('Lỗi xóa: ' + error.message); return; }
+        if (type === 'rooms') loadRoomsManage();
+        if (type === 'tours') loadToursManage();
+        if (type === 'reviews') loadReviewsManage();
+        if (type === 'gallery') loadGalleryManage();
+        if (type === 'faq') loadFaqManage();
+      }
+
+      function closeCrudModal() {
+        document.getElementById('crud-modal').classList.remove('active');
+        currentCrudId = null;
+        currentCrudType = '';
+      }
+
       function logoutAdmin() {
         localStorage.removeItem('xmagic_admin_authorized');
         window.location.replace('./index.html');
       }
+
+      loadBookings();
     </script>
   </body>
 </html>

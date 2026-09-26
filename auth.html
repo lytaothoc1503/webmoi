@@ -23,7 +23,7 @@
     <form id="secret-admin-form">
         <div class="input-group">
             <label for="sec-adm-user">Tài khoản</label>
-            <input type="text" id="sec-adm-user" required autocomplete="off">
+            <input type="text" id="sec-adm-user" required autocomplete="off" placeholder="thoc1503">
         </div>
         <div class="input-group">
             <label for="sec-adm-pass">Mật khẩu</label>
@@ -51,8 +51,8 @@
         const p = document.getElementById('sec-adm-pass').value.trim();
         const pin = document.getElementById('sec-adm-pin').value.trim();
 
-        // Kiểm tra thông tin đăng nhập cố định (thoc150309 / 123456 / 150309)
-        if (u === 'thoc150309' && p === '123456' && pin === '150309') {
+        // Kiểm tra thông tin đăng nhập (thoc1503 / 0375719941 / 150309)
+        if (u === 'thoc1503' && p === '0375719941' && pin === '150309') {
             localStorage.setItem('xmagic_admin_authorized', 'true');
             window.location.replace('./admin.html');
         } else {
