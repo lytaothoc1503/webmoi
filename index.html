@@ -1271,7 +1271,7 @@
     <script>
       const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       let currentRoomPrice = 0;
       let pendingBookingPayload = null;
@@ -1333,7 +1333,7 @@
 
       /* ===== LOAD DYNAMIC DATA ===== */
       async function loadRooms() {
-        const { data, error } = await supabase.from('rooms').select('*').eq('is_active', true).order('sort_order');
+        const { data, error } = await supabaseClient.from('rooms').select('*').eq('is_active', true).order('sort_order');
         if (error || !data || data.length === 0) return;
         roomsData = data;
         const grid = document.getElementById('rooms-grid');
@@ -1351,7 +1351,7 @@
       }
 
       async function loadTours() {
-        const { data, error } = await supabase.from('tours').select('*').eq('is_active', true).order('sort_order');
+        const { data, error } = await supabaseClient.from('tours').select('*').eq('is_active', true).order('sort_order');
         if (error || !data || data.length === 0) return;
         toursData = data;
         const grid = document.getElementById('tours-grid');
@@ -1368,7 +1368,7 @@
       }
 
       async function loadGallery() {
-        const { data, error } = await supabase.from('gallery').select('*').eq('is_active', true).order('sort_order');
+        const { data, error } = await supabaseClient.from('gallery').select('*').eq('is_active', true).order('sort_order');
         if (error || !data || data.length === 0) return;
         const grid = document.getElementById('gallery-grid');
         grid.innerHTML = data.map(g => `
@@ -1379,7 +1379,7 @@
       }
 
       async function loadReviews() {
-        const { data, error } = await supabase.from('reviews').select('*').eq('is_published', true).order('sort_order');
+        const { data, error } = await supabaseClient.from('reviews').select('*').eq('is_published', true).order('sort_order');
         if (error || !data || data.length === 0) return;
         const grid = document.getElementById('reviews-grid');
         grid.innerHTML = data.map(r => `
@@ -1396,7 +1396,7 @@
       }
 
       async function loadFAQ() {
-        const { data, error } = await supabase.from('faq').select('*').eq('is_active', true).order('sort_order');
+        const { data, error } = await supabaseClient.from('faq').select('*').eq('is_active', true).order('sort_order');
         if (error || !data || data.length === 0) return;
         const list = document.getElementById('faq-list');
         list.innerHTML = data.map(f => `
@@ -1589,7 +1589,7 @@
         btn.disabled = true;
         btn.textContent = 'ĐANG LƯU DỮ LIỆU...';
 
-        supabase.from('bookings').insert(pendingBookingPayload).then(({ error }) => {
+        supabaseClient.from('bookings').insert(pendingBookingPayload).then(({ error }) => {
           if (error) {
             alert('Lỗi kết nối máy chủ: ' + error.message);
             btn.disabled = false;
@@ -1615,7 +1615,7 @@
           return;
         }
 
-        const { data, error } = await supabase.from('bookings')
+        const { data, error } = await supabaseClient.from('bookings')
           .select('*').eq('booking_code', code).eq('phone', phone).maybeSingle();
 
         if (error || !data) {

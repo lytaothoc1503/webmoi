@@ -262,7 +262,7 @@
 
       const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
       const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
-      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       let allBookings = [];
       let revenueChart = null;
@@ -283,7 +283,7 @@
 
       /* ===== BOOKINGS ===== */
       function loadBookings() {
-        supabase.from('bookings').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
+        supabaseClient.from('bookings').select('*').order('created_at', { ascending: false }).then(({ data, error }) => {
           if (error) { console.error('Lỗi tải:', error.message); return; }
           allBookings = data || [];
           populateRoomFilter();
@@ -292,7 +292,7 @@
         });
       }
 
-      supabase.channel('bookings-changes').on('postgres_changes', { event: '*', table: 'bookings' }, () => {
+      supabaseClient.channel('bookings-changes').on('postgres_changes', { event: '*', table: 'bookings' }, () => {
         loadBookings();
       }).subscribe();
 
@@ -391,14 +391,14 @@
       }
 
       function updateStatus(id, newStatus) {
-        supabase.from('bookings').update({ status: newStatus }).eq('id', id).then(({ error }) => {
+        supabaseClient.from('bookings').update({ status: newStatus }).eq('id', id).then(({ error }) => {
           if (error) alert('Lỗi cập nhật: ' + error.message);
         });
       }
 
       function deleteBooking(id) {
         if (confirm('Xác nhận xóa đơn đặt phòng này?')) {
-          supabase.from('bookings').delete().eq('id', id).then(({ error }) => {
+          supabaseClient.from('bookings').delete().eq('id', id).then(({ error }) => {
             if (error) alert('Lỗi xóa: ' + error.message);
           });
         }
@@ -423,7 +423,7 @@
 
       /* ===== ROOMS CRUD ===== */
       async function loadRoomsManage() {
-        const { data } = await supabase.from('rooms').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('rooms').select('*').order('sort_order');
         const grid = document.getElementById('rooms-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có hạng phòng.</p>'; return; }
         grid.innerHTML = data.map(r => `
@@ -454,7 +454,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabase.from('rooms').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('rooms').select('*').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-name').value = data.name;
             document.getElementById('f-price').value = data.price;
@@ -470,7 +470,7 @@
 
       /* ===== TOURS CRUD ===== */
       async function loadToursManage() {
-        const { data } = await supabase.from('tours').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('tours').select('*').order('sort_order');
         const grid = document.getElementById('tours-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có tour.</p>'; return; }
         grid.innerHTML = data.map(t => `
@@ -500,7 +500,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabase.from('tours').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('tours').select('*').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-name').value = data.name;
             document.getElementById('f-price').value = data.price;
@@ -515,7 +515,7 @@
 
       /* ===== REVIEWS CRUD ===== */
       async function loadReviewsManage() {
-        const { data } = await supabase.from('reviews').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('reviews').select('*').order('sort_order');
         const grid = document.getElementById('reviews-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có đánh giá.</p>'; return; }
         grid.innerHTML = data.map(r => `
@@ -545,7 +545,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabase.from('reviews').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('reviews').select('*').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-name').value = data.author_name;
             document.getElementById('f-avatar').value = data.author_avatar || '';
@@ -560,7 +560,7 @@
 
       /* ===== GALLERY CRUD ===== */
       async function loadGalleryManage() {
-        const { data } = await supabase.from('gallery').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('gallery').select('*').order('sort_order');
         const grid = document.getElementById('gallery-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có ảnh.</p>'; return; }
         grid.innerHTML = data.map(g => `
@@ -589,7 +589,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabase.from('gallery').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('gallery').select('*').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-image').value = data.image_url;
             document.getElementById('f-caption').value = data.caption || '';
@@ -603,7 +603,7 @@
 
       /* ===== FAQ CRUD ===== */
       async function loadFaqManage() {
-        const { data } = await supabase.from('faq').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('faq').select('*').order('sort_order');
         const grid = document.getElementById('faq-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có câu hỏi.</p>'; return; }
         grid.innerHTML = data.map(f => `
@@ -631,7 +631,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabase.from('faq').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('faq').select('*').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-question').value = data.question;
             document.getElementById('f-answer').value = data.answer;
@@ -705,9 +705,9 @@
 
         let result;
         if (currentCrudId) {
-          result = await supabase.from(type).update(payload).eq('id', currentCrudId);
+          result = await supabaseClient.from(type).update(payload).eq('id', currentCrudId);
         } else {
-          result = await supabase.from(type).insert(payload);
+          result = await supabaseClient.from(type).insert(payload);
         }
 
         if (result.error) {
@@ -724,7 +724,7 @@
 
       async function deleteItem(type, id) {
         if (!confirm('Xác nhận xóa?')) return;
-        const { error } = await supabase.from(type).delete().eq('id', id);
+        const { error } = await supabaseClient.from(type).delete().eq('id', id);
         if (error) { alert('Lỗi xóa: ' + error.message); return; }
         if (type === 'rooms') loadRoomsManage();
         if (type === 'tours') loadToursManage();
