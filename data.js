@@ -1,18 +1,18 @@
 /* ====== DỮ LIỆU CÓ SẴN CHO WEB (dùng khi chưa nối Supabase) ======
-   price: 0 nghĩa là "Liên hệ báo giá". Ảnh mẫu lấy từ Unsplash — nên thay bằng ảnh thật của nhà.
+   GIÁ HIỆN LÀ GIÁ MẪU (đơn vị VNĐ), hãy sửa đúng giá thật của nhà. price: 0 nghĩa là "Liên hệ báo giá". Ảnh mẫu lấy từ Unsplash — nên thay bằng ảnh thật của nhà.
    Cách thay ảnh: bỏ ảnh vào thư mục images/ rồi đổi thành 'images/ten-anh.jpg'.
    Các mục ghi "MẪU" là nội dung tạm, hãy sửa cho đúng thực tế trước khi nhận khách. */
 const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 window.SITE_DATA = {
   rooms: [
-    { name: 'Phòng Đôi Gỗ View Thung Lũng', price: 0, image_url: U('1505691938895-1758d7feb511'), perks: ['Không gian gỗ ấm cúng', 'Ngắm mây từ khung cửa', 'Chăn đệm ấm cho đêm núi'] }, // MẪU
-    { name: 'Phòng Gia Đình', price: 0, image_url: U('1522708323590-d24dbb6b0267'), perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] }, // MẪU
-    { name: 'Giường Tập Thể (Dorm)', price: 0, image_url: U('1618773928121-c32242e63f39'), perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] }, // MẪU
+    { name: 'Phòng Đôi Gỗ View Thung Lũng', price: 850000, image_url: U('1505691938895-1758d7feb511'), perks: ['Không gian gỗ ấm cúng', 'Ngắm mây từ khung cửa', 'Chăn đệm ấm cho đêm núi'] }, // MẪU
+    { name: 'Phòng Gia Đình', price: 1600000, image_url: U('1522708323590-d24dbb6b0267'), perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] }, // MẪU
+    { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: U('1618773928121-c32242e63f39'), perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] }, // MẪU
   ],
   tours: [
-    { name: 'Săn Mây Bình Minh', price: 0, image_url: U('1500530855697-b586d89ba3ee'), description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.' },
-    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 0, image_url: U('1464822759023-fed622ff2c3b'), description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.' },
-    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 0, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.' },
+    { name: 'Săn Mây Bình Minh', price: 300000, image_url: U('1500530855697-b586d89ba3ee'), description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.' },
+    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: U('1464822759023-fed622ff2c3b'), description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.' },
+    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.' },
   ],
   gallery: [
     { image_url: U('1469474968028-56623f02e42e', 1000), caption: 'Tà Xùa buổi sớm' },

@@ -263,25 +263,39 @@ let currentOrder = null;
 function openOrderView(o) { currentOrder = o; renderOrderView(); showStep(2); $('booking-modal').classList.add('active'); }
 function renderOrderView() {
   const o = currentOrder, st = normStatus(o.status), total = Number(o.total) || 0;
+  const money2 = (n) => Number(n).toLocaleString('vi-VN') + ' đ';
+  const hasQR = bankOn() && total > 0;
+  const hours = '<small>Nhà hỗ trợ 24/7. Nhắn tin bất cứ lúc nào, nhà sẽ phản hồi sớm nhất.</small>';
+  const contactOthers = [C.phone ? `<a href="tel:${esc(C.phone)}">📞 ${esc(C.phone)}</a>` : '', C.zalo ? `<a href="${esc(chref('zalo'))}" target="_blank" rel="noopener">Zalo</a>` : ''].filter(Boolean).join(' · ');
   let body = '';
   if (st === ST.WAIT) {
-    if (bankOn() && total > 0) {
+    if (hasQR) {
       const qr = `https://api.vietqr.io/image/${encodeURIComponent(S.bank.bankId)}-${encodeURIComponent(S.bank.accountNo)}-compact2.png?amount=${total}&addInfo=${encodeURIComponent(o.tcode || o.code)}&accountName=${encodeURIComponent(S.bank.accountName)}`;
-      body = `<h4 class="ov-h">THÔNG TIN THANH TOÁN GIỮ CHỖ</h4><div class="qr-container"><img src="${esc(qr)}" alt="VietQR" /></div>
-        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr><tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr><tr><td>Số tiền:</td><td style="font-weight:bold">${total.toLocaleString('vi-VN')} đ</td></tr><tr><td>Nội dung CK:</td><td style="font-family:monospace;font-weight:bold">${esc(o.tcode || o.code)}</td></tr></table>
-        <button type="button" class="btn-submit-booking" data-ov="paid">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>`;
+      body = `<h4 class="ov-h">QUÉT MÃ QR ĐỂ HOÀN TẤT ĐẶT PHÒNG</h4><p class="ov-sub">Vui lòng quét mã QR chuyển khoản giữ chỗ qua tài khoản nhà:</p>
+        <div class="qr-container"><img src="${esc(qr)}" alt="VietQR" /></div>
+        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr><tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr><tr><td>Số tiền:</td><td style="font-weight:bold;color:#059669">${money2(total)}</td></tr><tr><td>Cú pháp:</td><td style="font-family:monospace;font-weight:bold">${esc(o.tcode || o.code)}</td></tr></table>
+        <button type="button" class="btn-submit-booking" data-ov="paid">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
+        <div class="ov-card"><strong>Chưa muốn thanh toán ngay?</strong><p>Đơn đã được lưu vào lịch sử của bạn. Bạn có thể xem lại, thanh toán sau hoặc trao đổi thêm với nhà trước khi chuyển khoản.</p>
+          <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử, thanh toán sau</button><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button></div></div>`;
     } else {
-      body = `<div class="pay-note">${total > 0 ? 'Thông tin thanh toán sẽ được nhà gửi cho bạn qua Facebook.' : 'Nhà sẽ báo giá và gửi thông tin thanh toán cho bạn qua Facebook hoặc điện thoại.'} Bạn hãy nhắn kèm <strong>mã đơn</strong>.</div>`;
+      body = `<div class="pay-note">Mức giá hoặc thông tin thanh toán của dịch vụ này sẽ được nhà gửi cho bạn qua Messenger. Bạn hãy nhắn kèm <strong>mã đơn</strong>.</div>
+        <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử</button></div>`;
     }
+    body += `<div class="ov-card support"><strong>🕑 Liên hệ homestay 24/7</strong><p>Cần hỏi thêm về phòng, giá, đưa đón hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.</p>${hours}${contactOthers ? `<div class="ov-others">${contactOthers}</div>` : ''}</div>`;
+  } else if (st === ST.PAID) {
+    body = `<div class="pay-note ok">Đã ghi nhận bạn chuyển khoản. Nhà đang đối chiếu giao dịch.</div>
+      <div class="ov-card confirm"><strong>📄 Nhận phiếu xác nhận dịch vụ chính thức</strong><p>Liên hệ homestay qua Messenger kèm <strong>mã đơn ${esc(o.code)}</strong> và ảnh chụp giao dịch. Nhà sẽ gửi phiếu xác nhận dịch vụ chính thức cho bạn.</p>
+      <button type="button" class="btn-send-fb" data-ov="fb">LIÊN HỆ HOMESTAY ĐỂ NHẬN PHIẾU XÁC NHẬN</button>${hours}</div>`;
+  } else if (st === ST.OK) {
+    body = `<div class="pay-note ok">${esc(STMSG[st])}${o.note ? '<br><em>' + esc(o.note) + '</em>' : ''}</div>
+      <div class="ov-card confirm"><strong>📄 Phiếu xác nhận dịch vụ chính thức</strong><p>Liên hệ homestay qua Messenger kèm mã đơn <strong>${esc(o.code)}</strong> để nhận phiếu.</p><button type="button" class="btn-send-fb" data-ov="fb">LIÊN HỆ HOMESTAY ĐỂ NHẬN PHIẾU XÁC NHẬN</button></div>`;
   } else {
     body = `<div class="pay-note ${st === ST.CANCEL ? 'bad' : 'ok'}">${esc(STMSG[st] || '')}${o.note ? '<br><em>' + esc(o.note) + '</em>' : ''}</div>`;
   }
   $('order-view').innerHTML = `<div class="booking-code-display">MÃ ĐƠN CỦA BẠN: <strong>${esc(o.code)}</strong><br>Hãy lưu mã này để tra cứu tình trạng đơn</div>
     <div style="text-align:center;margin:8px 0"><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
-    <p class="ov-sum">${esc(o.room)} · ${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))} · ${total > 0 ? total.toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}</p>
+    <p class="ov-sum">${esc(o.room)} · ${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))} · ${total > 0 ? money2(total) : 'Chờ báo giá'}</p>
     ${body}
-    <div class="ov-info">Sau khi nhà xác nhận thanh toán, <strong>phiếu xác nhận dịch vụ chính thức</strong> sẽ được gửi cho bạn qua Facebook của nhà.</div>
-    <button type="button" class="btn-send-fb" data-ov="fb">NHẮN FACEBOOK GỬI MINH CHỨNG / NHẬN PHIẾU XÁC NHẬN</button>
     <div class="ov-links"><a href="#" data-ov="copy">Sao chép nội dung đơn</a><a href="#" data-ov="track">Xem tình trạng đơn</a></div>`;
 }
 $('order-view').addEventListener('click', async (e) => {
@@ -289,6 +303,7 @@ $('order-view').addEventListener('click', async (e) => {
   const o = currentOrder; if (!o) return;
   const act = b.dataset.ov;
   if (act === 'fb') sendViaFacebook(o);
+  else if (act === 'later') { closeBookingModal(); toast('Đã lưu đơn ' + o.code + ' vào lịch sử. Bạn có thể thanh toán sau.'); $('tra-cuu-don').scrollIntoView(); }
   else if (act === 'copy') { toast((await copyText(orderText(o))) ? 'Đã sao chép nội dung đơn' : 'Không sao chép được'); }
   else if (act === 'track') { closeBookingModal(); $('tra-cuu-don').scrollIntoView(); refreshHistory(); }
   else if (act === 'paid') await markPaid(o, b);
