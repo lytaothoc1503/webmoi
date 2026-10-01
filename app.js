@@ -43,9 +43,15 @@ function toast(msg) {
 const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['hang-phong', 'Hạng Phòng'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
+const NAV_MORE = ['tour-ta-xua', 'khach-noi', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
+function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
+document.addEventListener('click', () => document.querySelectorAll('.nav-more.open').forEach((li) => li.classList.remove('open')));
 function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden); }
 function buildNav() {
-  const links = visibleSections().map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('');
+  const vs = visibleSections();
+  const main = vs.filter(([id]) => !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
+  const links = main.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')
+    + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Khám Phá Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
   $('nav-links').innerHTML = links + accountNavHtml() + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
   $('mobile-nav').innerHTML = visibleSections().map(([id, l]) => `<a href="#${id}" data-sec="${id}" onclick="closeMobileNav()">${l}</a>`).join('')
     + (currentUser ? `<a href="javascript:void(0)" onclick="closeMobileNav(); signOutUser()">Đăng xuất</a>` : (db ? `<a href="javascript:void(0)" onclick="closeMobileNav(); openAuthModal()">Đăng nhập / Đăng ký</a>` : ''))
@@ -62,6 +68,7 @@ function spy() {
   document.title = cur === 'trang-chu' ? `${S.name} | ${S.slogan}` : `${label} | ${S.name}`;
   history.replaceState(null, '', '#' + cur);
   document.querySelectorAll('[data-sec]').forEach((a) => a.classList.toggle('active', a.dataset.sec === cur));
+  document.querySelectorAll('.nav-more').forEach((li) => li.querySelector('.nav-more-btn').classList.toggle('active', NAV_MORE.includes(cur)));
 }
 let spyTick = false;
 window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(() => { spy(); spyTick = false; }); } }, { passive: true });

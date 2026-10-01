@@ -907,10 +907,18 @@
       .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
       .brand-logo-text { font-size: 20px; text-transform: none; white-space: nowrap; }
       .brand-sub { white-space: nowrap; }
-      .nav-links { gap: 16px; }
+      .nav-links { gap: 14px; }
+      .nav-more { position: relative; }
+      .nav-more-btn { cursor: pointer; }
+      .nav-more-btn .caret { font-size: 10px; margin-left: 2px; }
+      .nav-dropdown { display: none; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 14px; min-width: 190px; list-style: none; background: var(--nav-brown); border-radius: 12px; padding: 8px; box-shadow: 0 12px 28px rgba(0,0,0,.28); z-index: 1100; }
+      .nav-dropdown::before { content: ''; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
+      .nav-dropdown a { display: block; padding: 10px 14px; border-radius: 8px; }
+      .nav-dropdown a:hover { background: rgba(255,255,255,.08); }
+      .nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown, .nav-more:focus-within .nav-dropdown { display: block; }
       .nav-links a { white-space: nowrap; font-size: 12.5px; }
       .nav-links a.active, .mobile-nav a.active { color: var(--accent-orange); }
-      @media (max-width: 1240px) { .nav-links { display: none; } .hamburger { display: flex; } }
+      @media (max-width: 1160px) { .nav-links { display: none; } .hamburger { display: flex; } }
       .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
       .btn-hero-ghost { background: transparent; border: 2px solid #fff; text-decoration: none; display: inline-block; }
       .btn-hero-ghost:hover { background: rgba(255, 255, 255, 0.15); }
