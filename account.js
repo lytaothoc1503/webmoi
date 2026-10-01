@@ -1,6 +1,15 @@
 /* ===== TÀI KHOẢN KHÁCH: đăng ký / đăng nhập bằng SỐ ĐIỆN THOẠI (không cần mã xác nhận), Facebook, Google ===== */
 /* Đăng ký chạy qua Edge Function 'customer-signup' (supabase/functions/customer-signup): tạo tài khoản đã xác nhận sẵn, tên đăng nhập = SĐT. */
 let authMode = 'login';
+let tsWidget = null, tsToken = '';
+function setupTurnstile() { // chống bot khi đăng ký, chỉ bật khi config.js có turnstileSiteKey
+  const key = S.turnstileSiteKey, box = $('auth-ts');
+  if (!key || !box) return;
+  const render = () => { if (tsWidget !== null) { try { window.turnstile.reset(tsWidget); } catch (e) {} tsToken = ''; return; }
+    tsWidget = window.turnstile.render(box, { sitekey: key, callback: t => { tsToken = t; }, 'expired-callback': () => { tsToken = ''; }, 'error-callback': () => { tsToken = ''; } }); };
+  if (window.turnstile) render();
+  else if (!document.getElementById('ts-js')) { const sc = document.createElement('script'); sc.id = 'ts-js'; sc.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'; sc.async = true; sc.onload = render; document.head.appendChild(sc); }
+}
 const AUTH_INFO = {
   login: 'Đăng nhập bằng số điện thoại để đặt phòng và xem lịch sử đơn trên mọi thiết bị.',
   signup: 'Tạo tài khoản để tích lũy điểm thưởng và quản lý đơn đặt phòng.',
@@ -24,6 +33,7 @@ function authErr(err) {
 const authMsg = (t, ok) => { const e = $('auth-msg'); e.textContent = t || ''; e.className = 'auth-msg' + (ok ? ' ok' : ''); };
 function setAuthMode(m) {
   authMode = m;
+  if (m === 'signup') setTimeout(setupTurnstile, 0);
   document.querySelectorAll('#auth-form [data-m]').forEach((el) => { el.hidden = !el.dataset.m.split(' ').includes(m); });
   $('auth-tabs').hidden = !(m === 'login' || m === 'signup');
   $('auth-tab-login').classList.toggle('on', m === 'login'); $('auth-tab-signup').classList.toggle('on', m === 'signup');
@@ -69,7 +79,8 @@ $('auth-form').addEventListener('submit', async (e) => {
       if (r.error) { authMsg(authErr(r.error)); return; }
       doneAuth('Đăng nhập thành công');
     } else if (authMode === 'signup') {
-      const body = { phone, name: $('auth-name').value.trim(), password };
+      if (S.turnstileSiteKey && !tsToken) { authMsg('Vui lòng tích ô xác minh "Bạn không phải robot" rồi bấm lại nhé.'); return; }
+      const body = { phone, name: $('auth-name').value.trim(), password, ts: tsToken };
       if ($('auth-year').value.trim()) body.year = Number($('auth-year').value);
       let res, out = {};
       try {
@@ -77,7 +88,8 @@ $('auth-form').addEventListener('submit', async (e) => {
         out = await res.json().catch(() => ({}));
       } catch (e2) { authMsg('Mất kết nối mạng, bạn thử lại nhé.'); return; }
       if (!res.ok) {
-        const M = { exists: 'Số điện thoại này đã có tài khoản. Hãy chuyển sang tab ĐĂNG NHẬP.', rate: 'Bạn thao tác hơi nhanh, vui lòng đợi vài phút rồi thử lại.', bad_phone: 'Số điện thoại chưa đúng.', bad_name: 'Vui lòng nhập họ và tên.', bad_password: 'Mật khẩu cần từ 6 đến 72 ký tự.', bad_year: 'Năm sinh chưa hợp lệ (hoặc để trống).' };
+        if (tsWidget !== null) { try { window.turnstile.reset(tsWidget); } catch (e3) {} tsToken = ''; }
+        const M = { exists: 'Số điện thoại này đã có tài khoản. Hãy chuyển sang tab ĐĂNG NHẬP.', rate: 'Bạn thao tác hơi nhanh, vui lòng đợi vài phút rồi thử lại.', bad_phone: 'Số điện thoại chưa đúng.', bad_name: 'Vui lòng nhập họ và tên.', bad_password: 'Mật khẩu cần từ 6 đến 72 ký tự.', bot: 'Xác minh chưa thành công, vui lòng thử lại.', bad_year: 'Năm sinh chưa hợp lệ (hoặc để trống).' };
         authMsg(M[out.code] || 'Chưa tạo được tài khoản lúc này, bạn thử lại hoặc nhắn nhà qua Messenger nhé.'); return;
       }
       if (pendingBooking) { // đang dở đơn đặt: vào luôn để đặt tiếp, không làm mất form

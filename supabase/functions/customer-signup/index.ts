@@ -13,6 +13,12 @@ Deno.serve(async (req) => {
   let b: Record<string, unknown>; try { b = await req.json(); } catch { return json({ code: "bad_request" }, 400); }
   let phone = String(b.phone || "").replace(/[\s.\-()]/g, "");
   if (phone.startsWith("+84")) phone = "0" + phone.slice(3); else if (phone.startsWith("84") && phone.length === 11) phone = "0" + phone.slice(2);
+  const tsSecret = Deno.env.get("TURNSTILE_SECRET"); // đặt secret này để bật chống bot; chưa đặt = bỏ qua
+  if (tsSecret) {
+    const f = new URLSearchParams({ secret: tsSecret, response: String(b.ts || ""), remoteip: ip });
+    const v = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: f }).then((r) => r.json()).catch(() => ({ success: false }));
+    if (!v.success) return json({ code: "bot" }, 400);
+  }
   const name = String(b.name || "").trim(), password = String(b.password || ""), year = b.year ? Number(b.year) : null;
   if (!/^0\d{9}$/.test(phone)) return json({ code: "bad_phone" }, 400);
   if (name.length < 2 || name.length > 80) return json({ code: "bad_name" }, 400);
