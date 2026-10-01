@@ -197,9 +197,9 @@ const STMSG = {
 };
 const vdate = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s.split('-').reverse().join('/') : s || '');
 function newCode() {
-  const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', d = new Date(), r = new Uint32Array(4);
+  const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = new Uint32Array(8);
   (window.crypto || window.msCrypto).getRandomValues(r);
-  return 'NA' + String(d.getFullYear()).slice(2) + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + [...r].map((n) => a[n % a.length]).join('');
+  return 'NA' + [...r].map((n) => a[n % a.length]).join(''); // 8 ký tự ngẫu nhiên: đủ dài để không thể đoán mò
 }
 
 /* ===== LIÊN HỆ QUA FACEBOOK ===== */
@@ -223,9 +223,11 @@ function sendViaFacebook(o) {
 }
 
 /* ===== LỊCH SỬ ĐƠN TRÊN THIẾT BỊ ===== */
-const LS_KEY = 'na_orders';
-function getLocal() { try { const a = JSON.parse(localStorage.getItem(LS_KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
-function setLocal(a) { try { localStorage.setItem(LS_KEY, JSON.stringify(a.slice(0, 20))); } catch (e) { /* bỏ qua */ } }
+/* Lịch sử đơn thuộc về TÀI KHOẢN đang đăng nhập (mỗi người một ngăn riêng). Chưa đăng nhập thì không có lịch sử. */
+const lsKey = () => (currentUser ? 'na_orders:' + (currentUser.id || 'u') : (db ? '' : 'na_orders:local'));
+try { localStorage.removeItem('na_orders'); } catch (e) { /* bỏ lịch sử công khai kiểu cũ */ }
+function getLocal() { const k = lsKey(); if (!k) return []; try { const a = JSON.parse(localStorage.getItem(k) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+function setLocal(a) { const k = lsKey(); if (!k) return; try { localStorage.setItem(k, JSON.stringify(a.slice(0, 20))); } catch (e) { /* bỏ qua */ } }
 function saveOrder(o) { const a = getLocal().filter((x) => x.code !== o.code); a.unshift(o); setLocal(a); }
 function updateLocal(code, patch) { const a = getLocal(); const o = a.find((x) => x.code === code); if (o) { Object.assign(o, patch); setLocal(a); } return o; }
 
@@ -324,7 +326,8 @@ async function markPaid(o, btn) {
 }
 
 /* ===== TRA CỨU ĐƠN + LỊCH SỬ ===== */
-function orderCard(o) {
+function orderCard(o, opt) {
+  opt = opt || {};
   const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL, c = esc(o.code);
   const steps = STEPS.map((l, i) => `<li class="${!cancel && r >= i ? 'done' : ''}${!cancel && r === i ? ' now' : ''}"><span>${i + 1}</span>${l}</li>`).join('');
   const act = [];
@@ -335,7 +338,7 @@ function orderCard(o) {
     else if (o.review === 'pending') act.push('<span class="oc-chip">Đánh giá đang chờ nhà duyệt</span>');
     else if (db) act.push(`<button class="oc-btn" data-act="review" data-code="${c}">Viết đánh giá</button>`);
   }
-  act.push(`<button class="oc-link" data-act="remove" data-code="${c}">Xóa khỏi lịch sử</button>`);
+  if (!opt.lookup) act.push(`<button class="oc-link" data-act="remove" data-code="${c}">Xóa khỏi lịch sử</button>`);
   const note = o.gone ? 'Không tìm thấy đơn này trên hệ thống của nhà (có thể đã được xóa).' : !o.synced && !db ? 'Đơn lưu trên thiết bị này. Hãy nhắn Facebook của nhà kèm mã đơn để được xác nhận.' : STMSG[st] || '';
   return `<div class="oc ${cancel ? 'is-cancel' : ''}"><div class="oc-head"><div><strong class="oc-code">${c}</strong><small>${esc(vdate((o.created || '').slice(0, 10)))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
     <div class="oc-body"><strong>${esc(o.room)}</strong><br>${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))}${o.guests ? ' · ' + esc(o.guests) : ''} · ${Number(o.total) > 0 ? Number(o.total).toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}</div>
@@ -345,7 +348,8 @@ function orderCard(o) {
 }
 function renderHistory() {
   const list = getLocal(), box = $('order-history');
-  box.innerHTML = list.length ? list.map(orderCard).join('') : '<div class="oh-empty">Bạn chưa có đơn nào trên thiết bị này. Sau khi đặt phòng, đơn sẽ hiện ở đây để bạn theo dõi. Nếu đặt từ thiết bị khác, hãy nhập Mã đơn và Số điện thoại ở trên.</div>';
+  if (db && !currentUser) { box.innerHTML = '<div class="oh-empty">Lịch sử đặt phòng là riêng tư, mỗi người chỉ xem được đơn của chính mình.<br><button type="button" class="oc-btn primary" style="margin-top:12px" onclick="openAuthModal()">Đăng nhập để xem lịch sử đơn</button><br><small>Có mã đơn? Nhập vào ô tra cứu phía trên, không cần đăng nhập.</small></div>'; return; }
+  box.innerHTML = list.length ? list.map(orderCard).join('') : '<div class="oh-empty">Tài khoản của bạn chưa có đơn nào. Sau khi đặt phòng, đơn sẽ hiện ở đây trên mọi thiết bị bạn đăng nhập. Có mã đơn từ nhà? Nhập vào ô tra cứu phía trên.</div>';
 }
 let refreshing = false;
 async function refreshHistory() {
@@ -361,28 +365,42 @@ async function refreshHistory() {
     const cur = getLocal(); cur.forEach((o) => { if (updates[o.code]) Object.assign(o, updates[o.code]); }); setLocal(cur);
   } finally { refreshing = false; renderHistory(); }
 }
+const lookupCache = {};
 async function trackOrder() {
   const code = $('track-code').value.trim().toUpperCase(), phone = $('track-phone').value.trim(), out = $('track-result');
-  const show = (cls, msg) => { out.className = 'track-result ' + cls + ' show'; out.textContent = msg; };
-  if (!/^[A-Z0-9]{6,20}$/.test(code) || phone.replace(/\D/g, '').length < 9) { show('notfound', 'Vui lòng nhập đúng Mã đơn và Số điện thoại đã dùng khi đặt phòng.'); return; }
+  const show = (cls, html) => { out.className = 'track-result ' + cls + ' show'; out.innerHTML = html; };
+  const digits = phone.replace(/\D/g, '');
+  if (!code && digits.length < 9) { show('notfound', 'Vui lòng nhập Mã đơn hoặc Số điện thoại đã dùng khi đặt phòng.'); return; }
+  if (code && !/^[A-Z0-9]{6,20}$/.test(code)) { show('notfound', 'Mã đơn chưa đúng định dạng. Bạn kiểm tra lại giúp nhé.'); return; }
   if (!db) { show('notfound', 'Tra cứu trực tuyến chưa được bật. Bạn hãy nhắn Facebook của nhà kèm mã đơn để được kiểm tra.'); return; }
-  let res; try { res = await db.rpc('track_booking', { p_code: code, p_phone: phone }); } catch (e) { res = { error: e }; }
+  if (code) {
+    let res; try { res = await db.rpc('track_booking', { p_code: code, p_phone: null }); } catch (e) { res = { error: e }; }
+    if (res.error) { show('notfound', 'Chưa tra cứu được lúc này, bạn vui lòng thử lại sau.'); return; }
+    const r = res.data && res.data[0];
+    if (!r) { show('notfound', 'Không tìm thấy đơn với mã này. Vui lòng kiểm tra lại Mã đơn.'); return; }
+    const o = { code: r.booking_code, phone: '', room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: r.review_status, note: r.admin_note || '', created: r.created_at, synced: true };
+    lookupCache[o.code] = o;
+    show('found', orderCard(o, { lookup: true }));
+    if (currentUser) { saveOrder(o); renderHistory(); }
+    return;
+  }
+  let res; try { res = await db.rpc('track_by_phone', { p_phone: phone }); } catch (e) { res = { error: e }; }
   if (res.error) { show('notfound', 'Chưa tra cứu được lúc này, bạn vui lòng thử lại sau.'); return; }
-  const r = res.data && res.data[0];
-  if (!r) { show('notfound', 'Không tìm thấy đơn đặt phòng. Vui lòng kiểm tra lại Mã đơn và Số điện thoại.'); return; }
-  saveOrder({ code: r.booking_code, phone, room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: r.review_status, note: r.admin_note || '', created: r.created_at, synced: true });
-  show('found', 'Đã tìm thấy đơn ' + r.booking_code + '. Xem chi tiết ở phần lịch sử bên dưới.');
-  $('track-phone').value = ''; renderHistory();
+  const rows = res.data || [];
+  if (!rows.length) { show('notfound', 'Không tìm thấy đơn nào với số điện thoại này. Bạn thử nhập Mã đơn nhé.'); return; }
+  show('found', '<div class="oc-note">Tìm thấy ' + rows.length + ' đơn với số điện thoại này. Vì lý do riêng tư, chỉ hiện thông tin tối thiểu. Hãy nhập đủ <strong>Mã đơn</strong> để xem chi tiết.</div>' + rows.map((r) => { const st = normStatus(r.status); return `<div class="oc"><div class="oc-head"><div><strong class="oc-code">${esc(r.code_hint)}</strong><small>${esc(vdate((r.created_at || '').slice(0, 10)))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div><div class="oc-body">${esc(r.room)}</div></div>`; }).join(''));
 }
-$('order-history').addEventListener('click', (e) => {
+function onOrderAction(e) {
   const b = e.target.closest('[data-act]'); if (!b) return;
-  const o = getLocal().find((x) => x.code === b.dataset.code); if (!o) return;
+  const o = getLocal().find((x) => x.code === b.dataset.code) || lookupCache[b.dataset.code]; if (!o) return;
   const act = b.dataset.act;
   if (act === 'pay') openOrderView(o);
   else if (act === 'fb') sendViaFacebook(o);
   else if (act === 'review') openReview(o);
   else if (act === 'remove' && confirm('Xóa đơn này khỏi lịch sử trên thiết bị? (Đơn vẫn được lưu ở nhà)')) { setLocal(getLocal().filter((x) => x.code !== o.code)); renderHistory(); }
-});
+}
+$('order-history').addEventListener('click', onOrderAction);
+$('track-result').addEventListener('click', onOrderAction);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshHistory(); });
 
 /* ===== VIẾT ĐÁNH GIÁ (sau khi đặt phòng thành công; hiện lên web khi nhà duyệt) ===== */
@@ -396,7 +414,7 @@ async function submitReview() {
   if (text.length < 5) { toast('Bạn hãy viết thêm vài chữ nhé'); return; }
   if (!db || !reviewFor) return;
   const btn = $('rv-send'); btn.disabled = true;
-  let res; try { res = await db.rpc('submit_review', { p_code: reviewFor.code, p_phone: reviewFor.phone, p_rating: reviewRating, p_content: text }); } catch (e) { res = { error: e }; }
+  let res; try { res = await db.rpc('submit_review', { p_code: reviewFor.code, p_phone: reviewFor.phone || '', p_rating: reviewRating, p_content: text }); } catch (e) { res = { error: e }; }
   btn.disabled = false;
   const msg = { ok: 'Cảm ơn bạn! Đánh giá sẽ hiển thị sau khi nhà duyệt.', exists: 'Bạn đã gửi đánh giá cho đơn này rồi.', not_allowed: 'Chỉ viết được đánh giá sau khi đặt phòng thành công.', not_found: 'Không tìm thấy đơn.', invalid: 'Nội dung đánh giá chưa hợp lệ.' };
   if (res.error) { toast('Chưa gửi được đánh giá, bạn thử lại sau nhé'); return; }
