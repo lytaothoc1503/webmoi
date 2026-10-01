@@ -23,5 +23,5 @@ window.SITE = {
 
   // Cơ sở dữ liệu Supabase (Project Settings > API). Chỉ dán 'Project URL' và khóa 'anon public'.
   // KHÔNG BAO GIỜ dán khóa 'service_role' vào đây. Để trống thì web dùng dữ liệu trong data.js, và đơn chỉ gửi qua Facebook.
-  supabase: { url: '', anonKey: '' },
+  supabase: { url: 'https://hkfprewiprdztmdcoxzz.supabase.co', anonKey: 'sb_publishable_PZKK2CZBNQl8vez05Db4Gg_N8Fe9qm3' },
 };
