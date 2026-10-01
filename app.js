@@ -116,6 +116,7 @@ async function loadRooms() {
     <div class="room-card">${img(r.image_url, r.name, 'room-thumb')}
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${priceHtml(r.price, '/ đêm')}</div>
+        ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
         <ul class="room-perks">${(r.perks || []).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         <button class="btn-book-room" onclick="openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button></div></div>`).join('');
 }
@@ -131,6 +132,20 @@ function setupIntroVideo() {
   const v = S.introVideo, box = $('about-media');
   if (!v || !box || !/^(images\/|https:\/\/)[^"'<>\s]+$/.test(v)) return;
   box.innerHTML = `<video src="${esc(v)}" poster="${esc(S.introPoster || '')}" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"></video>`;
+}
+function setupStoryAndHero() {
+  const st = D.story;
+  if (st && st.length && $('about-story')) {
+    $('about-story').hidden = false;
+    $('about-story').innerHTML = st.map((p) => `<p>${esc(p)}</p>`).join('') + (D.storySign ? `<span class="sign">${esc(D.storySign)}</span>` : '') + (D.storyIsSample ? '<span class="sample-tag">nội dung mẫu</span>' : '');
+  }
+  const hv = S.heroVideo, hero = $('trang-chu');
+  const saver = (navigator.connection && navigator.connection.saveData) || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  if (hv && hero && !saver && /^(images\/|https:\/\/)[^"'<>\s]+$/.test(hv)) {
+    const v = document.createElement('video');
+    v.className = 'hero-video'; v.src = hv; v.poster = S.heroPoster || ''; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; v.preload = 'metadata'; v.setAttribute('aria-hidden', 'true');
+    hero.prepend(v);
+  }
 }
 async function loadGallery() {
   const list = await getList('gallery', D.gallery, 'is_active');
@@ -286,7 +301,7 @@ function renderOrderView() {
   const o = currentOrder, st = normStatus(o.status), total = Number(o.total) || 0;
   const money2 = (n) => Number(n).toLocaleString('vi-VN') + ' đ';
   const hasQR = bankOn() && total > 0;
-  const hours = '<small>Nhà hỗ trợ 24/7. Nhắn tin bất cứ lúc nào, nhà sẽ phản hồi sớm nhất.</small>';
+  const hours = '<small>Nhà hỗ trợ 24/7. Nhắn tin bất cứ lúc nào, nhà sẽ phản hồi sớm nhất.</small> <small><a href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">Xem chính sách hoàn / hủy</a></small>';
   const contactOthers = [C.phone ? `<a href="tel:${esc(C.phone)}">📞 ${esc(C.phone)}</a>` : '', C.zalo ? `<a href="${esc(chref('zalo'))}" target="_blank" rel="noopener">Zalo</a>` : ''].filter(Boolean).join(' · ');
   let body = '';
   if (st === ST.WAIT) {
@@ -443,7 +458,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo();
+  setupIntroVideo(); setupStoryAndHero();
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);

@@ -10,6 +10,9 @@ window.SITE = {
 
   // Để trống '' = chưa có (nút hiện "Đang cập nhật"). Điền vào là web tự cập nhật.
   // Video giới thiệu (tùy chọn): bỏ file vào images/ rồi ghi 'images/video-gioi-thieu.mp4' (hoặc link .mp4). Để trống = hiện ảnh.
+  // Video banner (tùy chọn): file .mp4 ~8 giây, dưới 3MB, không tiếng, đặt trong images/. Để trống = dùng ảnh.
+  heroVideo: '',
+  heroPoster: 'images/hero-san-may.jpg',
   introVideo: '',
   introPoster: 'images/video-poster.jpg',
   contacts: {

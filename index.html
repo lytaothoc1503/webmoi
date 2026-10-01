@@ -931,6 +931,14 @@
       .cta-band h2 { font-size: 28px; margin-bottom: 8px; }
       .cta-band p { opacity: .9; margin-bottom: 22px; }
       .cta-band .btn-hero, .hero .btn-hero:not(.btn-hero-ghost) { padding: 16px 38px; font-size: 16px; }
+      .about-story { margin: 14px 0; padding: 14px 16px; border-left: 4px solid var(--accent-orange); background: #fff; border-radius: 0 12px 12px 0; font-size: 14px; color: var(--text-muted); }
+      .about-story p { margin-bottom: 8px; font-style: italic; }
+      .about-story .sign { font-weight: 700; color: var(--nav-brown); font-style: normal; }
+      .sample-tag { display: inline-block; font-size: 10.5px; background: #fff3cd; color: #8a6d00; border-radius: 6px; padding: 1px 7px; margin-left: 6px; font-style: normal; }
+      .room-specs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+      .room-specs span { font-size: 11.5px; background: #f5ebe0; color: var(--nav-brown); border-radius: 999px; padding: 3px 10px; }
+      .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+      .hero-content { position: relative; z-index: 1; }
       .sticky-book { display: none; }
       @media (max-width: 900px) { .trust-strip { grid-template-columns: repeat(2, 1fr); margin-top: -24px; } }
       @media (max-width: 768px) {
@@ -1081,6 +1089,7 @@
             Nhà của An Homestay Tà Xùa là điểm dừng chân mộc mạc giữa vùng núi Tà Xùa, Bắc Yên, Sơn La. Đây là nơi bạn gác lại bộn bề, thưởng thức một ly cà phê nóng và đón những buổi sáng mây trắng bồng bềnh ngay trước mắt.
           </p>
           <div style="margin:16px 0 4px;display:flex;gap:12px;align-items:center;background:#fff;border-radius:12px;padding:10px;box-shadow:0 4px 14px rgba(0,0,0,.07)"><img src="images/ta-xua-wta-2026.jpg" alt="Tà Xùa - Điểm đến du lịch mới nổi hàng đầu châu Á 2026" style="width:84px;height:84px;object-fit:cover;border-radius:8px" /><p style="font-size:13px;color:var(--text-muted);margin:0"><strong>Tà Xùa</strong> được World Travel Awards 2026 vinh danh là Điểm đến du lịch mới nổi hàng đầu châu Á.</p></div>
+          <div id="about-story" class="about-story" hidden></div>
           <div class="feature-item"><div class="feature-num">01</div><div><strong>Săn mây ngay gần nhà</strong><p style="font-size: 13px; color: var(--text-muted)">Dậy sớm là có thể ngắm biển mây và bình minh trên núi.</p></div></div>
           <div class="feature-item"><div class="feature-num">02</div><div><strong>Không gian gỗ ấm cúng</strong><p style="font-size: 13px; color: var(--text-muted)">Phòng nghỉ mộc mạc, gần gũi với thiên nhiên Tây Bắc.</p></div></div>
           <div class="feature-item"><div class="feature-num">03</div><div><strong>Góc cà phê thư giãn</strong><p style="font-size: 13px; color: var(--text-muted)">Một ly cà phê, một khung cảnh núi rừng và những câu chuyện chậm rãi.</p></div></div>
@@ -1306,7 +1315,7 @@
       <div class="footer-grid">
         <div class="footer-col"><h4 data-site="name"></h4><p>Điểm dừng chân mộc mạc giữa Tà Xùa, nơi bạn thức dậy cùng biển mây.</p></div>
         <div class="footer-col"><h4>ĐỊA CHỈ & LIÊN HỆ</h4><p>Địa chỉ: <span data-site="address"></span></p><div id="footer-contacts"></div></div>
-        <div class="footer-col"><h4>QUY ĐỊNH LƯU TRÚ</h4><p>• Giờ nhận phòng: <span data-site="checkin"></span></p><p>• Giờ trả phòng: <span data-site="checkout"></span></p><p>• Liên hệ trước nếu cần gửi hành lý hoặc nhận phòng sớm.</p></div>
+        <div class="footer-col"><h4>QUY ĐỊNH LƯU TRÚ</h4><p>• Giờ nhận phòng: <span data-site="checkin"></span></p><p>• Giờ trả phòng: <span data-site="checkout"></span></p><p>• Liên hệ trước nếu cần gửi hành lý hoặc nhận phòng sớm.</p><p>• <a href="chinh-sach.html#hoan-huy" style="color:inherit;text-decoration:underline">Chính sách hoàn / hủy</a></p></div>
       </div>
       <div class="copyright">© 2026 Nhà của An Homestay Tà Xùa. All rights reserved.</div>
     </footer>

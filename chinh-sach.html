@@ -14,7 +14,12 @@
 <h2>3. Lưu trữ và bảo mật</h2>
 <p>Dữ liệu được lưu trên hệ thống Supabase. Chỉ nhân viên được cấp quyền của homestay mới xem được danh sách đơn. Bạn tra cứu đơn của mình bằng mã đơn và số điện thoại đã đặt, hoặc qua tài khoản của bạn. Mật khẩu được mã hóa, nhà không đọc được mật khẩu của bạn.</p>
 <h2>4. Thanh toán và hủy đơn</h2>
-<p>Bạn chuyển khoản theo thông tin hiển thị khi đặt phòng và nhắn homestay qua Messenger để nhận phiếu xác nhận dịch vụ chính thức. Việc đặt phòng chỉ được xem là thành công khi đơn ở trạng thái "Đặt phòng thành công". Chính sách hoàn/hủy sẽ do homestay thông báo khi xác nhận đơn.</p>
+<p>Bạn chuyển khoản theo thông tin hiển thị khi đặt phòng và nhắn homestay qua Messenger để nhận phiếu xác nhận dịch vụ chính thức. Việc đặt phòng chỉ được xem là thành công khi đơn ở trạng thái "Đặt phòng thành công". Chi tiết hoàn/hủy xem ở mục bên dưới.</p>
+<h2 id="hoan-huy">Chính sách hoàn / hủy phòng <span style="font-size:12px;background:#fff3cd;color:#8a6d00;border-radius:6px;padding:2px 8px">mẫu - chủ nhà sẽ xác nhận</span></h2>
+<ul id="cancel-list"></ul>
+<p>Để hủy hoặc đổi ngày, bạn nhắn homestay qua Messenger kèm mã đơn. Tiền hoàn (nếu có) được chuyển lại về tài khoản bạn đã dùng để thanh toán trong vòng 7 ngày làm việc.</p>
+<script src="data.js"></script>
+<script>(function(){var l=(window.SITE_DATA&&SITE_DATA.cancelPolicy)||[];document.getElementById('cancel-list').innerHTML=l.map(function(t){var d=document.createElement('div');d.textContent=t;return '<li>'+d.innerHTML+'</li>';}).join('');if(window.SITE_DATA&&SITE_DATA.policyIsSample===false){var t=document.querySelector('#hoan-huy span');if(t)t.remove();}})();</script>
 <h2>5. Quyền của bạn</h2>
 <p>Bạn có quyền yêu cầu xem, chỉnh sửa hoặc xóa thông tin cá nhân bằng cách liên hệ homestay qua Facebook hoặc kênh liên hệ trên website.</p>
 <h2>6. Liên hệ</h2>
