@@ -1217,10 +1217,10 @@
         <span class="modal-close" onclick="closeAuthModal()">&times;</span>
         <h3 class="modal-title" style="margin-bottom:12px">Tài khoản của bạn</h3>
         <div class="auth-tabs"><button type="button" id="auth-tab-login" class="on" onclick="setAuthMode('login')">Đăng nhập</button><button type="button" id="auth-tab-signup" onclick="setAuthMode('signup')">Đăng ký</button></div>
-        <p class="ov-sub" style="margin:10px 0">Có tài khoản, lịch sử đơn của bạn xem được trên mọi thiết bị. Không cần mã xác nhận.</p>
+        <p class="ov-sub" style="margin:10px 0">Bạn xem web tự do. Chỉ cần tài khoản khi đặt dịch vụ hoặc trao đổi với nhà, và lịch sử đơn xem được trên mọi thiết bị. Không cần mã xác nhận.</p>
         <form id="auth-form" class="auth-form">
-          <label>Email</label><input type="email" id="auth-email" required autocomplete="email" placeholder="ten@gmail.com" />
-          <label>Mật khẩu</label><input type="password" id="auth-password" required minlength="6" autocomplete="current-password" placeholder="Ít nhất 6 ký tự" />
+          <label>Email</label><input type="email" id="auth-email" name="email" required autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" placeholder="ten@gmail.com" />
+          <label>Mật khẩu</label><input type="password" id="auth-password" name="password" required minlength="6" autocomplete="current-password" placeholder="Ít nhất 6 ký tự" />
           <label class="auth-agree"><input type="checkbox" id="auth-agree" /> <span>Tôi đã đọc và đồng ý với <a href="chinh-sach.html" target="_blank" rel="noopener">Chính sách quyền riêng tư &amp; Điều khoản sử dụng</a>, đồng ý để nhà lưu thông tin đặt phòng của tôi.</span></label>
           <div id="auth-msg" class="auth-msg"></div>
           <button type="submit" id="auth-submit" class="btn-submit-booking" disabled>ĐĂNG NHẬP</button>

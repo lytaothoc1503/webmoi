@@ -25,14 +25,14 @@
 <div class="auth-container">
     <div class="logo">Nhà của An</div>
     <div class="sub">Khu vực quản trị</div>
-    <form id="admin-login-form">
+    <form id="admin-login-form" autocomplete="on" novalidate>
         <div class="input-group">
             <label for="adm-email">Email quản trị</label>
-            <input type="email" id="adm-email" required autocomplete="username">
+            <input type="email" id="adm-email" name="username" required autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" placeholder="email quản trị">
         </div>
         <div class="input-group">
             <label for="adm-pass">Mật khẩu</label>
-            <input type="password" id="adm-pass" required autocomplete="current-password">
+            <input type="password" id="adm-pass" name="password" required minlength="6" autocomplete="current-password" placeholder="mật khẩu">
         </div>
         <button type="submit" class="btn-submit" id="adm-btn">Đăng nhập</button>
         <div class="msg" id="adm-msg"></div>
@@ -50,17 +50,21 @@
         document.getElementById('adm-btn').disabled = true;
     } else {
         const client = window.supabase.createClient(CFG.url, CFG.anonKey);
-        client.auth.getSession().then(({ data }) => { if (data && data.session) window.location.replace('./admin.html'); });
+        const goAdmin = () => window.location.replace('./admin.html');
+        async function isAdmin() { const { data } = await client.auth.getSession(); if (!data || !data.session) return false; const r = await client.rpc('is_admin'); return r.data === true; }
+        // Đã là admin thì vào thẳng; nếu đang là tài khoản khách thì vẫn cho đăng nhập admin (sẽ thay phiên đăng nhập)
+        isAdmin().then((ok) => { if (ok) goAdmin(); });
         document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('adm-btn');
+            const email = document.getElementById('adm-email').value.trim(), password = document.getElementById('adm-pass').value;
+            if (!email || !password) { msg.textContent = 'Vui lòng nhập đủ email và mật khẩu.'; return; }
             btn.disabled = true; msg.textContent = '';
-            const { error } = await client.auth.signInWithPassword({
-                email: document.getElementById('adm-email').value.trim(),
-                password: document.getElementById('adm-pass').value,
-            });
+            const { error } = await client.auth.signInWithPassword({ email, password });
             if (error) { msg.textContent = 'Đăng nhập không thành công: email hoặc mật khẩu chưa đúng.'; btn.disabled = false; return; }
-            window.location.replace('./admin.html');
+            if (await isAdmin()) { goAdmin(); return; }
+            await client.auth.signOut();
+            msg.textContent = 'Tài khoản này chưa được cấp quyền quản trị.'; btn.disabled = false;
         });
     }
 </script>

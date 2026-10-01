@@ -16,8 +16,8 @@ function setAuthMode(m) {
   authMsg('');
 }
 function updateAuthButtons() { const ok = $('auth-agree').checked; $('auth-submit').disabled = !ok; $('auth-fb').disabled = !ok; }
-function openAuthModal() { if (!db) { toast('Tính năng tài khoản chưa sẵn sàng.'); return; } authMsg(''); $('auth-agree').checked = false; updateAuthButtons(); $('auth-modal').classList.add('active'); }
-function closeAuthModal() { $('auth-modal').classList.remove('active'); }
+function openAuthModal(note) { if (!db) { toast('Tính năng tài khoản chưa sẵn sàng.'); return; } authMsg(note || '', true); $('auth-agree').checked = false; updateAuthButtons(); $('auth-modal').classList.add('active'); }
+function closeAuthModal() { $('auth-modal').classList.remove('active'); pendingBooking = false; }
 async function signOutUser() { if (db) await db.auth.signOut(); toast('Đã đăng xuất'); }
 
 $('auth-form').addEventListener('submit', async (e) => {
@@ -31,7 +31,7 @@ $('auth-form').addEventListener('submit', async (e) => {
     else r = await db.auth.signUp({ email, password, options: { data: { accepted_policy_at: new Date().toISOString() } } });
     if (r.error) { authMsg(AUTH_ERR[r.error.message] || 'Không thực hiện được: ' + r.error.message); return; }
     if (!r.data.session) { authMsg('Đã tạo tài khoản. Nếu hệ thống yêu cầu xác nhận, hãy kiểm tra email rồi đăng nhập.', true); return; }
-    closeAuthModal(); toast(authMode === 'login' ? 'Đăng nhập thành công' : 'Tạo tài khoản thành công');
+    $('auth-modal').classList.remove('active'); toast(authMode === 'login' ? 'Đăng nhập thành công' : 'Tạo tài khoản thành công');
   } catch (err) { authMsg('Lỗi kết nối, bạn thử lại nhé.'); } finally { updateAuthButtons(); }
 });
 $('auth-fb').addEventListener('click', async () => {
@@ -56,6 +56,7 @@ async function applySession(session) {
   if (currentUser && currentUser.id !== before) {
     if (!$('bk-name').value) $('bk-name').value = (currentUser.user_metadata && currentUser.user_metadata.full_name) || '';
     syncAccountOrders();
+    if (pendingBooking) { pendingBooking = false; $('auth-modal').classList.remove('active'); if ($('booking-modal').classList.contains('active')) setTimeout(() => $('booking-form-step1').requestSubmit(), 50); }
   }
 }
 if (db) {

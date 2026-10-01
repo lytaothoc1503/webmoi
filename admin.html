@@ -796,7 +796,7 @@
         const { data } = await supabaseClient.auth.getSession();
         if (!data || !data.session) { window.location.replace('./auth.html'); return; }
         const { data: isAdm } = await supabaseClient.rpc('is_admin');
-        if (isAdm !== true) { alert('Tài khoản này không có quyền quản trị.'); window.location.replace('./index.html'); return; }
+        if (isAdm !== true) { window.location.replace('./auth.html'); return; }
         document.body.style.visibility = 'visible';
         loadBookings();
         loadReviewBadge();

@@ -247,6 +247,7 @@ async function createOrder(o) {
 $('booking-form-step1').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!validateDates()) return;
+  if (db && !currentUser) { pendingBooking = true; openAuthModal('Vui lòng đăng nhập hoặc đăng ký để đặt dịch vụ. Thông tin bạn vừa điền được giữ nguyên.'); return; }
   if (!currentItem.name) { alert('Vui lòng chọn hạng phòng hoặc tour.'); return; }
   const phone = $('bk-phone').value.trim();
   if (phone.replace(/\D/g, '').length < 9) { alert('Số điện thoại chưa hợp lệ.'); return; }
@@ -261,6 +262,7 @@ $('booking-form-step1').addEventListener('submit', async (e) => {
 });
 
 let currentOrder = null;
+let pendingBooking = false; // khách bấm đặt khi chưa đăng nhập
 let currentUser = null; // khách đã đăng nhập (do account.js cập nhật)
 const accountNavHtml = () => (currentUser ? `<li><a href="javascript:void(0)" onclick="signOutUser()" title="${esc(currentUser.email || '')}">Đăng xuất</a></li>` : (db ? `<li><a href="javascript:void(0)" onclick="openAuthModal()">Đăng nhập</a></li>` : ''));
 function openOrderView(o) { currentOrder = o; renderOrderView(); showStep(2); $('booking-modal').classList.add('active'); }
