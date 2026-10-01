@@ -1036,7 +1036,8 @@
       .auth-form .auth-agree { display:flex; gap:8px; align-items:flex-start; font-weight:400; font-size:12.5px; line-height:1.5; margin:14px 0 6px; }
       .auth-form .auth-agree input { margin-top:3px; } .auth-form .auth-agree a { color:var(--accent-orange); text-decoration:underline; }
       .auth-form [hidden] { display: none !important; }
-      .auth-form input[type=text], .auth-form input[type=number] { width:100%; height:42px; padding:0 12px; border:1px solid #d5c8be; border-radius:8px; font-size:14px; }
+      .auth-form input[type=text], .auth-form input[type=number], .auth-form input[type=tel] { width:100%; height:42px; padding:0 12px; border:1px solid #d5c8be; border-radius:8px; font-size:14px; }
+      .auth-forgot-box p { font-size:13px; color:var(--text-muted); margin:6px 0 12px; line-height:1.5; }
       .auth-form .req { color:#b91c1c; }
       .pw-wrap { position:relative; } .pw-wrap input { padding-right:44px !important; }
       .pw-eye { position:absolute; right:4px; top:4px; width:34px; height:34px; border:0; background:transparent; cursor:pointer; font-size:16px; opacity:.7; }
@@ -1307,14 +1308,15 @@
         <p class="ov-sub" id="auth-info" style="margin:10px 0"></p>
         <form id="auth-form" class="auth-form" novalidate>
           <div data-m="signup"><label for="auth-name">Họ và tên <span class="req">*</span></label><input type="text" id="auth-name" name="name" autocomplete="name" maxlength="80" placeholder="Nguyễn Văn A (hiện trên phiếu đặt phòng)" /></div>
-          <div data-m="login signup forgot"><label for="auth-email">Email</label><input type="email" id="auth-email" name="email" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" placeholder="ten@gmail.com" /></div>
+          <div data-m="login signup"><label for="auth-phone">Số điện thoại <small style="font-weight:400">(là tên đăng nhập)</small></label><input type="tel" id="auth-phone" name="username" autocomplete="username" inputmode="tel" maxlength="16" placeholder="0912 345 678" /></div>
+          <div data-m="forgot" class="auth-forgot-box"><p>Nhà chưa dùng email nên không gửi được liên kết. Bạn nhắn nhà qua Messenger kèm <strong>số điện thoại đã đăng ký</strong>, nhà sẽ đặt lại mật khẩu cho bạn ngay.</p><a class="btn-send-fb" id="auth-forgot-fb" href="#" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">NHẮN NHÀ QUA MESSENGER</a></div>
           <div data-m="login signup reset"><label for="auth-password" id="auth-pw-label">Mật khẩu</label>
             <div class="pw-wrap"><input type="password" id="auth-password" name="password" autocomplete="current-password" placeholder="Ít nhất 6 ký tự" /><button type="button" class="pw-eye" id="auth-eye" aria-label="Hiện / ẩn mật khẩu" title="Hiện / ẩn mật khẩu">👁️</button></div></div>
           <div data-m="login"><a href="javascript:void(0)" class="auth-forgot" onclick="setAuthMode('forgot')">Quên mật khẩu?</a></div>
           <div data-m="signup"><label for="auth-year">Năm sinh <small style="font-weight:400">(không bắt buộc)</small></label><input type="number" id="auth-year" name="year" inputmode="numeric" min="1920" max="2100" placeholder="VD: 1995" /></div>
           <label class="auth-agree" data-m="signup"><input type="checkbox" id="auth-agree" /> <span>Tôi đã đọc và đồng ý với <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách quyền riêng tư</a>, đồng ý để nhà lưu thông tin đặt phòng của tôi.</span></label>
           <div id="auth-msg" class="auth-msg" role="alert"></div>
-          <button type="submit" id="auth-submit" class="btn-submit-booking">ĐĂNG NHẬP</button>
+          <button type="submit" id="auth-submit" class="btn-submit-booking" data-m="login signup reset">ĐĂNG NHẬP</button>
           <div data-m="login signup">
             <div class="auth-or">hoặc</div>
             <button type="button" id="auth-fb" class="btn-send-fb">TIẾP TỤC VỚI FACEBOOK</button>
