@@ -15,6 +15,13 @@ window.SITE_DATA = {
     { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.' },
   ],
   gallery: [
+    { image_url: 'images/hero-san-may.jpg', caption: 'Biển mây Tà Xùa' },
+    { image_url: 'images/hoang-hon-fisheye.jpg', caption: 'Hoàng hôn rực lửa' },
+    { image_url: 'images/tram-mam-xoi.jpg', caption: 'Trạm Mầm Xôi cà phê' },
+    { image_url: 'images/ruong-bac-thang.jpg', caption: 'Ruộng bậc thang mùa chín' },
+    { image_url: 'images/bap-treo-cua-so.jpg', caption: 'Bắp treo bên khung cửa' },
+    { image_url: 'images/bang-hay-lay-toi-di.jpg', caption: 'Bữa sáng "Hãy lấy tôi đi"' },
+    { image_url: 'images/hay-lay-toi-di-cabin.jpg', caption: 'Góc check-in ở nhà gỗ' },
     { image_url: 'images/den-long-hoang-hon.jpg', caption: 'Đèn lồng lên đèn trên biển mây' },
     { image_url: 'images/phong-view-may.jpg', caption: 'Giường cạnh khung cửa ngắm mây' },
     { image_url: 'images/nha-go-den-long.jpg', caption: 'Nhà gỗ giữa đồi xanh' },

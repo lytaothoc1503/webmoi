@@ -9,6 +9,9 @@ window.SITE = {
   checkout: '12:00',
 
   // Để trống '' = chưa có (nút hiện "Đang cập nhật"). Điền vào là web tự cập nhật.
+  // Video giới thiệu (tùy chọn): bỏ file vào images/ rồi ghi 'images/video-gioi-thieu.mp4' (hoặc link .mp4). Để trống = hiện ảnh.
+  introVideo: '',
+  introPoster: 'images/video-poster.jpg',
   contacts: {
     facebook: 'https://www.facebook.com/NhacuaAnTaXuaSonLa/',
     zalo: '',  // ví dụ: 'https://zalo.me/0912345678'

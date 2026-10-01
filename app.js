@@ -119,6 +119,11 @@ async function loadTours() {
         <div class="tour-price-tag">${money(t.price)}</div>
         <span class="tour-link" onclick="openBookingModal('${arg(t.name)}', ${Number(t.price) || 0})">Khám Phá Tour</span></div></div>`).join('');
 }
+function setupIntroVideo() {
+  const v = S.introVideo, box = $('about-media');
+  if (!v || !box || !/^(images\/|https:\/\/)[^"'<>\s]+$/.test(v)) return;
+  box.innerHTML = `<video src="${esc(v)}" poster="${esc(S.introPoster || '')}" controls playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;border-radius:inherit"></video>`;
+}
 async function loadGallery() {
   const list = await getList('gallery', D.gallery, 'is_active');
   $('gallery-grid').innerHTML = list.map((g) => `<div class="gallery-item" data-full="${esc(safeUrl(g.image_url))}">${img(g.image_url, g.caption || 'Ảnh')}<div class="gallery-caption">${esc(g.caption || '')}</div></div>`).join('');
@@ -429,6 +434,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
+  setupIntroVideo();
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
