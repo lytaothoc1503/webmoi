@@ -46,7 +46,7 @@ let currentSec = '';
 const NAV_MORE = ['tour-ta-xua', 'khach-noi', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
 function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
 document.addEventListener('click', () => document.querySelectorAll('.nav-more.open').forEach((li) => li.classList.remove('open')));
-function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden); }
+function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden).sort((x, y) => ($(x[0]).compareDocumentPosition($(y[0])) & 4 ? -1 : 1)); } // luôn theo thứ tự trên trang
 function buildNav() {
   const vs = visibleSections();
   const main = vs.filter(([id]) => !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
@@ -71,6 +71,7 @@ function spy() {
   document.querySelectorAll('.nav-more').forEach((li) => li.querySelector('.nav-more-btn').classList.toggle('active', NAV_MORE.includes(cur)));
 }
 let spyTick = false;
+window.addEventListener('scroll', () => document.body.classList.toggle('scrolled', window.scrollY > 600), { passive: true });
 window.addEventListener('scroll', () => { if (!spyTick) { spyTick = true; requestAnimationFrame(() => { spy(); spyTick = false; }); } }, { passive: true });
 function goHash() {
   let h = location.hash.slice(1);
@@ -138,7 +139,8 @@ async function loadGallery() {
 }
 async function loadReviews() {
   const list = await getList('reviews', D.reviews, 'is_published');
-  if (!list.length) { $('khach-noi').hidden = true; return; }
+  if (!list.length) { $('khach-noi').hidden = true; $('trust-reviews').hidden = true; return; }
+  if (list.length >= 3 && $('hang-phong')) $('hang-phong').before($('khach-noi')); // đủ đánh giá thì đưa lên trước Hạng phòng
   $('reviews-grid').innerHTML = list.map((r) => {
     const n = Math.min(5, Math.max(1, Number(r.rating) || 5));
     const av = safeUrl(r.author_avatar) || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.author_name) + '&background=3d2314&color=fff';
@@ -437,7 +439,7 @@ async function submitReview() {
 /* ===== KHỞI TẠO ===== */
 (async function init() {
   renderContacts();
-  if (chref('facebook')) $('hero-fb').href = chref('facebook'); else $('hero-fb').hidden = true;
+  if (chref('facebook')) { $('hero-fb').href = chref('facebook'); $('sb-fb').href = chref('facebook'); } else { $('hero-fb').hidden = true; $('sb-fb').hidden = true; }
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();

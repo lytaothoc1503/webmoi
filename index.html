@@ -417,24 +417,25 @@
 
       /* GALLERY */
       .gallery-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-        gap: 16px;
+        column-count: 3;
+        column-gap: 14px;
       }
       .gallery-item {
         position: relative;
         border-radius: 14px;
         overflow: hidden;
         cursor: pointer;
-        aspect-ratio: 4/3;
+        margin-bottom: 14px;
+        break-inside: avoid;
         box-shadow: 0 6px 18px rgba(0,0,0,0.08);
       }
       .gallery-item img {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        height: auto;
+        display: block;
         transition: transform 0.4s;
       }
+      @media (max-width: 900px) { .gallery-grid { column-count: 2; column-gap: 10px; } .gallery-item { margin-bottom: 10px; } }
       .gallery-item:hover img {
         transform: scale(1.1);
       }
@@ -919,6 +920,31 @@
       .nav-links a { white-space: nowrap; font-size: 12.5px; }
       .nav-links a.active, .mobile-nav a.active { color: var(--accent-orange); }
       @media (max-width: 1160px) { .nav-links { display: none; } .hamburger { display: flex; } }
+
+      /* TRUST STRIP / CTA / STICKY BAR */
+      .trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1100px; margin: -34px auto 0; position: relative; z-index: 5; padding: 0 20px; }
+      .trust-item { display: flex; gap: 12px; align-items: center; background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 22px rgba(0,0,0,.12); }
+      .trust-ic { font-size: 24px; }
+      .trust-item strong { display: block; font-size: 13.5px; color: var(--nav-brown); }
+      .trust-item small { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+      .cta-band { text-align: center; background: linear-gradient(135deg, var(--nav-brown), #7a4a26); color: #fff; padding: 56px 20px; }
+      .cta-band h2 { font-size: 28px; margin-bottom: 8px; }
+      .cta-band p { opacity: .9; margin-bottom: 22px; }
+      .cta-band .btn-hero, .hero .btn-hero:not(.btn-hero-ghost) { padding: 16px 38px; font-size: 16px; }
+      .sticky-book { display: none; }
+      @media (max-width: 900px) { .trust-strip { grid-template-columns: repeat(2, 1fr); margin-top: -24px; } }
+      @media (max-width: 768px) {
+        body { padding-bottom: 72px; }
+        .sticky-book { display: flex; gap: 10px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: rgba(74,46,24,.97); box-shadow: 0 -6px 18px rgba(0,0,0,.25); }
+        .sticky-book .sb-book { flex: 2; background: var(--accent-orange); color: #fff; border: 0; border-radius: 12px; font-weight: 700; font-size: 15px; padding: 13px; }
+        .sticky-book .sb-fb { flex: 1.3; text-align: center; border: 2px solid #fff; color: #fff; text-decoration: none; border-radius: 12px; font-weight: 600; font-size: 13px; padding: 11px 6px; }
+        .floating-tools { bottom: 86px; left: auto; right: 12px; gap: 10px; }
+        .floating-tools { opacity: 0; pointer-events: none; transition: opacity .25s; }
+        body.scrolled .floating-tools { opacity: 1; pointer-events: auto; }
+        .tool-btn { width: 42px; height: 42px; font-size: 17px; }
+        .trust-item { padding: 10px 12px; } .trust-item small { display: none; }
+        .cta-band h2 { font-size: 22px; }
+      }
       .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
       .btn-hero-ghost { background: transparent; border: 2px solid #fff; text-decoration: none; display: inline-block; }
       .btn-hero-ghost:hover { background: rgba(255, 255, 255, 0.15); }
@@ -1036,6 +1062,14 @@
       </div>
     </section>
 
+    <!-- TRUST STRIP (chỉ thông tin có thật) -->
+    <div class="trust-strip" id="trust-strip">
+      <div class="trust-item"><span class="trust-ic">⏰</span><div><strong>Nhận 14:00 · Trả 12:00</strong><small>Báo trước nếu cần gửi hành lý</small></div></div>
+      <div class="trust-item"><span class="trust-ic">💰</span><div><strong>Giá hiển thị rõ ràng</strong><small>Thấy giá trước khi đặt, không phí ẩn</small></div></div>
+      <div class="trust-item"><span class="trust-ic">💬</span><div><strong>Hỗ trợ 24/7</strong><small>Nhắn Messenger bất cứ lúc nào</small></div></div>
+      <div class="trust-item" id="trust-reviews"><span class="trust-ic">⭐</span><div><strong>Khách đánh giá 5★</strong><small>Đánh giá thật trên Google Maps</small></div></div>
+    </div>
+
     <!-- ABOUT -->
     <section class="section-wrap" id="gioi-thieu">
       <div class="about-grid">
@@ -1109,29 +1143,11 @@
       </div>
     </section>
 
-    <!-- TRACK ORDER -->
-    <section class="section-wrap" id="tra-cuu-don">
-      <div class="section-header" style="text-align: center">
-        <span class="sec-sub">Theo Dõi Đặt Phòng</span>
-        <h2 class="sec-title">Tra Cứu Đơn Đặt Phòng</h2>
-      </div>
-      <div class="track-box">
-        <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 18px;">
-          Xem tình trạng đơn, thanh toán và đánh giá. Chỉ cần nhập <strong>Mã đơn</strong> (nhập đúng mã là xem được, trên mọi thiết bị) hoặc <strong>Số điện thoại</strong> đã đặt. Lịch sử đơn bên dưới là riêng tư, chỉ hiện khi bạn đăng nhập.
-        </p>
-        <div class="form-group" style="text-align: left">
-          <label>Mã đơn đặt phòng (khuyên dùng):</label>
-          <input type="text" id="track-code" placeholder="VD: NA7K3M9QXP" autocomplete="off" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #d5c8be; border-radius: 8px; font-size: 14px; text-transform: uppercase;" />
-        </div>
-        <div class="form-group" style="text-align: left">
-          <label>Hoặc Số điện thoại đã đặt:</label>
-          <input type="tel" id="track-phone" placeholder="09xxxxxxxx" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #d5c8be; border-radius: 8px; font-size: 14px;" />
-        </div>
-        <button class="btn-submit-booking" onclick="trackOrder()">TRA CỨU ĐƠN</button>
-        <div class="track-result" id="track-result"></div>
-      </div>
-      <div class="oh-title"><h3>Lịch sử đặt phòng của bạn</h3><button class="oc-link" onclick="refreshHistory()">↻ Làm mới</button></div>
-      <div id="order-history" class="order-history"></div>
+    <!-- CTA -->
+    <section class="cta-band" id="cta-band">
+      <h2>Sẵn sàng thức dậy trên biển mây?</h2>
+      <p>Chọn phòng, xem giá rõ ràng và giữ chỗ chỉ trong vài phút.</p>
+      <button class="btn-hero" onclick="openBookingModal('', 0)">ĐẶT PHÒNG NGAY</button>
     </section>
 
     <!-- SERVICES -->
@@ -1165,7 +1181,36 @@
     </section>
 
     <div class="floating-tools" id="floating-tools"></div>
+    <div class="sticky-book" id="sticky-book">
+      <button class="sb-book" onclick="openBookingModal('', 0)">ĐẶT PHÒNG</button>
+      <a class="sb-fb" id="sb-fb" href="#" target="_blank" rel="noopener">Nhắn Facebook</a>
+    </div>
     <div id="toast" class="toast"></div>
+
+    <!-- TRACK ORDER -->
+    <section class="section-wrap" id="tra-cuu-don">
+      <div class="section-header" style="text-align: center">
+        <span class="sec-sub">Theo Dõi Đặt Phòng</span>
+        <h2 class="sec-title">Tra Cứu Đơn Đặt Phòng</h2>
+      </div>
+      <div class="track-box">
+        <p style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 18px;">
+          Xem tình trạng đơn, thanh toán và đánh giá. Chỉ cần nhập <strong>Mã đơn</strong> (nhập đúng mã là xem được, trên mọi thiết bị) hoặc <strong>Số điện thoại</strong> đã đặt. Lịch sử đơn bên dưới là riêng tư, chỉ hiện khi bạn đăng nhập.
+        </p>
+        <div class="form-group" style="text-align: left">
+          <label>Mã đơn đặt phòng (khuyên dùng):</label>
+          <input type="text" id="track-code" placeholder="VD: NA7K3M9QXP" autocomplete="off" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #d5c8be; border-radius: 8px; font-size: 14px; text-transform: uppercase;" />
+        </div>
+        <div class="form-group" style="text-align: left">
+          <label>Hoặc Số điện thoại đã đặt:</label>
+          <input type="tel" id="track-phone" placeholder="09xxxxxxxx" style="width: 100%; height: 42px; padding: 0 12px; border: 1px solid #d5c8be; border-radius: 8px; font-size: 14px;" />
+        </div>
+        <button class="btn-submit-booking" onclick="trackOrder()">TRA CỨU ĐƠN</button>
+        <div class="track-result" id="track-result"></div>
+      </div>
+      <div class="oh-title"><h3>Lịch sử đặt phòng của bạn</h3><button class="oc-link" onclick="refreshHistory()">↻ Làm mới</button></div>
+      <div id="order-history" class="order-history"></div>
+    </section>
 
     <!-- BOOKING MODAL -->
     <div id="booking-modal" class="modal-overlay">
