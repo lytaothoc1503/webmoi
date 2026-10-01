@@ -46,8 +46,9 @@ let currentSec = '';
 function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden); }
 function buildNav() {
   const links = visibleSections().map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('');
-  $('nav-links').innerHTML = links + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
+  $('nav-links').innerHTML = links + accountNavHtml() + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
   $('mobile-nav').innerHTML = visibleSections().map(([id, l]) => `<a href="#${id}" data-sec="${id}" onclick="closeMobileNav()">${l}</a>`).join('')
+    + (currentUser ? `<a href="javascript:void(0)" onclick="closeMobileNav(); signOutUser()">Đăng xuất</a>` : (db ? `<a href="javascript:void(0)" onclick="closeMobileNav(); openAuthModal()">Đăng nhập / Đăng ký</a>` : ''))
     + `<a href="javascript:void(0)" onclick="closeMobileNav(); openBookingModal('', 0)" style="background: var(--accent-orange); text-align: center;">Đặt Phòng Ngay</a>`;
 }
 function spy() {
@@ -234,7 +235,7 @@ async function createOrder(o) {
   for (let i = 0; i < 3; i++) {
     let error = null;
     try {
-      ({ error } = await db.from('bookings').insert({ booking_code: o.code, room: o.room, fullname: o.name, phone: o.phone, checkin: o.checkin, checkout: o.checkout, guests: o.guests, notes: o.notes, total_price: o.total, transfer_code: o.tcode, status: ST.WAIT }));
+      ({ error } = await db.from('bookings').insert({ booking_code: o.code, room: o.room, fullname: o.name, phone: o.phone, checkin: o.checkin, checkout: o.checkout, guests: o.guests, notes: o.notes, total_price: o.total, transfer_code: o.tcode, status: ST.WAIT, user_id: currentUser ? currentUser.id : null }));
     } catch (e) { error = { message: String(e && e.message || e) }; }
     if (!error) return { ok: true };
     if (error.code === '23505') { o.code = newCode(); o.tcode = o.code; continue; }
@@ -260,6 +261,8 @@ $('booking-form-step1').addEventListener('submit', async (e) => {
 });
 
 let currentOrder = null;
+let currentUser = null; // khách đã đăng nhập (do account.js cập nhật)
+const accountNavHtml = () => (currentUser ? `<li><a href="javascript:void(0)" onclick="signOutUser()" title="${esc(currentUser.email || '')}">Đăng xuất</a></li>` : (db ? `<li><a href="javascript:void(0)" onclick="openAuthModal()">Đăng nhập</a></li>` : ''));
 function openOrderView(o) { currentOrder = o; renderOrderView(); showStep(2); $('booking-modal').classList.add('active'); }
 function renderOrderView() {
   const o = currentOrder, st = normStatus(o.status), total = Number(o.total) || 0;

@@ -968,6 +968,14 @@
       .ov-row .oc-btn { flex:1 1 180px; }
       .ov-others { margin-top:8px; display:flex; gap:14px; flex-wrap:wrap; }
       .ov-others a { color:var(--accent-orange); font-weight:600; }
+      .auth-tabs { display:flex; gap:6px; } .auth-tabs button { flex:1; padding:9px; border:1px solid #d5c8be; background:#fff; border-radius:8px; font-weight:700; cursor:pointer; color:var(--text-muted); }
+      .auth-tabs button.on { background:var(--accent-orange); color:#fff; border-color:var(--accent-orange); }
+      .auth-form label { display:block; font-size:12.5px; font-weight:600; margin:10px 0 4px; }
+      .auth-form input[type=email], .auth-form input[type=password] { width:100%; height:42px; padding:0 12px; border:1px solid #d5c8be; border-radius:8px; font-size:14px; }
+      .auth-form .auth-agree { display:flex; gap:8px; align-items:flex-start; font-weight:400; font-size:12.5px; line-height:1.5; margin:14px 0 6px; }
+      .auth-form .auth-agree input { margin-top:3px; } .auth-form .auth-agree a { color:var(--accent-orange); text-decoration:underline; }
+      .auth-msg { min-height:18px; font-size:12.5px; color:#b91c1c; margin:6px 0; } .auth-msg.ok { color:#059669; }
+      .auth-form button:disabled { opacity:.5; cursor:not-allowed; } .auth-or { text-align:center; font-size:12px; color:var(--text-muted); margin:10px 0; }
       .ov-h { color: var(--accent-orange); font-size: 15px; margin: 6px 0; }
       .ov-sum { text-align: center; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
       .pay-note { background: #fff4e5; color: #8a4b0f; border-radius: 10px; padding: 12px 14px; font-size: 13px; margin: 10px 0; line-height: 1.55; }
@@ -1204,6 +1212,23 @@
     </div>
 
     <!-- REVIEW MODAL -->
+    <div id="auth-modal" class="modal-overlay">
+      <div class="modal-box" style="max-width:420px">
+        <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+        <h3 class="modal-title" style="margin-bottom:12px">Tài khoản của bạn</h3>
+        <div class="auth-tabs"><button type="button" id="auth-tab-login" class="on" onclick="setAuthMode('login')">Đăng nhập</button><button type="button" id="auth-tab-signup" onclick="setAuthMode('signup')">Đăng ký</button></div>
+        <p class="ov-sub" style="margin:10px 0">Có tài khoản, lịch sử đơn của bạn xem được trên mọi thiết bị. Không cần mã xác nhận.</p>
+        <form id="auth-form" class="auth-form">
+          <label>Email</label><input type="email" id="auth-email" required autocomplete="email" placeholder="ten@gmail.com" />
+          <label>Mật khẩu</label><input type="password" id="auth-password" required minlength="6" autocomplete="current-password" placeholder="Ít nhất 6 ký tự" />
+          <label class="auth-agree"><input type="checkbox" id="auth-agree" /> <span>Tôi đã đọc và đồng ý với <a href="chinh-sach.html" target="_blank" rel="noopener">Chính sách quyền riêng tư &amp; Điều khoản sử dụng</a>, đồng ý để nhà lưu thông tin đặt phòng của tôi.</span></label>
+          <div id="auth-msg" class="auth-msg"></div>
+          <button type="submit" id="auth-submit" class="btn-submit-booking" disabled>ĐĂNG NHẬP</button>
+          <div class="auth-or">hoặc</div>
+          <button type="button" id="auth-fb" class="btn-send-fb" disabled>TIẾP TỤC VỚI FACEBOOK</button>
+        </form>
+      </div>
+    </div>
     <div id="review-modal" class="modal-overlay">
       <div class="modal-box">
         <span class="modal-close" onclick="closeReview()">&times;</span>
@@ -1235,5 +1260,6 @@
     <script src="config.js"></script>
     <script src="data.js"></script>
     <script src="app.js"></script>
+    <script src="account.js"></script>
   </body>
 </html>
