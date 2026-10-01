@@ -122,12 +122,42 @@ async function loadRooms() {
 }
 async function loadTours() {
   toursData = await getList('tours', D.tours, 'is_active');
-  $('tours-grid').innerHTML = toursData.map((t) => `
-    <div class="tour-arch-card">${img(t.image_url, t.name)}
+  $('tours-grid').innerHTML = toursData.map((t, i) => `
+    <div class="tour-arch-card" onclick="openInfo('t', ${i})" style="cursor:pointer">${img(t.image_url, t.name)}
       <div class="tour-overlay"><div class="tour-name">${esc(t.name)}</div>
-        <div class="tour-price-tag">${money(t.price)}</div>
-        <span class="tour-link" onclick="openBookingModal('${arg(t.name)}', ${Number(t.price) || 0})">Khám Phá Tour</span></div></div>`).join('');
+        <div class="tour-price-tag">${Number(t.price) > 0 ? money(t.price) + ' / người' : 'Liên hệ báo giá'}</div>
+        <span class="tour-link">Xem chi tiết</span></div></div>`).join('');
 }
+function loadServices() {
+  const list = D.services || [];
+  $('dich-vu').hidden = !list.length;
+  $('services-grid').innerHTML = list.map((s, i) => `
+    <div class="svc-card" onclick="openInfo('s', ${i})">${s.image_url ? img(s.image_url, s.name) : `<div class="svc-ph">${esc(s.icon || '✨')}</div>`}
+      <div class="svc-body"><h3>${esc(s.name)}</h3>
+        <div class="svc-price">${Number(s.price) > 0 ? money(s.price) + ` <small>${esc(s.unit || '')}</small>` : 'Liên hệ báo giá'}</div>
+        <p>${esc(s.description || '')}</p><span class="svc-more">Xem chi tiết →</span></div></div>`).join('');
+}
+function openInfo(kind, i) {
+  const it = (kind === 't' ? toursData : (D.services || []))[i]; if (!it) return;
+  const price = Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
+  const meta = (kind === 't' ? [['⏱', it.duration], ['📍', 'Điểm hẹn: ' + (it.meet || '')]] : [['🕒', it.time]]).filter((m) => m[1] && !/: $/.test(m[1]));
+  const sample = D.catalogIsSample ? '<span class="sample-tag">giá & nội dung mẫu</span>' : '';
+  const act = kind === 't'
+    ? `<a class="btn-submit-booking" href="javascript:void(0)" onclick="closeInfo(); openBookingModal('${arg(it.name)}', ${Number(it.price) || 0})">ĐẶT TOUR NÀY</a>`
+    : '';
+  const fb = messengerHref();
+  $('info-body').innerHTML = `${it.image_url ? img(it.image_url, it.name, 'info-hero') : ''}
+    <div class="info-in"><h3>${esc(it.name)} ${sample}</h3>
+      <div class="svc-price" style="font-size:18px;margin-bottom:6px">${esc(price)}</div>
+      ${meta.map((m) => `<div class="info-meta">${m[0]} ${esc(m[1])}</div>`).join('')}
+      <p style="font-size:14px;margin:8px 0">${esc(it.details || it.description || '')}</p>
+      ${(it.includes || []).length ? `<strong style="font-size:13.5px">Bao gồm</strong><ul>${it.includes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+      ${it.note ? `<p class="info-meta">💡 ${esc(it.note)}</p>` : ''}
+      <div class="info-actions">${act}${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">${kind === 't' ? 'Hỏi thêm qua Messenger' : 'Nhắn nhà để đặt / hỏi giá'}</a>` : ''}</div>
+    </div>`;
+  $('info-modal').classList.add('active');
+}
+function closeInfo() { $('info-modal').classList.remove('active'); }
 function setupIntroVideo() {
   const v = S.introVideo, box = $('about-media');
   if (!v || !box || !/^(images\/|https:\/\/)[^"'<>\s]+$/.test(v)) return;
@@ -458,7 +488,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo(); setupStoryAndHero();
+  setupIntroVideo(); setupStoryAndHero(); loadServices();
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);

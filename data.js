@@ -10,9 +10,22 @@ window.SITE_DATA = {
     { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: U('1618773928121-c32242e63f39'), guests: '1 khách / giường', bed: 'Giường tầng', view: 'Không gian chung', perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] }, // MẪU
   ],
   tours: [
-    { name: 'Săn Mây Bình Minh', price: 300000, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.' },
-    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: U('1464822759023-fed622ff2c3b'), description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.' },
-    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.' },
+    { name: 'Săn Mây Bình Minh', price: 300000, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.',
+      duration: 'Khoảng 3 giờ (xuất phát 4:30 sáng)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên dẫn đường', 'Nước suối', 'Đèn pin / áo ấm (mượn tại nhà)'], note: 'Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn, tour được dời ngày, nhà sẽ báo trước.', details: 'Xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Hướng dẫn viên đưa bạn tới điểm ngắm đẹp nhất trong ngày, chụp ảnh cùng bạn rồi cùng quay về ăn sáng nóng.' }, // MẪU
+    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: U('1464822759023-fed622ff2c3b'), description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
+      duration: 'Nửa ngày (khoảng 5 giờ)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Nước và đồ ăn nhẹ', 'Hỗ trợ chụp ảnh'], note: 'Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.', details: 'Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động và muốn có những tấm ảnh đẹp.' }, // MẪU
+    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
+      duration: 'Khoảng 3 giờ', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.' }, // MẪU
+  ],
+  // Dịch vụ & tiện ích. Giá và nội dung là MẪU, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). catalogIsSample: false để ẩn nhãn mẫu.
+  catalogIsSample: true,
+  services: [
+    { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 120000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
+    { icon: '🍜', name: 'Bữa sáng trên mây', price: 80000, unit: '/ người', image_url: 'images/bua-sang-tren-may.jpg', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
+    { icon: '☕', name: 'Cà phê & đồ uống', price: 30000, unit: 'từ / ly', image_url: 'images/ban-ghe-ngam-may.jpg', time: '7:00 - 21:00', description: 'Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.', includes: ['Cà phê, trà, nước ép', 'Chỗ ngồi ngoài trời ngắm mây'], note: 'Khách ở nhà được giảm khi gọi đồ uống tại quán.' },
+    { icon: '🛵', name: 'Thuê xe máy', price: 150000, unit: '/ ngày', time: 'Theo nhu cầu', description: 'Có xe máy cho thuê để di chuyển quanh Tà Xùa và khu trung tâm.', includes: ['Xe máy số/tay ga', 'Mũ bảo hiểm'], note: 'Cần giấy tờ tùy thân khi nhận xe. Nhắn nhà để giữ xe trước.' },
+    { icon: '🎒', name: 'Hỗ trợ hành lý & đưa đón', price: 0, unit: '', time: 'Báo trước khi đến', description: 'Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.', includes: ['Mang hành lý lên xuống', 'Tư vấn xe khứ hồi'], note: 'Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.' },
+    { icon: '🧭', name: 'Tư vấn lịch trình', price: 0, unit: '', time: 'Miễn phí', description: 'Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.', includes: ['Gợi ý theo mùa và thời tiết', 'Combo phòng, ăn sáng, xe khứ hồi (nhắn nhà để biết giá)'], note: 'Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.' },
   ],
   gallery: [
     { image_url: 'images/hero-san-may.jpg', caption: 'Biển mây Tà Xùa' },
