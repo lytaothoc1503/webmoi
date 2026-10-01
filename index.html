@@ -909,6 +909,10 @@
       .brand-logo-text { font-size: 20px; text-transform: none; white-space: nowrap; }
       .brand-sub { white-space: nowrap; }
       .nav-links { gap: 14px; }
+      .lang-switch { display: inline-flex; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; overflow: hidden; background: transparent; cursor: pointer; padding: 0; font: 700 11.5px/1 'Montserrat', sans-serif; flex-shrink: 0; margin-left: 14px; }
+      .lang-switch span { padding: 7px 9px; color: #fff; }
+      .lang-switch span.on { background: var(--accent-orange); }
+      @media (max-width: 1240px) { .lang-switch { margin-left: auto; margin-right: 12px; } }
       .nav-more { position: relative; }
       .nav-more-btn { cursor: pointer; }
       .nav-more-btn .caret { font-size: 10px; margin-left: 2px; }
@@ -919,7 +923,7 @@
       .nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown, .nav-more:focus-within .nav-dropdown { display: block; }
       .nav-links a { white-space: nowrap; font-size: 12.5px; }
       .nav-links a.active, .mobile-nav a.active { color: var(--accent-orange); }
-      @media (max-width: 1160px) { .nav-links { display: none; } .hamburger { display: flex; } }
+      @media (max-width: 1240px) { .nav-links { display: none; } .hamburger { display: flex; } }
 
       /* TRUST STRIP / CTA / STICKY BAR */
       .trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1100px; margin: -34px auto 0; position: relative; z-index: 5; padding: 0 20px; }
@@ -1077,6 +1081,7 @@
           <span class="brand-text"><span class="brand-logo-text" data-site="short"></span><span class="brand-sub">Homestay Tà Xùa</span></span>
         </div>
         <ul class="nav-links" id="nav-links"></ul>
+        <button type="button" class="lang-switch" id="lang-switch" title="Ngôn ngữ / Language"><span data-l="vi">VI</span><span data-l="en">EN</span></button>
         <div class="hamburger" id="hamburger-btn">
           <span></span><span></span><span></span>
         </div>
@@ -1367,5 +1372,6 @@
     <script src="data.js"></script>
     <script src="app.js"></script>
     <script src="account.js"></script>
+    <script src="i18n.js"></script>
   </body>
 </html>

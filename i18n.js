@@ -1,0 +1,561 @@
+/* ===== ĐA NGÔN NGỮ: Tiếng Việt (mặc định) <-> English =====
+   Cách hoạt động: giữ nguyên nội dung tiếng Việt trong code, khi khách bấm EN thì chữ trên trang
+   được thay bằng bản dịch trong bảng DICT bên dưới (tra theo đúng câu tiếng Việt). Bấm VI để quay lại.
+   Muốn dịch câu mới: thêm dòng  "câu tiếng Việt": "English text"  vào DICT. Câu chưa có trong DICT sẽ giữ nguyên tiếng Việt. */
+(function () {
+  const DICT = /*DICT*/{
+"Trang Chủ": "Home",
+"Giới Thiệu": "About",
+"Hạng Phòng": "Rooms",
+"Tour Tà Xùa": "Ta Xua Tours",
+"Thư Viện": "Gallery",
+"Khách Nói": "Guest Reviews",
+"FAQ": "FAQ",
+"Tra Cứu Đơn": "Track Order",
+"Dịch Vụ": "Services",
+"Liên Hệ": "Contact",
+"Khám Phá Thêm": "Explore More",
+"Đăng nhập": "Log in",
+"Đăng xuất": "Log out",
+"Đăng nhập / Đăng ký": "Log in / Sign up",
+"Đặt Phòng": "Book Now",
+"Đặt Phòng Ngay": "Book Now",
+"ĐẶT PHÒNG": "BOOK NOW",
+"ĐẶT PHÒNG NGAY": "BOOK NOW",
+"Homestay Tà Xùa": "Ta Xua Homestay",
+"Nhà của An": "Nha cua An",
+"Nhà của An Tà Xùa": "Nha cua An Ta Xua",
+"Nhà của An Homestay Tà Xùa": "Nha cua An Homestay Ta Xua",
+"NHÀ CỦA AN HOMESTAY": "NHA CUA AN HOMESTAY",
+"Thức dậy giữa biển mây Tà Xùa": "Wake up in the sea of clouds of Ta Xua",
+"Khám Phá & Đặt Phòng": "Explore & Book",
+"Nhắn Facebook": "Message on Facebook",
+"Nhận 14:00 · Trả 12:00": "Check-in 14:00 · Check-out 12:00",
+"Báo trước nếu cần gửi hành lý": "Let us know if you need to store luggage",
+"Giá hiển thị rõ ràng": "Clear, upfront prices",
+"Thấy giá trước khi đặt, không phí ẩn": "See prices before booking, no hidden fees",
+"Hỗ trợ 24/7": "24/7 support",
+"Nhắn Messenger bất cứ lúc nào": "Message us on Messenger anytime",
+"Khách đánh giá 5★": "Guests rate us 5★",
+"Đánh giá thật trên Google Maps": "Real reviews on Google Maps",
+"Bình yên giữa đại ngàn": "Peace in the heart of the mountains",
+"Nhà của An - thức dậy cùng biển mây": "Nha cua An - wake up with the sea of clouds",
+"Nhà của An Homestay Tà Xùa là điểm dừng chân mộc mạc giữa vùng núi Tà Xùa, Bắc Yên, Sơn La. Đây là nơi bạn gác lại bộn bề, thưởng thức một ly cà phê nóng và đón những buổi sáng mây trắng bồng bềnh ngay trước mắt.": "Nha cua An Homestay Ta Xua is a rustic stop in the mountains of Ta Xua, Bac Yen, Son La. Leave your worries behind, enjoy a hot cup of coffee and greet mornings of drifting white clouds right before your eyes.",
+"được World Travel Awards 2026 vinh danh là Điểm đến du lịch mới nổi hàng đầu châu Á.": "was named Asia's Leading Emerging Tourism Destination by World Travel Awards 2026.",
+"Tà Xùa": "Ta Xua",
+"Săn mây ngay gần nhà": "Cloud hunting right by the house",
+"Dậy sớm là có thể ngắm biển mây và bình minh trên núi.": "Wake up early to see the sea of clouds and sunrise over the mountains.",
+"Không gian gỗ ấm cúng": "Cozy wooden space",
+"Phòng nghỉ mộc mạc, gần gũi với thiên nhiên Tây Bắc.": "Rustic rooms close to the nature of the Northwest.",
+"Góc cà phê thư giãn": "A relaxing coffee corner",
+"Một ly cà phê, một khung cảnh núi rừng và những câu chuyện chậm rãi.": "A cup of coffee, a mountain view and slow conversations.",
+"Nhà của An bắt đầu từ một mong muốn giản dị: có một góc nhỏ trên Tà Xùa để khách dừng chân, uống ly cà phê nóng và nhìn mây trôi dưới chân mình.": "Nha cua An began with a simple wish: a small corner on Ta Xua where guests can stop, sip hot coffee and watch clouds drift beneath their feet.",
+"Chúng tôi giữ nhà thật mộc, thật ấm, để mỗi vị khách đến đây được nghỉ ngơi chậm lại giữa núi rừng Tây Bắc.": "We keep the house simple and warm so every guest can slow down and rest in the Northwest mountains.",
+"— Chủ nhà An": "— An, your host",
+"nội dung mẫu": "sample content",
+"giá & nội dung mẫu": "sample price & content",
+"mẫu - chủ nhà sẽ xác nhận": "sample - to be confirmed by the host",
+"Không Gian Nghỉ Dưỡng": "Places to Stay",
+"Chọn Xem & Đặt Phòng": "Browse & Book a Room",
+"Phòng Đôi Gỗ View Thung Lũng": "Wooden Double Room - Valley View",
+"Phòng Gia Đình": "Family Room",
+"Giường Tập Thể (Dorm)": "Dorm Bed",
+"Phòng Đôi Gỗ": "Wooden Double Room",
+"Đặt Hạng Phòng Này": "Book This Room",
+"2 khách": "2 guests",
+"4 khách": "4 guests",
+"1 khách / giường": "1 guest / bed",
+"1 giường đôi": "1 double bed",
+"2 giường đôi": "2 double beds",
+"Giường tầng": "Bunk bed",
+"View thung lũng, biển mây": "Valley & sea-of-clouds view",
+"View núi rừng": "Mountain forest view",
+"Không gian chung": "Shared space",
+"Ngắm mây từ khung cửa": "Watch the clouds from the window",
+"Chăn đệm ấm cho đêm núi": "Warm bedding for mountain nights",
+"Phù hợp nhóm nhỏ, gia đình": "Good for small groups and families",
+"Không gian rộng rãi": "Spacious",
+"Gần khu ngắm mây": "Near the cloud viewing spot",
+"Phù hợp nhóm bạn": "Great for groups of friends",
+"Tiết kiệm chi phí": "Budget-friendly",
+"Không gian chung vui vẻ": "Fun shared space",
+"/ đêm": "/ night",
+"/ người": "/ person",
+"/ ngày": "/ day",
+"từ / ly": "from / cup",
+"Liên hệ báo giá": "Contact for a quote",
+"Báo giá khi nhà liên hệ": "Quote provided on contact",
+"Đang cập nhật": "Coming soon",
+"Khám Phá Tà Xùa": "Discover Ta Xua",
+"Tour Trải Nghiệm & Chữa Lành": "Experience & Healing Tours",
+"Xem chi tiết": "View details",
+"Xem chi tiết →": "View details →",
+"Tour Trải Nghiệm": "Tours",
+"Săn Mây Bình Minh": "Sunrise Cloud Hunting",
+"Chinh Phục Sống Lưng Khủng Long": "Dinosaur Spine Trek",
+"Rừng Chè Shan Tuyết Cổ Thụ": "Ancient Shan Tuyet Tea Forest",
+"Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.": "Wake up early to catch the sea of clouds and sunrise on the Ta Xua peak.",
+"Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.": "A famous trail of winding mountain ridges through the clouds.",
+"Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.": "Stroll among ancient tea trees in the cool mountain air.",
+"Khoảng 3 giờ (xuất phát 4:30 sáng)": "About 3 hours (departing 4:30 am)",
+"Nửa ngày (khoảng 5 giờ)": "Half a day (about 5 hours)",
+"Khoảng 3 giờ": "About 3 hours",
+"Sảnh Nhà của An": "Nha cua An lobby",
+"Hướng dẫn viên dẫn đường": "Guide to lead the way",
+"Nước suối": "Bottled water",
+"Đèn pin / áo ấm (mượn tại nhà)": "Flashlight / warm jacket (borrow at the house)",
+"Hướng dẫn viên": "Guide",
+"Nước và đồ ăn nhẹ": "Water and light snacks",
+"Hỗ trợ chụp ảnh": "Photo assistance",
+"Thưởng thức trà tại vườn": "Tea tasting in the garden",
+"Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn, tour được dời ngày, nhà sẽ báo trước.": "Bring a warm jacket and shoes with good grip. In heavy rain the tour is rescheduled; we will let you know in advance.",
+"Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.": "Good fitness required. Wear sports shoes and avoid going when it is wet and slippery.",
+"Nên mang áo ấm, đi giày kín.": "Bring warm clothes and wear closed shoes.",
+"Xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Hướng dẫn viên đưa bạn tới điểm ngắm đẹp nhất trong ngày, chụp ảnh cùng bạn rồi cùng quay về ăn sáng nóng.": "Set off while it is still dark to catch the sea of clouds and sunrise. Your guide takes you to the best viewpoint of the day, takes photos with you, then you head back together for a hot breakfast.",
+"Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động và muốn có những tấm ảnh đẹp.": "A classic Ta Xua trekking route with ridges winding through the clouds. Great for active groups who want beautiful photos.",
+"Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.": "Walk among ancient Shan Tuyet tea trees, hear about local tea-making and sip hot tea in the middle of the forest.",
+"Bao gồm": "Includes",
+"ĐẶT TOUR NÀY": "BOOK THIS TOUR",
+"Hỏi thêm qua Messenger": "Ask more on Messenger",
+"Nhắn nhà để đặt / hỏi giá": "Message us to book / ask for prices",
+"Điểm hẹn:": "Meeting point:",
+"Khoảnh Khắc Tà Xùa": "Ta Xua Moments",
+"Thư Viện Ảnh": "Photo Gallery",
+"Biển mây Tà Xùa": "Sea of clouds, Ta Xua",
+"Hoàng hôn rực lửa": "Fiery sunset",
+"Trạm Mầm Xôi cà phê": "Tram Mam Xoi coffee",
+"Ruộng bậc thang mùa chín": "Terraced fields in harvest season",
+"Bắp treo bên khung cửa": "Corn hanging by the window",
+"Bữa sáng \"Hãy lấy tôi đi\"": "\"Take me away\" breakfast",
+"Góc check-in ở nhà gỗ": "Check-in corner at the wooden house",
+"Đèn lồng lên đèn trên biển mây": "Lanterns lit above the clouds",
+"Giường cạnh khung cửa ngắm mây": "Bed by the cloud-view window",
+"Nhà gỗ giữa đồi xanh": "Wooden house on the green hill",
+"Nằm trong phòng ngắm biển mây": "Watching the clouds from bed",
+"Góc ban công ngắm mây": "Balcony corner with cloud views",
+"Hoàng hôn từ quán cà phê": "Sunset from the café",
+"Bậc đá dẫn lối đến nhà gỗ": "Stone steps to the wooden house",
+"Chào buổi sáng trên mây": "Good morning above the clouds",
+"Bữa sáng nóng giữa trời mây": "Hot breakfast among the clouds",
+"Nhà của An lúc hoàng hôn trên biển mây": "Nha cua An at sunset above the clouds",
+"Tà Xùa - Điểm đến du lịch mới nổi hàng đầu châu Á 2026": "Ta Xua - Asia's Leading Emerging Tourism Destination 2026",
+"Ảnh": "Photo",
+"Tiếng Nói Khách Hàng": "Guest Voices",
+"Khách Nói Gì Về Chúng Tôi": "What Guests Say About Us",
+"Phòng ốc sạch sẽ, ấm cúng. Mình lên thời điểm 20-22/8/25 thời tiết đẹp, sáng sớm mưa lất phất, tầm 9h sáng trở đi mây phủ giăng khắp cả ngọn đồi trông rất chill. Dù vậy nhiệt độ chỉ tầm 19-20° nên rất đã. Các bạn nhân viên nhiệt tình dễ thương. Dù đi bộ lên khá mệt nhưng suy nghĩ như đi tập thể dục thì cũng vui. Đừng lo về hành lí vì đã có các bạn nhân viên hỗ trợ mang lên xuống.": "Clean, cozy rooms. I visited on 20-22/8/25; the weather was lovely, light drizzle early morning, and from about 9am clouds covered the whole hillside - so chill. The temperature was only around 19-20° which was great. The staff are friendly and lovely. Walking up is a bit tiring but think of it as exercise and it's fun. Don't worry about luggage, the staff help carry it up and down. (Translated from Vietnamese)",
+"Chị chủ nhiệt tình, dễ thương. Nhân viên phục vụ chu đáo nhiệt tình. Phòng và cafe view đẹppp, dễ săn mây, giá cả hợp lí. Đặt combo 3n2d bao gồm ăn sáng (mì thập cẩm), phòng và xe khứ hồi 1tr2 + mua nước ở cafe đc giảm 15% và home cũng có dv cho thuê xe máy nên rất tiện, gần trung tâm. Phòng mình ở là An 9, giường ở 3 người vẫn rộng rãi thoải mái. Mỗi tội từ phòng leo lên mệt muốn đứt hơi.": "The owner is warm and lovely. The staff are attentive and enthusiastic. The rooms and café have beautiful views, it's easy to hunt clouds, and prices are reasonable. I booked the 3-day-2-night combo with breakfast (mixed noodles), room and round-trip transfer for 1.2 million VND, plus drinks at the café were 15% off, and the home also rents motorbikes, which is very convenient and close to the center. My room was An 9; even with 3 people in the bed it was roomy and comfortable. Only downside: climbing up from the room leaves you out of breath. (Translated from Vietnamese)",
+"Thu Vu": "Thu Vu",
+"Vy Anh Trần": "Vy Anh Tran",
+"Giải Đáp Thắc Mắc": "Answers to Your Questions",
+"Câu Hỏi Thường Gặp": "Frequently Asked Questions",
+"Làm sao để đặt phòng?": "How do I book a room?",
+"Bạn bấm \"Đặt Phòng\" và điền thông tin, hoặc nhắn trực tiếp qua Facebook của nhà. Nhà sẽ liên hệ xác nhận với bạn.": "Tap \"Book Now\" and fill in your details, or message us directly on Facebook. We will contact you to confirm.",
+"Giờ nhận và trả phòng như thế nào?": "What are the check-in and check-out times?",
+"Nhận phòng từ 14:00 và trả phòng trước 12:00. Nếu cần đến sớm hoặc gửi hành lý, hãy báo trước cho nhà.": "Check-in is from 14:00 and check-out before 12:00. If you need to arrive early or store luggage, please tell us in advance.",
+"Thời điểm nào săn mây đẹp nhất?": "When is the best time to see the clouds?",
+"Mùa săn mây ở Tà Xùa thường từ cuối tháng 9 đến tháng 4 năm sau. Thời tiết thay đổi theo ngày nên nhà sẽ tư vấn thêm khi bạn liên hệ.": "Cloud season in Ta Xua usually runs from late September to April. The weather changes daily, so we will advise you when you get in touch.",
+"Nhà có hỗ trợ tư vấn lịch trình không?": "Do you help plan itineraries?",
+"Có. Bạn nhắn cho nhà thời gian dự định đến, nhà sẽ gợi ý lịch trình săn mây và các điểm tham quan gần đó.": "Yes. Tell us when you plan to come and we will suggest a cloud-hunting itinerary and nearby sights.",
+"Chính sách hoàn / hủy phòng thế nào?": "What is the cancellation / refund policy?",
+"Hủy trước 7 ngày hoàn 100%, từ 3 đến 6 ngày hoàn 50%, dưới 3 ngày không hoàn. Xem chi tiết ở trang Chính sách. Nếu thời tiết xấu khiến bạn không lên được, hãy nhắn nhà để được hỗ trợ.": "Cancel 7+ days ahead for a 100% refund, 3-6 days ahead 50%, under 3 days no refund. See the Policy page for details. If bad weather stops you from coming up, message us for help.",
+"Theo Dõi Đặt Phòng": "Follow Your Booking",
+"Tra Cứu Đơn Đặt Phòng": "Track Your Booking",
+"Xem tình trạng đơn, thanh toán và đánh giá. Chỉ cần nhập": "See your order status, payment and review. Just enter your",
+"Mã đơn đặt phòng (khuyên dùng):": "Booking code (recommended):",
+"Hoặc Số điện thoại đã đặt:": "Or the phone number used to book:",
+"(nhập đúng mã là xem được, trên mọi thiết bị) hoặc": "(enter the correct code to view it, on any device) or",
+"đã đặt. Lịch sử đơn bên dưới là riêng tư, chỉ hiện khi bạn đăng nhập.": "you booked with. The order history below is private and only shows when you log in.",
+"Mã đơn": "Booking code",
+"Số điện thoại": "Phone number",
+"TRA CỨU ĐƠN": "TRACK ORDER",
+"Lịch sử đặt phòng của bạn": "Your booking history",
+"↻ Làm mới": "↻ Refresh",
+"Đăng nhập để xem lịch sử đơn": "Log in to view order history",
+"Lịch sử đặt phòng là riêng tư, mỗi người chỉ xem được đơn của chính mình.": "Booking history is private; everyone can only see their own orders.",
+"Có mã đơn? Nhập vào ô tra cứu phía trên, không cần đăng nhập.": "Have a booking code? Enter it in the search box above, no login needed.",
+"Tài khoản của bạn chưa có đơn nào. Sau khi đặt phòng, đơn sẽ hiện ở đây trên mọi thiết bị bạn đăng nhập. Có mã đơn từ nhà? Nhập vào ô tra cứu phía trên.": "Your account has no orders yet. After booking, your order will appear here on every device you log in on. Have a code from us? Enter it in the search box above.",
+"để xem chi tiết.": "to see the details.",
+"Hãy lưu mã này để tra cứu tình trạng đơn": "Save this code to check your order status later",
+"MÃ ĐƠN CỦA BẠN:": "YOUR BOOKING CODE:",
+"Chăm Sóc Tận Tâm": "Caring Service",
+"Dịch Vụ & Trải Nghiệm Tại Nhà": "Services & Experiences at the House",
+"Xem trước dịch vụ và giá, không cần đăng nhập hay điền thông tin.": "Preview our services and prices, no login or forms needed.",
+"Trà chiều ngắm hoàng hôn": "Afternoon tea at sunset",
+"Bữa sáng trên mây": "Breakfast above the clouds",
+"Cà phê & đồ uống": "Coffee & drinks",
+"Thuê xe máy": "Motorbike rental",
+"Hỗ trợ hành lý & đưa đón": "Luggage help & transfers",
+"Tư vấn lịch trình": "Itinerary advice",
+"Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.": "A pot of hot tea with small treats while you watch the sunset above the clouds.",
+"Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.": "A hot bowl of mixed noodles with a drink, eaten among the clouds.",
+"Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.": "A coffee corner with mountain views right at the house, with outdoor seating.",
+"Có xe máy cho thuê để di chuyển quanh Tà Xùa và khu trung tâm.": "Motorbikes for rent to get around Ta Xua and the town center.",
+"Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.": "The walk up to the house is a little steep; our staff help carry luggage up and down and advise on transport.",
+"Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.": "Suggestions on timing, cloud spots and 2-day-1-night or 3-day-2-night itineraries.",
+"16:00 - 18:00 hằng ngày": "16:00 - 18:00 daily",
+"Theo nhu cầu": "On demand",
+"Báo trước khi đến": "Tell us before you arrive",
+"Miễn phí": "Free",
+"Ấm trà nóng theo mùa": "Seasonal hot tea",
+"Bánh / hạt nhỏ ăn kèm": "Small cakes / nuts on the side",
+"Chỗ ngồi view hoàng hôn": "Seat with a sunset view",
+"Mì thập cẩm": "Mixed noodles",
+"Cà phê hoặc trà nóng": "Coffee or hot tea",
+"Cà phê, trà, nước ép": "Coffee, tea, juice",
+"Chỗ ngồi ngoài trời ngắm mây": "Outdoor seats with cloud views",
+"Xe máy số/tay ga": "Manual / scooter motorbike",
+"Mũ bảo hiểm": "Helmet",
+"Mang hành lý lên xuống": "Luggage carried up and down",
+"Tư vấn xe khứ hồi": "Round-trip transport advice",
+"Gợi ý theo mùa và thời tiết": "Suggestions by season and weather",
+"Combo phòng, ăn sáng, xe khứ hồi (nhắn nhà để biết giá)": "Combo of room, breakfast and round-trip transfer (message us for a price)",
+"Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.": "Arrive 15 minutes early to pick a good spot. Message us to reserve for larger groups.",
+"Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.": "Guests staying with us can add this when booking or by messaging us.",
+"Khách ở nhà được giảm khi gọi đồ uống tại quán.": "Staying guests get a discount on drinks at the café.",
+"Cần giấy tờ tùy thân khi nhận xe. Nhắn nhà để giữ xe trước.": "ID required when picking up the bike. Message us to reserve in advance.",
+"Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.": "Tell us your arrival time so we can prepare. Transfer costs will be quoted when you message us.",
+"Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.": "Message us on Messenger anytime, we support you 24/7.",
+"Hủy trước ngày nhận phòng từ 7 ngày: hoàn 100% tiền đã chuyển.": "Cancel 7 or more days before check-in: 100% refund of the amount paid.",
+"Hủy từ 3 đến 6 ngày trước ngày nhận phòng: hoàn 50%.": "Cancel 3 to 6 days before check-in: 50% refund.",
+"Hủy dưới 3 ngày hoặc không đến: không hoàn tiền.": "Cancel less than 3 days before or no-show: no refund.",
+"Đổi ngày: báo trước ít nhất 3 ngày, tùy tình trạng phòng.": "Changing dates: notify at least 3 days ahead, subject to room availability.",
+"Thời tiết xấu, đường bị chặn khiến không thể lên Tà Xùa: nhà hỗ trợ đổi ngày hoặc hoàn tiền, báo cho nhà qua Messenger.": "Bad weather or blocked roads preventing you from reaching Ta Xua: we will help reschedule or refund; tell us on Messenger.",
+"Kết Nối Với Chúng Tôi": "Get in Touch",
+"Liên Hệ & Chỉ Đường": "Contact & Directions",
+"Địa chỉ:": "Address:",
+"CHỈ ĐƯỜNG TRÊN GOOGLE MAPS": "GET DIRECTIONS ON GOOGLE MAPS",
+"Tà Xùa, Bắc Yên, Sơn La, Việt Nam": "Ta Xua, Bac Yen, Son La, Vietnam",
+"Bản đồ Tà Xùa": "Map of Ta Xua",
+"Facebook": "Facebook",
+"Facebook:": "Facebook:",
+"Zalo": "Zalo",
+"Zalo:": "Zalo:",
+"Gọi điện": "Call",
+"Gọi điện:": "Call:",
+"Gmail": "Email",
+"Gmail:": "Email:",
+"Fanpage Nhà của An": "Nha cua An Fanpage",
+"Chat Zalo": "Chat on Zalo",
+"Gmail: đang cập nhật": "Email: coming soon",
+"Gọi điện: đang cập nhật": "Call: coming soon",
+"Zalo: đang cập nhật": "Zalo: coming soon",
+"Facebook: đang cập nhật": "Facebook: coming soon",
+"Điểm dừng chân mộc mạc giữa Tà Xùa, nơi bạn thức dậy cùng biển mây.": "A rustic stop in Ta Xua, where you wake up with the sea of clouds.",
+"ĐỊA CHỈ & LIÊN HỆ": "ADDRESS & CONTACT",
+"Địa chỉ": "Address",
+"QUY ĐỊNH LƯU TRÚ": "STAY RULES",
+"• Giờ nhận phòng:": "• Check-in time:",
+"• Giờ trả phòng:": "• Check-out time:",
+"• Liên hệ trước nếu cần gửi hành lý hoặc nhận phòng sớm.": "• Contact us in advance if you need to store luggage or check in early.",
+"Chính sách hoàn / hủy": "Cancellation / refund policy",
+"Xem chính sách hoàn / hủy": "View cancellation / refund policy",
+"© 2026 Nhà của An Homestay Tà Xùa. All rights reserved.": "© 2026 Nha cua An Homestay Ta Xua. All rights reserved.",
+"Sẵn sàng thức dậy trên biển mây?": "Ready to wake up above the clouds?",
+"Chọn phòng, xem giá rõ ràng và giữ chỗ chỉ trong vài phút.": "Choose a room, see clear prices and reserve in just a few minutes.",
+"Phiếu Đặt Phòng Trực Tuyến": "Online Booking Form",
+"Dịch Vụ / Hạng Phòng:": "Service / Room:",
+"-- Chọn hạng phòng hoặc tour --": "-- Choose a room or tour --",
+"Ngày Nhận Phòng:": "Check-in date:",
+"Ngày Trả Phòng:": "Check-out date:",
+"Họ và tên người đặt:": "Name of the person booking:",
+"Số điện thoại liên hệ (Zalo):": "Contact phone number (Zalo):",
+"Số lượng khách (Người lớn + Trẻ em):": "Number of guests (adults + children):",
+"Ghi chú thêm (Đưa đón, tiệc BBQ...):": "Additional notes (transfers, BBQ party...):",
+"Tổng tiền dự tính:": "Estimated total:",
+"TẠO ĐƠN & XEM THÔNG TIN THANH TOÁN →": "CREATE ORDER & VIEW PAYMENT INFO →",
+"ĐANG TẠO ĐƠN...": "CREATING ORDER...",
+"Ví dụ: Hoàng Minh Anh": "E.g. Minh Anh Hoang",
+"Ví dụ: 2 người lớn": "E.g. 2 adults",
+"Yêu cầu thêm nếu có...": "Any extra requests...",
+"VD: NA7K3M9QXP": "E.g. NA7K3M9QXP",
+"Đơn Đặt Phòng Của Bạn": "Your Booking",
+"Ngân hàng:": "Bank:",
+"Số tài khoản:": "Account number:",
+"Chủ tài khoản:": "Account holder:",
+"Số tiền:": "Amount:",
+"Cú pháp:": "Transfer note:",
+"Chờ báo giá": "Awaiting quote",
+"Liên hệ": "Contact",
+"QUÉT MÃ QR ĐỂ HOÀN TẤT ĐẶT PHÒNG": "SCAN THE QR CODE TO COMPLETE YOUR BOOKING",
+"Vui lòng quét mã QR chuyển khoản giữ chỗ qua tài khoản nhà:": "Please scan the QR code to transfer your deposit to our account:",
+"TÔI ĐÃ CHUYỂN KHOẢN XONG": "I HAVE MADE THE TRANSFER",
+"Chưa muốn thanh toán ngay?": "Not ready to pay yet?",
+"Đơn đã được lưu vào lịch sử của bạn. Bạn có thể xem lại, thanh toán sau hoặc trao đổi thêm với nhà trước khi chuyển khoản.": "Your order is saved in your history. You can review it, pay later, or talk to us before transferring.",
+"Lưu vào lịch sử, thanh toán sau": "Save to history, pay later",
+"Lưu vào lịch sử": "Save to history",
+"Trao đổi với nhà qua Messenger": "Chat with us on Messenger",
+"Mức giá hoặc thông tin thanh toán của dịch vụ này sẽ được nhà gửi cho bạn qua Messenger. Bạn hãy nhắn kèm": "We will send you the price or payment details for this service via Messenger. Please message us with your",
+"mã đơn": "booking code",
+"🕑 Liên hệ homestay 24/7": "🕑 Contact the homestay 24/7",
+"Cần hỏi thêm về phòng, giá, đưa đón hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.": "Questions about rooms, prices, transfers or itineraries? Message us now, no prepayment needed.",
+"Nhà hỗ trợ 24/7. Nhắn tin bất cứ lúc nào, nhà sẽ phản hồi sớm nhất.": "We are here 24/7. Message anytime and we will reply as soon as we can.",
+"Đã ghi nhận bạn chuyển khoản. Nhà đang đối chiếu giao dịch.": "We have noted your transfer. We are verifying the transaction.",
+"📄 Nhận phiếu xác nhận dịch vụ chính thức": "📄 Get your official service confirmation voucher",
+"📄 Phiếu xác nhận dịch vụ chính thức": "📄 Official service confirmation voucher",
+"Liên hệ homestay qua Messenger kèm": "Contact the homestay on Messenger with your",
+"và ảnh chụp giao dịch. Nhà sẽ gửi phiếu xác nhận dịch vụ chính thức cho bạn.": "and a screenshot of the transaction. We will send you the official service confirmation voucher.",
+"Liên hệ homestay qua Messenger kèm mã đơn": "Contact the homestay on Messenger with booking code",
+"để nhận phiếu.": "to receive your voucher.",
+"LIÊN HỆ HOMESTAY ĐỂ NHẬN PHIẾU XÁC NHẬN": "CONTACT THE HOMESTAY FOR YOUR CONFIRMATION VOUCHER",
+"Sao chép nội dung đơn": "Copy order details",
+"Xem tình trạng đơn": "View order status",
+"Chờ thanh toán": "Awaiting payment",
+"Đã thanh toán - chờ xác nhận": "Paid - awaiting confirmation",
+"Đặt phòng thành công": "Booking confirmed",
+"Hoàn thành": "Completed",
+"Hủy đơn": "Cancelled",
+"Chờ duyệt tiền cọc": "Awaiting deposit approval",
+"Đã duyệt phòng": "Room approved",
+"Đã tạo đơn": "Order created",
+"Đã thanh toán, chờ xác nhận": "Paid, awaiting confirmation",
+"Đơn đã được tạo. Hoàn tất chuyển khoản để nhà giữ chỗ cho bạn.": "Your order has been created. Complete the transfer so we can hold your spot.",
+"Nhà đã nhận thông báo thanh toán của bạn và đang đối chiếu giao dịch. Nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch để được xác nhận nhanh hơn.": "We received your payment notice and are verifying the transaction. Message us on Facebook with your booking code and a transaction screenshot for faster confirmation.",
+"Đặt phòng thành công! Hãy nhắn Facebook của nhà để nhận phiếu xác nhận dịch vụ chính thức.": "Booking confirmed! Message us on Facebook to receive your official service confirmation voucher.",
+"Cảm ơn bạn đã ở cùng Nhà của An. Hẹn gặp lại bạn!": "Thank you for staying with Nha cua An. See you again!",
+"Đơn này đã được hủy. Cần hỗ trợ, bạn hãy liên hệ nhà qua Facebook.": "This order was cancelled. If you need help, contact us on Facebook.",
+"Không tìm thấy đơn này trên hệ thống của nhà (có thể đã được xóa).": "This order was not found in our system (it may have been deleted).",
+"Đơn lưu trên thiết bị này. Hãy nhắn Facebook của nhà kèm mã đơn để được xác nhận.": "This order is stored on this device. Message us on Facebook with the code to get it confirmed.",
+"Tiếp tục thanh toán": "Continue payment",
+"Nhắn Facebook nhận phiếu xác nhận": "Message us on Facebook for your voucher",
+"Gửi minh chứng qua Facebook": "Send proof on Facebook",
+"Viết đánh giá": "Write a review",
+"Xóa khỏi lịch sử": "Remove from history",
+"Đánh giá của bạn đã hiển thị ✓": "Your review is published ✓",
+"Đánh giá đang chờ nhà duyệt": "Review awaiting approval",
+"Viết Đánh Giá": "Write a Review",
+"Cảm nhận của bạn:": "Your feedback:",
+"Bạn thấy chuyến nghỉ tại Nhà của An thế nào?": "How was your stay at Nha cua An?",
+"GỬI ĐÁNH GIÁ": "SUBMIT REVIEW",
+"Đánh giá sẽ hiển thị trên web sau khi nhà duyệt.": "Your review will appear on the site after we approve it.",
+"Tài khoản của bạn": "Your account",
+"Chào mừng bạn quay lại": "Welcome back",
+"Tạo tài khoản mới": "Create a new account",
+"Quên mật khẩu": "Forgot password",
+"Đặt lại mật khẩu": "Reset password",
+"ĐĂNG NHẬP": "LOG IN",
+"ĐĂNG KÝ": "SIGN UP",
+"ĐĂNG KÝ TÀI KHOẢN": "CREATE ACCOUNT",
+"ĐỔI MẬT KHẨU": "CHANGE PASSWORD",
+"Họ và tên": "Full name",
+"(là tên đăng nhập)": "(your username)",
+"(không bắt buộc)": "(optional)",
+"Năm sinh": "Year of birth",
+"Mật khẩu": "Password",
+"Mật khẩu mới": "New password",
+"Quên mật khẩu?": "Forgot password?",
+"Nguyễn Văn A (hiện trên phiếu đặt phòng)": "Full name (shown on your booking voucher)",
+"Ít nhất 6 ký tự": "At least 6 characters",
+"VD: 1995": "E.g. 1995",
+"Hiện / ẩn mật khẩu": "Show / hide password",
+"Tôi đã đọc và đồng ý với": "I have read and agree to the",
+"Điều khoản & Chính sách quyền riêng tư": "Terms & Privacy Policy",
+"Điều khoản & Chính sách": "Terms & Policy",
+", đồng ý để nhà lưu thông tin đặt phòng của tôi.": ", and agree that the homestay stores my booking information.",
+"Tiếp tục đồng nghĩa bạn đồng ý": "By continuing you agree to the",
+"hoặc": "or",
+"TIẾP TỤC VỚI FACEBOOK": "CONTINUE WITH FACEBOOK",
+"TIẾP TỤC VỚI GOOGLE": "CONTINUE WITH GOOGLE",
+"← Quay lại đăng nhập": "← Back to log in",
+"NHẮN NHÀ QUA MESSENGER": "MESSAGE US ON MESSENGER",
+"Nhà chưa dùng email nên không gửi được liên kết. Bạn nhắn nhà qua Messenger kèm": "We do not use email, so we cannot send a reset link. Message us on Messenger with your",
+"số điện thoại đã đăng ký": "registered phone number",
+", nhà sẽ đặt lại mật khẩu cho bạn ngay.": ", and we will reset your password right away.",
+"Đăng nhập bằng số điện thoại để đặt phòng và xem lịch sử đơn trên mọi thiết bị.": "Log in with your phone number to book and see your order history on any device.",
+"Tạo tài khoản để tích lũy điểm thưởng và quản lý đơn đặt phòng.": "Create an account to earn rewards and manage your bookings.",
+"Quên mật khẩu? Nhà sẽ đặt lại giúp bạn qua Messenger.": "Forgot your password? We will reset it for you via Messenger.",
+"Nhập mật khẩu mới cho tài khoản của bạn.": "Enter a new password for your account.",
+"Bạn cần tích đồng ý Điều khoản & Chính sách trước khi tiếp tục.": "Please tick to accept the Terms & Policy before continuing.",
+"Bạn cần tích đồng ý Điều khoản & Chính sách để tạo tài khoản.": "Please tick to accept the Terms & Policy to create an account.",
+"Bạn thao tác hơi nhanh, vui lòng đợi khoảng 1 phút rồi thử lại.": "You are going a bit fast. Please wait about a minute and try again.",
+"Bạn thao tác hơi nhanh, vui lòng đợi vài phút rồi thử lại.": "You are going a bit fast. Please wait a few minutes and try again.",
+"Bạn đang đặt lại mật khẩu.": "You are resetting your password.",
+"Chưa tạo được tài khoản lúc này, bạn thử lại hoặc nhắn nhà qua Messenger nhé.": "We could not create your account right now. Please try again or message us on Messenger.",
+"Hệ thống tạm thời chưa mở đăng ký. Bạn nhắn nhà qua Facebook để được hỗ trợ.": "Sign-up is temporarily closed. Please message us on Facebook for help.",
+"Mất kết nối mạng, bạn thử lại nhé.": "Network connection lost, please try again.",
+"Mật khẩu cần từ 6 đến 72 ký tự.": "Password must be 6 to 72 characters.",
+"Mật khẩu cần ít nhất 6 ký tự.": "Password must be at least 6 characters.",
+"Mật khẩu mới phải khác mật khẩu cũ.": "The new password must differ from the old one.",
+"Năm sinh chưa hợp lệ (hoặc để trống).": "Invalid year of birth (or leave it blank).",
+"Số điện thoại chưa đúng, gồm 10 số bắt đầu bằng 0, ví dụ 0912345678.": "Invalid phone number: 10 digits starting with 0, e.g. 0912345678.",
+"Số điện thoại chưa đúng.": "Invalid phone number.",
+"Số điện thoại hoặc mật khẩu chưa đúng. Nếu chưa có tài khoản, hãy chọn tab ĐĂNG KÝ.": "Incorrect phone number or password. If you have no account yet, choose the SIGN UP tab.",
+"Số điện thoại này đã có tài khoản. Hãy chuyển sang tab ĐĂNG NHẬP.": "This phone number already has an account. Please switch to the LOG IN tab.",
+"Tài khoản này chưa dùng được. Bạn nhắn nhà qua Messenger, nhà hỗ trợ ngay.": "This account cannot be used yet. Message us on Messenger and we will help right away.",
+"Tính năng tài khoản chưa sẵn sàng.": "Accounts are not available yet.",
+"Tạo tài khoản thành công": "Account created",
+"Vui lòng nhập họ và tên (dùng để in trên phiếu đặt phòng).": "Please enter your full name (printed on your booking voucher).",
+"Vui lòng nhập họ và tên.": "Please enter your full name.",
+"Đang xử lý...": "Processing...",
+"Đã đăng xuất": "Logged out",
+"Đã đổi mật khẩu": "Password changed",
+"Đăng nhập thành công": "Logged in",
+"Đăng ký thành công! Mời bạn đăng nhập bằng số điện thoại và mật khẩu vừa tạo.": "Sign-up successful! Please log in with your phone number and the password you just created.",
+"Đăng nhập Facebook đang được cài đặt. Bạn dùng số điện thoại tạm nhé.": "Facebook login is being set up. Please use your phone number for now.",
+"Đăng nhập Google đang được cài đặt. Bạn dùng số điện thoại tạm nhé.": "Google login is being set up. Please use your phone number for now.",
+"Vui lòng đăng nhập hoặc đăng ký để đặt dịch vụ. Thông tin bạn vừa điền được giữ nguyên.": "Please log in or sign up to book. The information you filled in is kept.",
+"Vui lòng chọn hạng phòng hoặc tour.": "Please choose a room or tour.",
+"Số điện thoại chưa hợp lệ.": "Invalid phone number.",
+"Ngày nhận phòng không được trong quá khứ.": "Check-in date cannot be in the past.",
+"Ngày trả phòng phải sau ngày nhận phòng ít nhất 1 ngày.": "Check-out must be at least 1 day after check-in.",
+"Trùng mã đơn, vui lòng thử lại.": "Duplicate booking code, please try again.",
+"Chưa kết nối cơ sở dữ liệu. Hãy nhắn Facebook để nhà xác nhận.": "Not connected to the database. Please message us on Facebook to confirm.",
+"Facebook của nhà đang được cập nhật. Đã sao chép nội dung đơn.": "Our Facebook is being updated. Order details copied.",
+"Đã sao chép nội dung đơn": "Order details copied",
+"Đã sao chép nội dung đơn. Hãy dán vào tin nhắn Facebook.": "Order details copied. Paste them into your Facebook message.",
+"Không sao chép được": "Could not copy",
+"Đã gửi": "Sent",
+"Không có": "None",
+"Vui lòng nhập Mã đơn hoặc Số điện thoại đã dùng khi đặt phòng.": "Please enter the booking code or the phone number used when booking.",
+"Mã đơn chưa đúng định dạng. Bạn kiểm tra lại giúp nhé.": "The booking code format is invalid. Please check it.",
+"Không tìm thấy đơn với mã này. Vui lòng kiểm tra lại Mã đơn.": "No order found with this code. Please check the code.",
+"Không tìm thấy đơn nào với số điện thoại này. Bạn thử nhập Mã đơn nhé.": "No orders found for this phone number. Try entering the booking code.",
+"Không tìm thấy đơn.": "Order not found.",
+"Chưa tra cứu được lúc này, bạn vui lòng thử lại sau.": "Cannot look up right now, please try again later.",
+"Tra cứu trực tuyến chưa được bật. Bạn hãy nhắn Facebook của nhà kèm mã đơn để được kiểm tra.": "Online lookup is not enabled. Message us on Facebook with your code to check.",
+"Chưa cập nhật được. Bạn thử lại hoặc nhắn Facebook nhé.": "Could not update. Please try again or message us on Facebook.",
+"Chỉ viết được đánh giá sau khi đặt phòng thành công.": "You can only review after a confirmed booking.",
+"Bạn đã gửi đánh giá cho đơn này rồi.": "You have already reviewed this order.",
+"Bạn hãy viết thêm vài chữ nhé": "Please write a bit more",
+"Nội dung đánh giá chưa hợp lệ.": "The review content is invalid.",
+"Chưa gửi được đánh giá, bạn thử lại sau nhé": "Could not submit the review, please try again later",
+"Cảm ơn bạn! Đánh giá sẽ hiển thị sau khi nhà duyệt.": "Thank you! Your review will appear after we approve it.",
+"Xóa đơn này khỏi lịch sử trên thiết bị? (Đơn vẫn được lưu ở nhà)": "Remove this order from the history on this device? (The homestay still keeps it)",
+"Vì lý do riêng tư, chỉ hiện thông tin tối thiểu. Hãy nhập đủ": "For privacy, only minimal details are shown. Please enter the full",
+"Chính sách quyền riêng tư & Điều khoản sử dụng": "Privacy Policy & Terms of Use",
+"← Về trang chủ": "← Back to home",
+"Cập nhật: 01/10/2026. Áp dụng cho website của Nhà của An Homestay Tà Xùa (Tà Xùa, Bắc Yên, Sơn La).": "Updated: 01/10/2026. Applies to the website of Nha cua An Homestay Ta Xua (Ta Xua, Bac Yen, Son La).",
+"1. Thông tin chúng tôi thu thập": "1. Information we collect",
+"2. Mục đích sử dụng": "2. How we use it",
+"3. Lưu trữ và bảo mật": "3. Storage and security",
+"4. Thanh toán và hủy đơn": "4. Payment and cancellation",
+"5. Quyền của bạn": "5. Your rights",
+"6. Liên hệ": "6. Contact",
+"Chính sách hoàn / hủy phòng": "Cancellation / refund policy",
+"Khi bạn đặt phòng/tour: họ tên, số điện thoại, ngày nhận – trả phòng, số khách, ghi chú. Khi bạn tạo tài khoản: họ tên, số điện thoại, năm sinh (không bắt buộc), hoặc tài khoản Google/Facebook nếu bạn chọn đăng nhập bằng các tài khoản đó (chúng tôi chỉ nhận thông tin cơ bản như tên và email mà họ cho phép).": "When you book a room/tour: name, phone number, check-in/out dates, number of guests, notes. When you create an account: name, phone number, year of birth (optional), or a Google/Facebook account if you choose to log in with them (we only receive basic information such as your name and email that they allow).",
+"Để xác nhận và quản lý đơn đặt phòng, liên hệ hỗ trợ bạn, gửi phiếu xác nhận dịch vụ, đối soát thanh toán và cải thiện chất lượng phục vụ. Chúng tôi không bán thông tin của bạn cho bên thứ ba.": "To confirm and manage bookings, contact and support you, send service confirmation vouchers, reconcile payments and improve our service. We do not sell your information to third parties.",
+"Dữ liệu được lưu trên hệ thống Supabase. Chỉ nhân viên được cấp quyền của homestay mới xem được danh sách đơn. Bạn tra cứu đơn của mình bằng mã đơn và số điện thoại đã đặt, hoặc qua tài khoản của bạn. Mật khẩu được mã hóa, nhà không đọc được mật khẩu của bạn.": "Data is stored on the Supabase system. Only authorized homestay staff can see the order list. You can look up your orders with your booking code and the phone number used, or through your account. Passwords are encrypted; we cannot read your password.",
+"Bạn chuyển khoản theo thông tin hiển thị khi đặt phòng và nhắn homestay qua Messenger để nhận phiếu xác nhận dịch vụ chính thức. Việc đặt phòng chỉ được xem là thành công khi đơn ở trạng thái \"Đặt phòng thành công\". Chi tiết hoàn/hủy xem ở mục bên dưới.": "You transfer payment using the details shown when booking and message the homestay on Messenger to receive the official service confirmation voucher. A booking is only considered successful when the order status is \"Booking confirmed\". See the cancellation/refund details below.",
+"Để hủy hoặc đổi ngày, bạn nhắn homestay qua Messenger kèm mã đơn. Tiền hoàn (nếu có) được chuyển lại về tài khoản bạn đã dùng để thanh toán trong vòng 7 ngày làm việc.": "To cancel or change dates, message the homestay on Messenger with your booking code. Refunds (if any) are returned to the account you paid from within 7 working days.",
+"Bạn có quyền yêu cầu xem, chỉnh sửa hoặc xóa thông tin cá nhân bằng cách liên hệ homestay qua Facebook hoặc kênh liên hệ trên website.": "You have the right to request to view, edit or delete your personal information by contacting the homestay via Facebook or the contact channels on the website.",
+"Nhà của An Homestay Tà Xùa – Tà Xùa, Bắc Yên, Sơn La. Facebook:": "Nha cua An Homestay Ta Xua – Ta Xua, Bac Yen, Son La. Facebook:",
+"Đây là bản chính sách mẫu cơ bản. Chủ homestay nên rà soát và chỉnh cho đúng thực tế vận hành.": "This is a basic sample policy. The homestay owner should review and adjust it to match actual operations.",
+"MB Bank (Quân Đội)": "MB Bank (Military Commercial Joint Stock Bank)",
+"Đã ghi nhận thanh toán của bạn": "Your payment has been recorded",
+"Bạn thử lại hoặc nhắn Facebook của nhà nhé.": "Please try again or message us on Facebook.",
+"Hãy nhập đủ": "Please enter the full"
+}/*END*/;
+  const KEY = 'na_lang';
+  let lang = 'vi';
+  try { if (localStorage.getItem(KEY) === 'en') lang = 'en'; } catch (e) { /* bỏ qua */ }
+  const orig = new Map();               // nút / phần tử -> nội dung gốc tiếng Việt
+  const ATTRS = ['placeholder', 'title', 'alt', 'aria-label', 'label'];
+  const SKIP = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, NOSCRIPT: 1 };
+
+  const vnd = (n) => n.replace(/\./g, ',') + ' VND';
+  const UNIT = { 'người': '/ person', 'đêm': '/ night', 'ngày': '/ day' };
+  const PATTERNS = [
+    [/^Tìm thấy (\d+) đơn với số điện thoại này\. (.*)$/, (m, n, rest) => `Found ${n} order${n === '1' ? '' : 's'} for this phone number. ` + core(rest)],
+    [/^Đã lưu đơn (\S+) vào lịch sử\. Bạn có thể thanh toán sau\.$/, (m, c) => `Order ${c} saved to history. You can pay later.`],
+    [/^Hãy gửi mã đơn (\S+) cho nhà qua Facebook\.$/, (m, c) => `Please send booking code ${c} to us on Facebook.`],
+    [/^Chưa gửi được đơn: (.*)$/s, (m, r) => 'Could not submit your order: ' + r],
+    [/^Chưa thực hiện được, bạn thử lại sau ít phút\. \((.*)\)$/, (m, r) => `Could not complete this, please try again in a few minutes. (${r})`],
+    [/^mã đơn (\S+)$/, (m, c) => `booking code ${c}`],
+    [/^Nhà nhắn: (.*)$/, (m, r) => 'Note from us: ' + r],
+    [/^(Facebook|Zalo|Gọi điện|Gmail): thông tin đang được cập nhật$/, (m, l) => `${DICT[l] || l}: details coming soon`],
+    [/^Bạn thử lại hoặc nhắn Facebook của nhà nhé\.$/, () => 'Please try again or message us on Facebook.'],
+  ];
+  function core(t) {                    // t đã chuẩn hóa khoảng trắng; trả về bản dịch hoặc null
+    if (!t) return null;
+    if (Object.prototype.hasOwnProperty.call(DICT, t)) return DICT[t];
+    let m = t.match(/^([\d.]+) đ ?(?:\/ ?(người|đêm|ngày))?$/);
+    if (m) return vnd(m[1]) + (m[2] ? ' ' + UNIT[m[2]] : '');
+    for (const [re, f] of PATTERNS) { m = t.match(re); if (m) return f.apply(null, m); }
+    m = t.match(/^["“](.+)["”]$/s);
+    if (m) { const r = core(m[1]); if (r !== null) return '"' + r + '"'; }
+    m = t.match(/^(.*) - ([\d.]+ đ ?(?:\/ ?\S+)?)$/);
+    if (m) { const a = core(m[1]), b = core(m[2]); if (a !== null || b !== null) return (a !== null ? a : m[1]) + ' - ' + (b !== null ? b : m[2]); }
+    for (const sep of [' | ', ' · ', '\n']) {
+      if (t.includes(sep)) { let ch = false; const out = t.split(sep).map((p) => { const r = core(p.trim()); if (r !== null) { ch = true; return r; } return p; }); if (ch) return out.join(sep); }
+    }
+    m = t.match(/^([^\p{L}\p{N}"“(]+)(.+)$/su);
+    if (m) { const r = core(m[2]); if (r !== null) return m[1] + r; }
+    m = t.match(/^([^:]{2,40}:) (.+)$/s);
+    if (m) { const a = core(m[1]), b = core(m[2]); if (a !== null || b !== null) return (a !== null ? a : m[1]) + ' ' + (b !== null ? b : m[2]); }
+    return null;
+  }
+  function tr(s) {                      // dịch 1 chuỗi (giữ khoảng trắng đầu/cuối)
+    if (typeof s !== 'string' || lang !== 'en') return s;
+    const t = s.replace(/\s+/g, ' ').trim(); if (!t) return s;
+    const r = core(t); if (r === null) return s;
+    return s.match(/^\s*/)[0] + r + s.match(/\s*$/)[0];
+  }
+  function txt(n) {
+    if (!n.parentElement || SKIP[n.parentElement.tagName]) return;
+    const v = n.nodeValue, r = tr(v);
+    if (r !== v) { orig.set(n, v); n.nodeValue = r; }
+  }
+  function attr(el, a) {
+    const v = el.getAttribute(a); if (!v) return; const r = tr(v);
+    if (r !== v) { let o = orig.get(el); if (!o) { o = {}; orig.set(el, o); } o[a] = v; el.setAttribute(a, r); }
+  }
+  function walk(root) {
+    if (root.nodeType === 3) { txt(root); return; }
+    if (root.nodeType !== 1) return;
+    const els = [root, ...root.querySelectorAll('*')];
+    els.forEach((el) => {
+      ATTRS.forEach((a) => { if (el.hasAttribute(a)) attr(el, a); });
+      if (!SKIP[el.tagName]) el.childNodes.forEach((c) => { if (c.nodeType === 3) txt(c); });
+    });
+  }
+  const obs = new MutationObserver((muts) => {
+    if (lang !== 'en') return;
+    obs.disconnect();
+    muts.forEach((m) => {
+      if (m.type === 'childList') m.addedNodes.forEach(walk);
+      else if (m.type === 'characterData') txt(m.target);
+      else if (m.type === 'attributes') attr(m.target, m.attributeName);
+    });
+    start();
+  });
+  function start() { obs.observe(document.documentElement, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS }); }
+  function revert() {
+    orig.forEach((v, k) => {
+      if (k.nodeType === 3) { if (k.isConnected) k.nodeValue = v; }
+      else if (k.isConnected) Object.keys(v).forEach((a) => k.setAttribute(a, v[a]));
+    });
+    orig.clear();
+  }
+  function paintSwitch() {
+    document.querySelectorAll('.lang-switch').forEach((b) => {
+      b.querySelectorAll('span').forEach((s) => s.classList.toggle('on', s.dataset.l === lang));
+      b.setAttribute('aria-label', lang === 'en' ? 'Language: English. Switch to Vietnamese' : 'Ngôn ngữ: Tiếng Việt. Chuyển sang tiếng Anh');
+    });
+  }
+  function setLang(l) {
+    lang = l === 'en' ? 'en' : 'vi';
+    try { localStorage.setItem(KEY, lang); } catch (e) { /* bỏ qua */ }
+    obs.disconnect();
+    document.documentElement.lang = lang;
+    if (lang === 'en') walk(document.documentElement); else revert();
+    paintSwitch();
+    if (lang === 'en') start();
+  }
+  function ensureSwitch() {
+    if (!document.querySelector('.lang-switch')) {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'lang-switch lang-float';
+      b.innerHTML = '<span data-l="vi">VI</span><span data-l="en">EN</span>'; document.body.appendChild(b);
+      const st = document.createElement('style');
+      st.textContent = '.lang-switch{display:inline-flex;border:1px solid rgba(255,255,255,.55);border-radius:999px;overflow:hidden;background:transparent;cursor:pointer;padding:0;font:700 11.5px/1 sans-serif;flex-shrink:0}.lang-switch span{padding:7px 9px;color:#fff}.lang-switch span.on{background:#d96b27}.lang-float{position:fixed;top:12px;right:12px;z-index:3000;background:#4a2e18}';
+      document.head.appendChild(st);
+    }
+    document.querySelectorAll('.lang-switch').forEach((b) => b.addEventListener('click', () => setLang(lang === 'en' ? 'vi' : 'en')));
+  }
+  // hộp thoại alert / confirm của trình duyệt cũng được dịch
+  const _alert = window.alert, _confirm = window.confirm;
+  window.alert = (m) => _alert.call(window, tr(String(m)));
+  window.confirm = (m) => _confirm.call(window, tr(String(m)));
+  window.tr = tr; window.setLang = setLang; window.getLang = () => lang;
+  ensureSwitch(); paintSwitch();
+  document.documentElement.lang = lang;
+  if (lang === 'en') { walk(document.documentElement); start(); }
+})();
