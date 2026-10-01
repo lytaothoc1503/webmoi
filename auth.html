@@ -3,62 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xmagic - Admin Authentication</title>
+    <meta name="robots" content="noindex, nofollow">
+    <title>Quản trị | Nhà của An Homestay Tà Xùa</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <style>
-        body { margin: 0; background-color: #0a0a0a; color: #d4af37; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        .auth-container { background: linear-gradient(145deg, #1a1a1a, #000000); border: 1px solid #d4af37; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(212, 175, 55, 0.1); width: 100%; max-width: 400px; text-align: center; }
-        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; margin-bottom: 30px; text-transform: uppercase; }
-        .input-group { margin-bottom: 20px; text-align: left; }
-        .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #a9a9a9; text-transform: uppercase; letter-spacing: 1px; }
-        .input-group input { width: 100%; padding: 12px; background-color: #111; border: 1px solid #333; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 14px; transition: border-color 0.3s; }
-        .input-group input:focus { outline: none; border-color: #d4af37; }
-        .btn-submit { width: 100%; padding: 14px; background-color: #d4af37; color: #000; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-submit:hover { background-color: #f3c746; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+        body { margin: 0; background-color: #1c110a; color: #f5eee8; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 16px; box-sizing: border-box; }
+        .auth-container { background: #2b1b11; border: 1px solid #d96b27; padding: 36px 32px; border-radius: 14px; width: 100%; max-width: 400px; text-align: center; }
+        .logo { font-size: 24px; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
+        .sub { font-size: 12px; color: #d96b27; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 26px; }
+        .input-group { margin-bottom: 16px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; margin-bottom: 5px; color: #b9a99a; }
+        .input-group input { width: 100%; padding: 12px; background-color: #1c110a; border: 1px solid #4a3425; color: #fff; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .input-group input:focus { outline: none; border-color: #d96b27; }
+        .btn-submit { width: 100%; padding: 13px; background-color: #d96b27; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
+        .btn-submit:disabled { opacity: .6; cursor: wait; }
+        .msg { margin-top: 14px; font-size: 13px; color: #fca5a5; min-height: 18px; }
+        .back { display: inline-block; margin-top: 16px; font-size: 12.5px; color: #b9a99a; }
     </style>
 </head>
 <body>
-
 <div class="auth-container">
-    <div class="logo">Xmagic Portal</div>
-    <form id="secret-admin-form">
+    <div class="logo">Nhà của An</div>
+    <div class="sub">Khu vực quản trị</div>
+    <form id="admin-login-form">
         <div class="input-group">
-            <label for="sec-adm-user">Tài khoản</label>
-            <input type="text" id="sec-adm-user" required autocomplete="off" placeholder="thoc1503">
+            <label for="adm-email">Email quản trị</label>
+            <input type="email" id="adm-email" required autocomplete="username">
         </div>
         <div class="input-group">
-            <label for="sec-adm-pass">Mật khẩu</label>
-            <input type="password" id="sec-adm-pass" required autocomplete="off">
+            <label for="adm-pass">Mật khẩu</label>
+            <input type="password" id="adm-pass" required autocomplete="current-password">
         </div>
-        <div class="input-group">
-            <label for="sec-adm-pin">Mã PIN</label>
-            <input type="password" id="sec-adm-pin" required autocomplete="off" maxlength="6">
-        </div>
-        <button type="submit" class="btn-submit">Truy cập hệ thống</button>
+        <button type="submit" class="btn-submit" id="adm-btn">Đăng nhập</button>
+        <div class="msg" id="adm-msg"></div>
     </form>
+    <a class="back" href="./index.html">← Về trang chủ</a>
 </div>
 
-<!-- Supabase JS SDK -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<script src="config.js"></script>
 <script>
-    const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    document.getElementById('secret-admin-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const u = document.getElementById('sec-adm-user').value.trim();
-        const p = document.getElementById('sec-adm-pass').value.trim();
-        const pin = document.getElementById('sec-adm-pin').value.trim();
-
-        // Kiểm tra thông tin đăng nhập (thoc1503 / 0375719941 / 150309)
-        if (u === 'thoc1503' && p === '0375719941' && pin === '150309') {
-            localStorage.setItem('xmagic_admin_authorized', 'true');
+    const CFG = (window.SITE && window.SITE.supabase) || {};
+    const msg = document.getElementById('adm-msg');
+    if (!CFG.url || !CFG.anonKey) {
+        msg.textContent = 'Cơ sở dữ liệu chưa được cấu hình. Hãy điền url và anonKey của Supabase trong file config.js.';
+        document.getElementById('adm-btn').disabled = true;
+    } else {
+        const client = window.supabase.createClient(CFG.url, CFG.anonKey);
+        client.auth.getSession().then(({ data }) => { if (data && data.session) window.location.replace('./admin.html'); });
+        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('adm-btn');
+            btn.disabled = true; msg.textContent = '';
+            const { error } = await client.auth.signInWithPassword({
+                email: document.getElementById('adm-email').value.trim(),
+                password: document.getElementById('adm-pass').value,
+            });
+            if (error) { msg.textContent = 'Đăng nhập không thành công: email hoặc mật khẩu chưa đúng.'; btn.disabled = false; return; }
             window.location.replace('./admin.html');
-        } else {
-            alert('Từ chối truy cập: Sai thông tin hoặc mã PIN!');
-        }
-    });
+        });
+    }
 </script>
 </body>
 </html>

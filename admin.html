@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản Trị Booking | Bảnh Fuli Homestay Tà Xùa</title>
+    <title>Quản Trị | Nhà của An Homestay Tà Xùa</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
@@ -74,6 +75,13 @@
       .badge-paid { background: #dbeafe; color: #1e40af; }
       .badge-approved { background: #d1fae5; color: #059669; }
       .badge-rejected { background: #fee2e2; color: #dc2626; }
+      .badge-wait { background: #fff4e5; color: #b45309; }
+      .badge-done { background: #e7e5e4; color: #44403c; }
+      .btn-note { background: #8b5cf6; color: #fff; }
+      .btn-done { background: #0ea5e9; color: #fff; }
+      .menu-badge { background: var(--red); color: #fff; border-radius: 10px; padding: 1px 7px; font-size: 11px; margin-left: 4px; }
+      .pill { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 700; margin-left: 6px; }
+      .pill.pending { background: #fff4e5; color: #b45309; } .pill.live { background: #d1fae5; color: #047857; }
 
       .btn-act { border: none; padding: 6px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 600; cursor: pointer; margin-right: 4px; }
       .btn-confirm { background: var(--green); color: #fff; }
@@ -126,13 +134,13 @@
       }
     </style>
   </head>
-  <body>
+  <body style="visibility:hidden">
     <aside>
-      <div class="brand-title">BẢNH FULI MANAGER</div>
+      <div class="brand-title">NHÀ CỦA AN MANAGER</div>
       <div class="menu-item active" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
       <div class="menu-item" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
       <div class="menu-item" onclick="showPage('tours', this)">🧭 Tour Trải Nghiệm</div>
-      <div class="menu-item" onclick="showPage('reviews', this)">⭐ Đánh Giá</div>
+      <div class="menu-item" onclick="showPage('reviews', this)">⭐ Đánh Giá <span id="rv-badge" class="menu-badge" style="display:none"></span></div>
       <div class="menu-item" onclick="showPage('gallery', this)">📷 Thư Viện Ảnh</div>
       <div class="menu-item" onclick="showPage('faq', this)">❓ Câu Hỏi FAQ</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
@@ -142,7 +150,7 @@
       <!-- BOOKINGS PAGE -->
       <div class="page-section active" id="page-bookings">
         <div class="top-bar">
-          <h2>Quản Lý Booking & Duyệt Tiền Cọc</h2>
+          <h2>Quản Lý Đơn Đặt Phòng & Thanh Toán</h2>
           <div style="display: flex; gap: 10px;">
             <button class="btn-export" onclick="exportCSV()">📊 Xuất Excel/CSV</button>
             <a href="./index.html" target="_blank" class="btn-view-web">← Xem Trang Web</a>
@@ -150,10 +158,11 @@
         </div>
 
         <div class="stat-grid">
-          <div class="stat-card"><div class="stat-label">Tổng Lịch Đặt</div><div class="stat-num" id="stat-total">0</div></div>
-          <div class="stat-card"><div class="stat-label">Chờ Duyệt Cọc</div><div class="stat-num" id="stat-pending" style="color: var(--accent)">0</div></div>
-          <div class="stat-card"><div class="stat-label">Đã Duyệt</div><div class="stat-num" id="stat-approved" style="color: var(--green)">0</div></div>
-          <div class="stat-card"><div class="stat-label">Doanh Thu Cọc</div><div class="stat-num" id="stat-revenue" style="color: var(--green)">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Tổng Đơn</div><div class="stat-num" id="stat-total">0</div></div>
+          <div class="stat-card"><div class="stat-label">Chờ Thanh Toán</div><div class="stat-num" id="stat-wait" style="color: #b45309">0</div></div>
+          <div class="stat-card"><div class="stat-label">Đã Chuyển Khoản, Chờ Xác Nhận</div><div class="stat-num" id="stat-paid" style="color: #1e40af">0</div></div>
+          <div class="stat-card"><div class="stat-label">Đặt Phòng Thành Công</div><div class="stat-num" id="stat-ok" style="color: var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Doanh Thu (đơn thành công)</div><div class="stat-num" id="stat-revenue" style="color: var(--green)">0 đ</div></div>
         </div>
 
         <div class="chart-box">
@@ -165,8 +174,10 @@
           <input type="text" id="filter-search" placeholder="Tìm theo tên, SĐT, mã đơn..." oninput="renderBookings()" style="flex: 1; min-width: 200px;" />
           <select id="filter-status" onchange="renderBookings()">
             <option value="">Tất cả trạng thái</option>
-            <option value="Chờ duyệt tiền cọc">Chờ duyệt</option>
-            <option value="Đã duyệt phòng">Đã duyệt</option>
+            <option value="Chờ thanh toán">Chờ thanh toán</option>
+            <option value="Đã thanh toán - chờ xác nhận">Đã thanh toán, chờ xác nhận</option>
+            <option value="Đặt phòng thành công">Đặt phòng thành công</option>
+            <option value="Hoàn thành">Hoàn thành</option>
             <option value="Hủy đơn">Đã hủy</option>
           </select>
           <select id="filter-room" onchange="renderBookings()">
@@ -255,14 +266,16 @@
     </div>
 
     <script>
-      if (localStorage.getItem('xmagic_admin_authorized') !== 'true') {
-        alert('Vui lòng đăng nhập quyền quản trị viên!');
+      const CFG = (window.SITE && window.SITE.supabase) || {};
+      if (!CFG.url || !CFG.anonKey) {
+        alert('Cơ sở dữ liệu chưa được cấu hình. Hãy điền url và anonKey của Supabase trong file config.js.');
         window.location.replace('./index.html');
+        throw new Error('Supabase chưa cấu hình');
       }
-
-      const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
-      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
-      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const supabaseClient = window.supabase.createClient(CFG.url, CFG.anonKey);
+      const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+      const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn' };
+      const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
 
       let allBookings = [];
       let revenueChart = null;
@@ -292,14 +305,16 @@
         });
       }
 
-      supabaseClient.channel('bookings-changes').on('postgres_changes', { event: '*', table: 'bookings' }, () => {
-        loadBookings();
-      }).subscribe();
-
       function populateRoomFilter() {
         const select = document.getElementById('filter-room');
+        const cur = select.value;
         const rooms = [...new Set(allBookings.map(b => b.room))];
-        select.innerHTML = '<option value="">Tất cả phòng/tour</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+        select.innerHTML = '<option value="">Tất cả phòng/tour</option>' + rooms.map(r => `<option value="${esc(r)}">${esc(r)}</option>`).join('');
+        select.value = cur;
+      }
+
+      function badgeClass(st) {
+        return st === ST.WAIT ? 'badge-wait' : st === ST.PAID ? 'badge-paid' : st === ST.OK ? 'badge-approved' : st === ST.DONE ? 'badge-done' : 'badge-rejected';
       }
 
       function renderBookings() {
@@ -308,21 +323,24 @@
         const statusFilter = document.getElementById('filter-status').value;
         const roomFilter = document.getElementById('filter-room').value;
 
-        let filtered = allBookings.filter(b => {
+        const filtered = allBookings.filter(b => {
           if (search && !((b.fullname || '').toLowerCase().includes(search) || (b.phone || '').includes(search) || (b.booking_code || '').toLowerCase().includes(search) || (b.transfer_code || '').toLowerCase().includes(search))) return false;
-          if (statusFilter && b.status !== statusFilter) return false;
+          if (statusFilter && normStatus(b.status) !== statusFilter) return false;
           if (roomFilter && b.room !== roomFilter) return false;
           return true;
         });
 
-        let pending = 0, approved = 0, revenue = 0;
+        let wait = 0, paid = 0, ok = 0, revenue = 0;
         allBookings.forEach(b => {
-          if (b.status && b.status.includes('Chờ')) pending++;
-          if (b.status === 'Đã duyệt phòng') { approved++; revenue += Number(b.total_price || 0); }
+          const st = normStatus(b.status);
+          if (st === ST.WAIT) wait++;
+          if (st === ST.PAID) paid++;
+          if (st === ST.OK || st === ST.DONE) { ok++; revenue += Number(b.total_price || 0); }
         });
         document.getElementById('stat-total').textContent = allBookings.length;
-        document.getElementById('stat-pending').textContent = pending;
-        document.getElementById('stat-approved').textContent = approved;
+        document.getElementById('stat-wait').textContent = wait;
+        document.getElementById('stat-paid').textContent = paid;
+        document.getElementById('stat-ok').textContent = ok;
         document.getElementById('stat-revenue').textContent = revenue.toLocaleString('vi-VN') + ' đ';
 
         if (filtered.length === 0) {
@@ -331,31 +349,34 @@
         }
 
         tbody.innerHTML = filtered.map(item => {
-          const isPending = item.status && item.status.includes('Chờ');
-          const isApproved = item.status === 'Đã duyệt phòng';
+          const st = normStatus(item.status);
+          const id = esc(item.id);
+          const acts = [];
+          if (st === ST.WAIT || st === ST.PAID) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.OK}')">Xác nhận thành công</button>`);
+          if (st === ST.OK) acts.push(`<button class="btn-act btn-done" onclick="setStatus('${id}', '${ST.DONE}')">Hoàn thành</button>`);
+          if (st !== ST.CANCEL && st !== ST.DONE) acts.push(`<button class="btn-act btn-cancel" onclick="setStatus('${id}', '${ST.CANCEL}')">Hủy</button>`);
+          acts.push(`<button class="btn-act btn-note" onclick="editNote('${id}')">Ghi chú</button>`);
+          acts.push(`<button class="btn-act btn-del" onclick="deleteBooking('${id}')">Xóa</button>`);
           return `
           <tr>
-            <td><span style="font-family:monospace; font-weight:700; color:var(--accent); font-size:12px;">${item.booking_code || 'N/A'}</span></td>
-            <td><small>${new Date(item.created_at).toLocaleString('vi-VN')}</small></td>
-            <td><strong>${item.fullname}</strong><br><a href="tel:${item.phone}" style="color:var(--accent); font-weight:700; text-decoration:none;">${item.phone}</a></td>
-            <td><strong style="color:var(--primary);">${item.room}</strong></td>
+            <td><span style="font-family:monospace; font-weight:700; color:var(--accent); font-size:12px;">${esc(item.booking_code || 'N/A')}</span></td>
+            <td><small>${esc(new Date(item.created_at).toLocaleString('vi-VN'))}</small></td>
+            <td><strong>${esc(item.fullname)}</strong><br><a href="tel:${esc(item.phone)}" style="color:var(--accent); font-weight:700; text-decoration:none;">${esc(item.phone)}</a></td>
+            <td><strong style="color:var(--primary);">${esc(item.room)}</strong>${item.notes && item.notes !== 'Không có' ? '<br><small>' + esc(item.notes) + '</small>' : ''}</td>
             <td style="font-weight:700; color:#10b981;">${Number(item.total_price || 0).toLocaleString('vi-VN')} đ</td>
-            <td><span style="font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px; font-weight:bold; font-size:11px;">${item.transfer_code || 'N/A'}</span></td>
-            <td><small>${item.checkin} → ${item.checkout}<br>(${item.guests || '2 khách'})</small></td>
-            <td><span class="status-badge ${isPending ? 'badge-paid' : isApproved ? 'badge-approved' : 'badge-rejected'}">${item.status}</span></td>
-            <td>
-              <button class="btn-act btn-confirm" onclick="updateStatus('${item.id}', 'Đã duyệt phòng')">Duyệt</button>
-              <button class="btn-act btn-cancel" onclick="updateStatus('${item.id}', 'Hủy đơn')">Hủy</button>
-              <button class="btn-act btn-del" onclick="deleteBooking('${item.id}')">Xóa</button>
-            </td>
+            <td><span style="font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px; font-weight:bold; font-size:11px;">${esc(item.transfer_code || 'N/A')}</span></td>
+            <td><small>${esc(item.checkin)} → ${esc(item.checkout)}<br>(${esc(item.guests || '2 khách')})</small></td>
+            <td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span>${item.paid_at ? '<br><small>Báo CK: ' + esc(new Date(item.paid_at).toLocaleString('vi-VN')) + '</small>' : ''}${item.admin_note ? '<br><small><em>Ghi chú: ' + esc(item.admin_note) + '</em></small>' : ''}</td>
+            <td>${acts.join('')}</td>
           </tr>`;
         }).join('');
       }
 
       function renderChart() {
+        if (typeof Chart === 'undefined') return;
         const months = {};
         allBookings.forEach(b => {
-          if (b.status === 'Đã duyệt phòng') {
+          if (normStatus(b.status) === ST.OK || normStatus(b.status) === ST.DONE) {
             const d = new Date(b.created_at);
             const key = String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
             if (!months[key]) months[key] = { revenue: 0, count: 0 };
@@ -390,16 +411,29 @@
         });
       }
 
-      function updateStatus(id, newStatus) {
-        supabaseClient.from('bookings').update({ status: newStatus }).eq('id', id).then(({ error }) => {
-          if (error) alert('Lỗi cập nhật: ' + error.message);
-        });
+      async function setStatus(id, status) {
+        if (status === ST.CANCEL && !confirm('Hủy đơn này?')) return;
+        const patch = { status };
+        if (status === ST.PAID) patch.paid_at = new Date().toISOString();
+        if (status === ST.OK) patch.confirmed_at = new Date().toISOString();
+        const { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
+        if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
+        loadBookings();
+      }
+
+      async function editNote(id) {
+        const b = allBookings.find(x => x.id === id);
+        const v = prompt('Ghi chú hiển thị cho khách khi họ tra cứu đơn (để trống để xóa):', (b && b.admin_note) || '');
+        if (v === null) return;
+        const { error } = await supabaseClient.from('bookings').update({ admin_note: v.trim() || null }).eq('id', id);
+        if (error) { alert('Lỗi lưu ghi chú: ' + error.message); return; }
+        loadBookings();
       }
 
       function deleteBooking(id) {
         if (confirm('Xác nhận xóa đơn đặt phòng này?')) {
           supabaseClient.from('bookings').delete().eq('id', id).then(({ error }) => {
-            if (error) alert('Lỗi xóa: ' + error.message);
+            if (error) alert('Lỗi xóa: ' + error.message); else loadBookings();
           });
         }
       }
@@ -410,7 +444,7 @@
         const rows = allBookings.map(b => [
           b.booking_code || '', new Date(b.created_at).toLocaleString('vi-VN'),
           b.fullname, b.phone, b.room, b.checkin, b.checkout, b.guests || '',
-          b.total_price, b.transfer_code || '', b.status, b.notes || ''
+          b.total_price, b.transfer_code || '', normStatus(b.status), b.notes || ''
         ]);
         let csv = headers.join(',') + '\n';
         rows.forEach(r => { csv += r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\n'; });
@@ -428,9 +462,9 @@
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có hạng phòng.</p>'; return; }
         grid.innerHTML = data.map(r => `
           <div class="manage-card">
-            <img src="${r.image_url || ''}" alt="${r.name}" />
+            <img src="${esc(r.image_url)}" alt="${esc(r.name)}" />
             <div class="manage-card-body">
-              <div class="manage-card-title">${r.name}</div>
+              <div class="manage-card-title">${esc(r.name)}</div>
               <div class="manage-card-sub">${r.price.toLocaleString('vi-VN')} đ/đêm • Thứ tự: ${r.sort_order} • ${r.is_active ? 'Hiển thị' : 'Ẩn'}</div>
               <div class="manage-card-actions">
                 <button class="btn-act btn-edit" onclick="openRoomModal('${r.id}')">Sửa</button>
@@ -475,9 +509,9 @@
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có tour.</p>'; return; }
         grid.innerHTML = data.map(t => `
           <div class="manage-card">
-            <img src="${t.image_url || ''}" alt="${t.name}" />
+            <img src="${esc(t.image_url)}" alt="${esc(t.name)}" />
             <div class="manage-card-body">
-              <div class="manage-card-title">${t.name}</div>
+              <div class="manage-card-title">${esc(t.name)}</div>
               <div class="manage-card-sub">${t.price.toLocaleString('vi-VN')} đ • Thứ tự: ${t.sort_order} • ${t.is_active ? 'Hiển thị' : 'Ẩn'}</div>
               <div class="manage-card-actions">
                 <button class="btn-act btn-edit" onclick="openTourModal('${t.id}')">Sửa</button>
@@ -515,21 +549,35 @@
 
       /* ===== REVIEWS CRUD ===== */
       async function loadReviewsManage() {
-        const { data } = await supabaseClient.from('reviews').select('*').order('sort_order');
+        const { data } = await supabaseClient.from('reviews').select('*').order('is_published', { ascending: true }).order('created_at', { ascending: false });
         const grid = document.getElementById('reviews-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có đánh giá.</p>'; return; }
         grid.innerHTML = data.map(r => `
           <div class="manage-card">
             <div class="manage-card-body">
-              <div class="manage-card-title">${r.author_name}</div>
-              <div class="manage-card-sub">${'★'.repeat(r.rating || 5)} • ${r.is_published ? 'Đã đăng' : 'Ẩn'} • Thứ tự: ${r.sort_order}</div>
-              <p style="font-size:12px; color:var(--muted); margin-bottom:8px; font-style:italic;">"${r.content}"</p>
+              <div class="manage-card-title">${esc(r.author_name)} <span class="pill ${r.is_published ? 'live' : 'pending'}">${r.is_published ? 'Đã đăng' : 'Chờ duyệt'}</span></div>
+              <div class="manage-card-sub">${'★'.repeat(r.rating || 5)}${r.booking_code ? ' • Đơn ' + esc(r.booking_code) : ' • Nhập tay'} • Thứ tự: ${esc(r.sort_order)}</div>
+              <p style="font-size:12px; color:var(--muted); margin-bottom:8px; font-style:italic;">"${esc(r.content)}"</p>
               <div class="manage-card-actions">
-                <button class="btn-act btn-edit" onclick="openReviewModal('${r.id}')">Sửa</button>
-                <button class="btn-act btn-del" onclick="deleteItem('reviews', '${r.id}')">Xóa</button>
+                <button class="btn-act ${r.is_published ? 'btn-del' : 'btn-confirm'}" onclick="toggleReview('${esc(r.id)}', ${!r.is_published})">${r.is_published ? 'Ẩn' : 'Duyệt & đăng'}</button>
+                <button class="btn-act btn-edit" onclick="openReviewModal('${esc(r.id)}')">Sửa</button>
+                <button class="btn-act btn-del" onclick="deleteItem('reviews', '${esc(r.id)}')">Xóa</button>
               </div>
             </div>
           </div>`).join('');
+        loadReviewBadge();
+      }
+
+      async function toggleReview(id, publish) {
+        const { error } = await supabaseClient.from('reviews').update({ is_published: publish }).eq('id', id);
+        if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
+        loadReviewsManage();
+      }
+
+      async function loadReviewBadge() {
+        const { count } = await supabaseClient.from('reviews').select('id', { count: 'exact', head: true }).eq('is_published', false);
+        const el = document.getElementById('rv-badge');
+        el.textContent = count || 0; el.style.display = count ? 'inline-block' : 'none';
       }
 
       function openReviewModal(id) {
@@ -565,10 +613,10 @@
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có ảnh.</p>'; return; }
         grid.innerHTML = data.map(g => `
           <div class="manage-card">
-            <img src="${g.image_url}" alt="${g.caption || ''}" />
+            <img src="${esc(g.image_url)}" alt="${esc(g.caption || '')}" />
             <div class="manage-card-body">
-              <div class="manage-card-title">${g.caption || 'Không có chú thích'}</div>
-              <div class="manage-card-sub">Danh mục: ${g.category || 'N/A'} • Thứ tự: ${g.sort_order} • ${g.is_active ? 'Hiển thị' : 'Ẩn'}</div>
+              <div class="manage-card-title">${esc(g.caption || 'Không có chú thích')}</div>
+              <div class="manage-card-sub">Danh mục: ${esc(g.category || 'N/A')} • Thứ tự: ${g.sort_order} • ${g.is_active ? 'Hiển thị' : 'Ẩn'}</div>
               <div class="manage-card-actions">
                 <button class="btn-act btn-edit" onclick="openGalleryModal('${g.id}')">Sửa</button>
                 <button class="btn-act btn-del" onclick="deleteItem('gallery', '${g.id}')">Xóa</button>
@@ -609,9 +657,9 @@
         grid.innerHTML = data.map(f => `
           <div class="manage-card">
             <div class="manage-card-body">
-              <div class="manage-card-title">${f.question}</div>
+              <div class="manage-card-title">${esc(f.question)}</div>
               <div class="manage-card-sub">${f.is_active ? 'Hiển thị' : 'Ẩn'} • Thứ tự: ${f.sort_order}</div>
-              <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">${f.answer}</p>
+              <p style="font-size:12px; color:var(--muted); margin-bottom:8px;">${esc(f.answer)}</p>
               <div class="manage-card-actions">
                 <button class="btn-act btn-edit" onclick="openFaqModal('${f.id}')">Sửa</button>
                 <button class="btn-act btn-del" onclick="deleteItem('faq', '${f.id}')">Xóa</button>
@@ -739,12 +787,19 @@
         currentCrudType = '';
       }
 
-      function logoutAdmin() {
-        localStorage.removeItem('xmagic_admin_authorized');
+      async function logoutAdmin() {
+        await supabaseClient.auth.signOut();
         window.location.replace('./index.html');
       }
 
-      loadBookings();
+      (async function initAdmin() {
+        const { data } = await supabaseClient.auth.getSession();
+        if (!data || !data.session) { window.location.replace('./auth.html'); return; }
+        document.body.style.visibility = 'visible';
+        loadBookings();
+        loadReviewBadge();
+        supabaseClient.channel('bookings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => loadBookings()).subscribe();
+      })();
     </script>
   </body>
 </html>
