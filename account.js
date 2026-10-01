@@ -52,6 +52,8 @@ async function syncAccountOrders() {
 async function applySession(session) {
   const before = currentUser && currentUser.id;
   currentUser = session ? session.user : null;
+  // Thiết bị dùng chung: đăng xuất thì xóa lịch sử đơn lưu trên máy (đăng nhập lại sẽ tự đồng bộ về)
+  if (before && !currentUser) { setLocal([]); renderHistory(); }
   buildNav();
   if (currentUser && currentUser.id !== before) {
     if (!$('bk-name').value) $('bk-name').value = (currentUser.user_metadata && currentUser.user_metadata.full_name) || '';
