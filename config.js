@@ -16,12 +16,11 @@ window.SITE = {
   introVideo: '',
   introPoster: 'images/video-poster.jpg',
   contacts: {
-    facebook: 'https://www.facebook.com/NhacuaAnTaXuaSonLa/',
-    zalo: '',  // ví dụ: 'https://zalo.me/0912345678'
-    phone: '', // ví dụ: '0912345678'
+    facebook: 'https://www.facebook.com/share/1dCcJYWvU1/',
+    phone: '0352554863',
     email: '', // ví dụ: 'ten@gmail.com'
   },
-  hideEmptyContacts: false, // đổi true để ẩn hẳn nút chưa có thông tin
+  hideEmptyContacts: true, // true = ẩn hẳn nút chưa có thông tin (hiện chưa dùng Zalo, Gmail)
 
   // Thanh toán QR: để trống thì web chỉ nhận yêu cầu đặt phòng, không hiện mã QR.
   // bankId là mã ngân hàng theo VietQR (ví dụ MB = '970422').

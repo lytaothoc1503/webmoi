@@ -258,7 +258,7 @@
 "Ngày Nhận Phòng:": "Check-in date:",
 "Ngày Trả Phòng:": "Check-out date:",
 "Họ và tên người đặt:": "Name of the person booking:",
-"Số điện thoại liên hệ (Zalo):": "Contact phone number (Zalo):",
+"Số điện thoại liên hệ:": "Contact phone number:",
 "Số lượng khách (Người lớn + Trẻ em):": "Number of guests (adults + children):",
 "Ghi chú thêm (Đưa đón, tiệc BBQ...):": "Additional notes (transfers, BBQ party...):",
 "Tổng tiền dự tính:": "Estimated total:",

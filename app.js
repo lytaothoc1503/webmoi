@@ -12,7 +12,7 @@ let roomsData = [], toursData = [], currentItem = { name: '', price: 0 }, pendin
 document.querySelectorAll('[data-site]').forEach((el) => (el.textContent = S[el.dataset.site] || ''));
 
 /* ===== LIÊN HỆ (để trống = "Đang cập nhật") ===== */
-const CONTACTS = [['facebook', 'Facebook', 'f', 'btn-fb'], ['zalo', 'Zalo', 'Z', 'btn-zalo'], ['phone', 'Gọi điện', '📞', 'btn-call'], ['email', 'Gmail', '✉', 'btn-mail']];
+const CONTACTS = [['facebook', 'Facebook', 'f', 'btn-fb'], ['phone', 'Gọi điện', '📞', 'btn-call'], ['email', 'Gmail', '✉', 'btn-mail']];
 function chref(k) {
   const v = (C[k] || '').trim();
   if (!v) return '';
@@ -270,7 +270,7 @@ function newCode() {
 }
 
 /* ===== LIÊN HỆ QUA FACEBOOK ===== */
-function fbSlug() { const m = (C.facebook || '').match(/facebook\.com\/(?:profile\.php\?id=)?([^/?#]+)/); return m ? m[1] : ''; }
+function fbSlug() { const m = (C.facebook || '').match(/facebook\.com\/(?:profile\.php\?id=)?([^/?#]+)/); return m && !['share', 'profile.php', 'people', 'groups'].includes(m[1]) ? m[1] : ''; } // link dạng /share/... không có tên trang nên dùng thẳng link Facebook
 function messengerHref() { return fbSlug() ? 'https://m.me/' + fbSlug() : chref('facebook'); }
 function orderText(o) {
   return [`ĐƠN ĐẶT PHÒNG - ${S.name}`, `Mã đơn: ${o.code}`, `Dịch vụ: ${o.room}`, `Khách: ${o.name} - ${o.phone}`, `Nhận phòng: ${vdate(o.checkin)} | Trả phòng: ${vdate(o.checkout)}`, `Số khách: ${o.guests || ''}`, `Tổng tiền: ${o.total > 0 ? o.total.toLocaleString('vi-VN') + ' đ' : 'Chờ nhà báo giá'}`, `Nội dung chuyển khoản: ${o.tcode || o.code}`, `Ghi chú: ${o.notes || 'Không có'}`].join('\n');
@@ -340,7 +340,7 @@ function renderOrderView() {
   const money2 = (n) => Number(n).toLocaleString('vi-VN') + ' đ';
   const hasQR = bankOn() && total > 0;
   const hours = '<small>Nhà hỗ trợ 24/7. Nhắn tin bất cứ lúc nào, nhà sẽ phản hồi sớm nhất.</small> <small><a href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">Xem chính sách hoàn / hủy</a></small>';
-  const contactOthers = [C.phone ? `<a href="tel:${esc(C.phone)}">📞 ${esc(C.phone)}</a>` : '', C.zalo ? `<a href="${esc(chref('zalo'))}" target="_blank" rel="noopener">Zalo</a>` : ''].filter(Boolean).join(' · ');
+  const contactOthers = [C.phone ? `<a href="tel:${esc(C.phone)}">📞 ${esc(C.phone)}</a>` : ''].filter(Boolean).join(' · ');
   let body = '';
   if (st === ST.WAIT) {
     if (hasQR) {
