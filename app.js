@@ -189,12 +189,20 @@ async function loadReviews() {
   $('reviews-grid').innerHTML = list.map((r) => {
     const n = Math.min(5, Math.max(1, Number(r.rating) || 5));
     const av = safeUrl(r.author_avatar) || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.author_name) + '&background=3d2314&color=fff';
-    return `<div class="review-card"><div class="review-header"><img src="${esc(av)}" class="review-avatar" alt="${esc(r.author_name)}" /><div><div class="review-name">${esc(r.author_name)}</div><div class="review-stars">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</div></div></div><p class="review-content">"${esc(r.content)}"</p></div>`;
+    return `<div class="review-card"><div class="review-header"><img src="${esc(av)}" class="review-avatar" alt="${esc(r.author_name)}" width="48" height="48" loading="lazy" decoding="async" /><div><div class="review-name">${esc(r.author_name)}</div><div class="review-stars">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</div></div></div><p class="review-content">"${esc(r.content)}"</p></div>`;
   }).join('');
 }
 async function loadFAQ() {
   const list = await getList('faq', D.faq, 'is_active');
   $('faq-list').innerHTML = list.map((f) => `<div class="faq-item"><div class="faq-question" onclick="this.parentElement.classList.toggle('open')">${esc(f.question)}<span class="faq-icon">+</span></div><div class="faq-answer">${esc(f.answer)}</div></div>`).join('');
+  // Dữ liệu có cấu trúc FAQPage, tự đồng bộ với nội dung FAQ đang hiển thị
+  const old = document.getElementById('faq-jsonld'); if (old) old.remove();
+  if (list.length) {
+    const s = document.createElement('script');
+    s.type = 'application/ld+json'; s.id = 'faq-jsonld';
+    s.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: list.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) });
+    document.head.appendChild(s);
+  }
 }
 function openLightbox(url) { $('lightbox-img').src = url; $('lightbox').classList.add('active'); }
 function closeLightbox() { $('lightbox').classList.remove('active'); }
