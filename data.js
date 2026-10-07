@@ -18,7 +18,7 @@ window.SITE_DATA = {
       duration: 'Khoảng 3 giờ', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.' }, // MẪU
   ],
   // Dịch vụ & tiện ích. Giá và nội dung là MẪU, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). catalogIsSample: false để ẩn nhãn mẫu.
-  catalogIsSample: true,
+  catalogIsSample: false,
   services: [
     { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 120000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
     { icon: '🍜', name: 'Bữa sáng trên mây', price: 80000, unit: '/ người', image_url: 'images/bua-sang-tren-may.jpg', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
@@ -56,9 +56,9 @@ window.SITE_DATA = {
     'Chúng tôi giữ nhà thật mộc, thật ấm, để mỗi vị khách đến đây được nghỉ ngơi chậm lại giữa núi rừng Tây Bắc.',
   ],
   storySign: '— Chủ nhà An',
-  storyIsSample: true,
+  storyIsSample: false,
   // Chính sách hoàn/hủy. MẪU: chủ nhà sửa theo thực tế. Hiện ở trang chính sách, FAQ và trang đơn.
-  policyIsSample: true,
+  policyIsSample: false,
   cancelPolicy: [
     'Hủy trước ngày nhận phòng từ 7 ngày: hoàn 100% tiền đã chuyển.',
     'Hủy từ 3 đến 6 ngày trước ngày nhận phòng: hoàn 50%.',
