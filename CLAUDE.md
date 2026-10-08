@@ -39,6 +39,8 @@ Bấm vào thẻ phòng mở trang chi tiết (hàm `openRoom` trong `app.js`): 
 ## Mục Coffee (ngang hàng Homestay)
 `#coffee` lấy dữ liệu từ `coffee` trong `data.js` (giới thiệu, 4 điểm nhấn Mây/Trải nghiệm/Chill/Khách, bảng thông tin quán, menu lấy từ `services`, ảnh quán, ảnh khách hàng, đánh giá có nhắc quán). Ô nào để trống thì web tự ẩn; chủ nhà bổ sung giờ mở cửa, menu, ảnh khách thật tại đây. Menu và đầu trang có thẻ đôi Homestay | Coffee. Ba dịch vụ chính (cà phê, trà chiều, bữa sáng trên mây) nằm ở mục Coffee (khai báo ở `coffee.menuFrom`); mục `#dich-vu` ở cuối trang chỉ là "Dịch Vụ Thêm" (thuê xe, hành lý, tư vấn).
 
+Phần "Ăn uống" trong mục Coffee lấy từ `coffee.dining` (nhóm Bữa sáng, Món chính, Đồ uống). Hiện chưa có món nào nên web ẩn; chủ dự án tự điền tên món và giá vào `items` (có dòng mẫu trong comment). Không dùng ảnh/tên của nhà hàng khác; chỉ dùng ảnh của chính Nhà của An.
+
 ## Quy tắc khi sửa
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).
 1. `git pull --rebase` trước khi làm.

@@ -6,6 +6,10 @@
   const DICT = /*DICT*/{
 "Trang Chủ": "Home",
 "Giới Thiệu": "About",
+"Ăn uống tại Nhà của An": "Dining at Nha cua An",
+"Bữa sáng": "Breakfast",
+"Món chính": "Main dishes",
+"Đồ uống": "Drinks",
 "Dịch Vụ Thêm": "Extra Services",
 "Tiện Ích Đi Kèm": "Included Extras",
 "Homestay": "Homestay",

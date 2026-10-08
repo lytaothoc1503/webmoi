@@ -221,6 +221,10 @@ async function loadCoffee() {
   const menu = (c.menuFrom || []).map((n) => (D.services || []).findIndex((s) => s.name === n)).filter((i) => i >= 0).map((i) => Object.assign({ _i: i }, D.services[i]));
   $('cf-menu').innerHTML = menu.map((s) => `<div class="cf-item" onclick="openInfo('s', ${s._i})" style="cursor:pointer">${s.image_url ? img(s.image_url, s.name) : ''}<div><strong>${esc(s.icon || '')} ${esc(s.name)}</strong><em>${Number(s.price) > 0 ? esc(money(s.price) + ' ' + (s.unit || '')) : 'Liên hệ'}</em><p>${esc(s.description || '')}${s.time ? ' (' + esc(s.time) + ')' : ''}</p></div></div>`).join('');
   $('cf-menu-box').hidden = !menu.length; $('cf-menu-btn').hidden = !menu.length;
+  const groups = (c.dining || []).map((g) => ({ g, items: (g.items || []).filter((x) => x && x.name) })).filter((x) => x.items.length);
+  $('cf-dining').innerHTML = groups.map(({ g, items }) => `<div class="dn-group"><h4>${esc(g.title)}</h4>${g.note ? `<p class="kp-note" style="text-align:left;margin:0 0 8px">${esc(g.note)}</p>` : ''}<div class="dn-list">${items.map((x) => `<div class="dn-item">${x.image_url ? img(x.image_url, x.name) : ''}<div><strong>${esc(x.name)}</strong>${x.desc ? `<p>${esc(x.desc)}</p>` : ''}</div><em>${Number(x.price) > 0 ? esc(money(x.price)) : 'Liên hệ'}</em></div>`).join('')}</div></div>`).join('');
+  $('cf-dining-note').textContent = c.diningNote || '';
+  $('cf-dining-box').hidden = !groups.length;
   const fig = (u, cap) => `<figure data-full="${esc(safeUrl(u))}">${img(u, cap || 'Ảnh quán')}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`;
   const photos = (c.photos || []).map((u) => fig(u, '')), gp = (c.guestPhotos || []).map((g) => fig(g.image_url, g.caption));
   $('cf-photos').innerHTML = photos.join(''); $('cf-photos-box').hidden = !photos.length;

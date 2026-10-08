@@ -64,6 +64,20 @@ window.SITE_DATA = {
       { icon: '☕', label: 'Đồ uống từ', value: '30.000 đ / ly' },
       { icon: '🅿️', label: 'Chỗ đỗ xe', value: 'Có' },
     ],
+    // ĂN UỐNG tại Nhà của An (nhà hàng). Chủ nhà tự điền: thêm dòng vào `items` của từng nhóm, bỏ dấu // ở đầu dòng mẫu.
+    // price: số tiền (ví dụ 65000); price: 0 = hiện "Liên hệ". image_url: 'images/ten-anh.jpg' (không bắt buộc). Nhóm chưa có món thì web tự ẩn.
+    dining: [
+      { title: 'Bữa sáng', note: '', items: [
+        // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
+      ] },
+      { title: 'Món chính', note: '', items: [
+        // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
+      ] },
+      { title: 'Đồ uống', note: '', items: [
+        // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
+      ] },
+    ],
+    diningNote: '',
     menuFrom: ['Cà phê & đồ uống', 'Trà chiều ngắm hoàng hôn', 'Bữa sáng trên mây'],
     goods: ['Vị trí đẹp ngay Đỉnh Gió', 'Không khí thư thái, chữa lành', 'Khách ở nhà được giảm khi gọi đồ uống'],
     notes: ['Trải nghiệm phụ thuộc thời tiết, mây không có mỗi ngày. Nhắn nhà để biết tình hình trước khi lên.'],
