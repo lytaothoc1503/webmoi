@@ -6,15 +6,15 @@ const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&
 window.SITE_DATA = {
   rooms: [
     { name: 'Phòng Đôi Gỗ View Thung Lũng', price: 850000, image_url: 'images/phong-view-may.jpg', guests: '2 khách', bed: '1 giường đôi', view: 'View thung lũng, biển mây', perks: ['Không gian gỗ ấm cúng', 'Ngắm mây từ khung cửa', 'Chăn đệm ấm cho đêm núi'] }, // MẪU
-    { name: 'Phòng Gia Đình', price: 1600000, image_url: U('1522708323590-d24dbb6b0267'), guests: '4 khách', bed: '2 giường đôi', view: 'View núi rừng', perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] }, // MẪU
-    { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: U('1618773928121-c32242e63f39'), guests: '1 khách / giường', bed: 'Giường tầng', view: 'Không gian chung', perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] }, // MẪU
+    { name: 'Phòng Gia Đình', price: 1600000, image_url: 'images/hay-lay-toi-di-cabin.jpg', guests: '4 khách', bed: '2 giường đôi', view: 'View núi rừng', perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] }, // MẪU
+    { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: 'images/bap-treo-cua-so.jpg', guests: '1 khách / giường', bed: 'Giường tầng', view: 'Không gian chung', perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] }, // MẪU
   ],
   tours: [
     { name: 'Săn Mây Bình Minh', price: 300000, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.',
       duration: 'Khoảng 3 giờ (xuất phát 4:30 sáng)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên dẫn đường', 'Nước suối', 'Đèn pin / áo ấm (mượn tại nhà)'], note: 'Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn, tour được dời ngày, nhà sẽ báo trước.', details: 'Xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Hướng dẫn viên đưa bạn tới điểm ngắm đẹp nhất trong ngày, chụp ảnh cùng bạn rồi cùng quay về ăn sáng nóng.' }, // MẪU
-    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: U('1464822759023-fed622ff2c3b'), description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
+    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: 'images/ta-xua-wta-2026.jpg', description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
       duration: 'Nửa ngày (khoảng 5 giờ)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Nước và đồ ăn nhẹ', 'Hỗ trợ chụp ảnh'], note: 'Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.', details: 'Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động và muốn có những tấm ảnh đẹp.' }, // MẪU
-    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: U('1441974231531-c6227db76b6e'), description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
+    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: 'images/ruong-bac-thang.jpg', description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
       duration: 'Khoảng 3 giờ', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.' }, // MẪU
   ],
   // Dịch vụ & tiện ích. Giá và nội dung là MẪU, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). catalogIsSample: false để ẩn nhãn mẫu.

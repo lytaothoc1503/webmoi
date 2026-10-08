@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="only light" />
     <title>Nhà của An Homestay Tà Xùa | Thức dậy giữa biển mây Tà Xùa</title>
     <meta name="description" content="Nhà của An Homestay Tà Xùa - không gian nghỉ dưỡng mộc mạc giữa Tà Xùa, Bắc Yên, Sơn La. Đặt phòng, tour săn mây và trải nghiệm núi rừng Tây Bắc." />
     <meta name="keywords" content="Nhà của An, homestay Tà Xùa, săn mây Tà Xùa, đặt phòng Tà Xùa, tour Tà Xùa, homestay Sơn La" />
@@ -30,6 +31,7 @@
     </script>
 
     <style>
+      :root { color-scheme: only light; }
       :root {
         --primary-brown: #3d2314;
         --nav-brown: #4a2e18;
@@ -647,7 +649,6 @@
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.75);
-        backdrop-filter: blur(8px);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -669,6 +670,8 @@
         padding: 28px;
         position: relative;
         max-height: 90vh;
+        max-height: 90dvh;
+        color: #2b2b2b;
         overflow-y: auto;
       }
       .modal-close {
@@ -964,7 +967,7 @@
       .svc-body p { font-size: 13px; color: var(--text-muted); flex: 1; }
       .svc-more { font-size: 12.5px; font-weight: 700; color: var(--accent-orange); }
       .info-hero { width: 100%; height: 220px; object-fit: cover; display: block; }
-      .info-in { padding: 20px 22px 22px; max-height: 60vh; overflow: auto; }
+      .info-in { padding: 20px 22px 22px; max-height: 60vh; max-height: 55dvh; overflow: auto; }
       .info-in h3 { font-size: 20px; color: var(--nav-brown); margin-bottom: 4px; }
       .info-in ul { margin: 6px 0 10px 18px; font-size: 13.5px; color: var(--text-muted); }
       .info-meta { font-size: 13px; color: var(--text-muted); margin: 3px 0; }
