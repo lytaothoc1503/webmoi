@@ -123,6 +123,14 @@ async function loadRooms() {
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
 }
+function syncLodgingPrice() { // giữ priceRange trong dữ liệu có cấu trúc đúng theo giá phòng hiện tại
+  try {
+    const ps = (roomsData || []).map((r) => Number(r.price)).filter((n) => n > 0); if (!ps.length) return;
+    const el = document.getElementById('ld-lodging'), d = JSON.parse(el.textContent), f = (n) => n.toLocaleString('vi-VN') + '₫';
+    d.priceRange = Math.min(...ps) === Math.max(...ps) ? f(ps[0]) : f(Math.min(...ps)) + ' - ' + f(Math.max(...ps));
+    el.textContent = JSON.stringify(d);
+  } catch (e) { /* bỏ qua */ }
+}
 async function loadTours() {
   toursData = await getList('tours', D.tours, 'is_active');
   $('tours-grid').innerHTML = toursData.map((t, i) => `
@@ -573,6 +581,6 @@ async function submitReview() {
   buildNav();
   setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); loadCoffee(); $('ask-cloud').addEventListener('click', askCloud);
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
-  populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
+  syncLodgingPrice(); populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
 })();
