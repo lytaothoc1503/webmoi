@@ -28,6 +28,9 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 | `supabase/functions/customer-signup/` | Hàm đăng ký bằng SĐT, có chỗ nối Cloudflare Turnstile (tắt khi chưa có khóa) |
 | `supabase/migrations/` | SQL tạo bảng và quyền |
 
+## Mục Khám phá Tà Xùa
+Mục `#kham-pha` (mẹo săn mây + 9 địa điểm) lấy dữ liệu từ `cloudTips`, `attractions`, `attractionsNote` trong `data.js`; thêm/sửa điểm ở đó (chữ Việt mới cần thêm bản Anh vào `i18n.js`). Nội dung tổng hợp từ bài hướng dẫn du lịch công khai, chủ nhà nên rà lại và thay ảnh thật cho các điểm đang dùng biểu tượng.
+
 ## Quy tắc khi sửa
 1. `git pull --rebase` trước khi làm.
 2. Không để chữ "mẫu" hay dữ liệu thử hiển thị cho khách (cờ `catalogIsSample`, `storyIsSample`, `policyIsSample` trong `data.js` phải là `false`).

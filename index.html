@@ -955,6 +955,20 @@
       .room-specs span { font-size: 11.5px; background: #f5ebe0; color: var(--nav-brown); border-radius: 999px; padding: 3px 10px; }
       .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
       .hero-content { position: relative; z-index: 1; }
+      .kp-tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
+      .kp-tip { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+      .kp-tip .ic { font-size: 26px; } .kp-tip strong { display: block; margin: 6px 0 4px; color: var(--nav-brown); }
+      .kp-tip p { font-size: 13px; color: var(--text-muted); margin: 0; }
+      @media (max-width: 600px) { .kp-tips { grid-template-columns: 1fr 1fr; gap: 10px; } .kp-tip { padding: 12px; } .kp-tip p { font-size: 12px; } .kp-grid { grid-template-columns: 1fr 1fr; gap: 10px; } .kp-card img, .kp-ph { height: 100px; } .kp-body { padding: 10px; } .kp-body p { font-size: 12px; } }
+      .kp-h { color: var(--nav-brown); margin: 0 0 12px; font-size: 18px; }
+      .kp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
+      .kp-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+      .kp-card img, .kp-ph { width: 100%; height: 130px; object-fit: cover; display: block; }
+      .kp-ph { display: flex; align-items: center; justify-content: center; font-size: 44px; background: linear-gradient(135deg,#f5ebe0,#e8d5c0); }
+      .kp-body { padding: 12px 14px 14px; } .kp-body h4 { font-size: 15px; color: var(--nav-brown); margin: 0 0 4px; }
+      .kp-body small { display: inline-block; font-size: 11px; color: var(--accent-orange); font-weight: 700; margin-bottom: 4px; }
+      .kp-body p { font-size: 13px; color: var(--text-muted); margin: 0; }
+      .kp-note { font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 16px; }
       .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
       .svc-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.08); display: flex; flex-direction: column; cursor: pointer; transition: transform .2s; }
       .svc-card:hover { transform: translateY(-3px); }
@@ -1141,6 +1155,19 @@
           <div class="feature-item"><div class="feature-num">03</div><div><strong>Góc cà phê thư giãn</strong><p style="font-size: 13px; color: var(--text-muted)">Một ly cà phê, một khung cảnh núi rừng và những câu chuyện chậm rãi.</p></div></div>
         </div>
       </div>
+    </section>
+
+    <!-- KHÁM PHÁ TÀ XÙA -->
+    <section class="section-wrap" id="kham-pha">
+      <div class="section-header" style="text-align: center">
+        <span class="sec-sub">Cẩm nang Tà Xùa</span>
+        <h2 class="sec-title">Săn mây & địa điểm nên đến</h2>
+      </div>
+      <div class="kp-tips" id="kp-tips"></div>
+      <h3 class="kp-h">Địa điểm tham quan</h3>
+      <div class="kp-grid" id="kp-grid"></div>
+      <p class="kp-note" id="kp-note"></p>
+      <div style="text-align:center;margin-top:18px"><a class="btn-hero" href="#tour-ta-xua" style="display:inline-block;text-decoration:none">Xem tour có hướng dẫn viên</a></div>
     </section>
 
     <!-- ROOMS -->

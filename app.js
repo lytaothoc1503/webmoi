@@ -40,7 +40,7 @@ function toast(msg) {
 }
 
 /* ===== MENU + TÊN MỤC TRÊN TAB/THANH ĐỊA CHỈ ===== */
-const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['hang-phong', 'Hạng Phòng'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
+const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Hạng Phòng'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
 const NAV_MORE = ['tour-ta-xua', 'khach-noi', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
@@ -176,6 +176,13 @@ function setupStoryAndHero() {
     v.className = 'hero-video'; v.src = hv; v.poster = S.heroPoster || ''; v.muted = true; v.loop = true; v.autoplay = true; v.playsInline = true; v.preload = 'metadata'; v.setAttribute('aria-hidden', 'true');
     hero.prepend(v);
   }
+}
+function loadExplore() {
+  const tips = D.cloudTips || [], at = D.attractions || [];
+  if (!tips.length && !at.length) { $('kham-pha').hidden = true; return; }
+  $('kp-tips').innerHTML = tips.map((t) => `<div class="kp-tip"><span class="ic">${esc(t.icon || '')}</span><strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div>`).join('');
+  $('kp-grid').innerHTML = at.map((x) => `<div class="kp-card">${x.image_url ? img(x.image_url, x.name) : `<div class="kp-ph">${esc(x.emoji || '⛰️')}</div>`}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
+  $('kp-note').textContent = D.attractionsNote || '';
 }
 async function loadGallery() {
   const list = await getList('gallery', D.gallery, 'is_active');
@@ -504,7 +511,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo(); setupStoryAndHero(); loadServices();
+  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore();
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
