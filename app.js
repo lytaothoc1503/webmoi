@@ -177,6 +177,12 @@ function setupStoryAndHero() {
     hero.prepend(v);
   }
 }
+function askCloud() {
+  const msg = 'Chào nhà, sáng mai ở Tà Xùa có săn mây được không ạ?', h = messengerHref();
+  if (!h) { toast('Facebook của nhà đang được cập nhật. Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi nhé.'); return; }
+  const pr = copyText(msg); window.open(h, '_blank', 'noopener');
+  pr.then((ok) => toast(ok ? 'Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.' : 'Hãy nhắn nhà để hỏi về mây sáng mai.'));
+}
 function loadExplore() {
   const tips = D.cloudTips || [], at = D.attractions || [];
   if (!tips.length && !at.length) { $('kham-pha').hidden = true; return; }
@@ -511,7 +517,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore();
+  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); $('ask-cloud').addEventListener('click', askCloud);
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);

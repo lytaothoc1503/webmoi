@@ -32,6 +32,8 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## Mục Khám phá Tà Xùa
 Mục `#kham-pha` (mẹo săn mây + 9 địa điểm) lấy dữ liệu từ `cloudTips`, `attractions`, `attractionsNote` trong `data.js`; thêm/sửa điểm ở đó (chữ Việt mới cần thêm bản Anh vào `i18n.js`). Quy ước: KHÔNG ghi nguồn/credit bên ngoài lên web, chỉ dùng nội dung cần thiết viết lại bằng lời của nhà. Chủ nhà nên rà lại và thay ảnh thật cho các điểm đang dùng biểu tượng.
 
+Đầu trang có hàng nút "Bạn đến để:" (Săn mây, Ngắm sao, Cà phê, Nghỉ dưỡng) và nút "Hỏi nhà: sáng mai có mây không?" (sao chép câu hỏi + mở Messenger). Đồng bộ 2 thiết bị: mọi thay đổi phải nằm trên `main` của GitHub (máy tính và điện thoại đều `git pull --rebase` từ đó); kiểm tra `git rev-parse HEAD origin/main` bằng nhau sau khi đẩy.
+
 ## Quy tắc khi sửa
 1. `git pull --rebase` trước khi làm.
 2. Không để chữ "mẫu" hay dữ liệu thử hiển thị cho khách (cờ `catalogIsSample`, `storyIsSample`, `policyIsSample` trong `data.js` phải là `false`).

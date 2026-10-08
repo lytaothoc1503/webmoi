@@ -33,6 +33,8 @@ window.SITE_DATA = {
     { name: 'Mỏm đá Đầu Rùa', tag: 'Ngắm cảnh', emoji: '🐢', text: 'Tảng đá nhô ra khỏi vách núi, hình dáng giống đầu rùa, đứng đó nhìn xuống biển mây.' },
     { name: 'Mỏm Cá Heo', tag: 'Ngắm cảnh', emoji: '🐬', text: 'Khối đá tự nhiên giống cá heo đang vươn lên giữa biển mây.' },
     { name: 'Thảo nguyên Tà Xùa', tag: 'Dã ngoại', emoji: '🌾', text: 'Triền cỏ rộng trên đường đến Mỏm Cá Heo và Cây cô đơn, hợp để chụp ảnh và dã ngoại.' },
+    { name: 'Ngắm sao, săn dải Ngân Hà', tag: 'Tháng 3 - 10', emoji: '✨', text: 'Những đêm trời quang, ít ánh sáng, núi Tà Xùa có rất nhiều sao. Hợp vào mùa hè khi mây ít hơn. Nhà sẽ báo bạn đêm nào trời đẹp.' },
+    { name: 'Cà phê ngắm view tại nhà', tag: 'Thư giãn', image_url: 'images/ban-ghe-ngam-may.jpg', text: 'Một ly cà phê nóng, một chiếc ghế gỗ và tầm nhìn mở ra thung lũng. Không cần đi đâu xa vẫn thấy mây.' },
     { name: 'Đồi chè cổ thụ', tag: 'Trải nghiệm', image_url: 'images/ruong-bac-thang.jpg', text: 'Những gốc chè hàng trăm năm tuổi giữa rừng, không khí se lạnh và yên tĩnh.' },
     { name: 'Rừng rêu', tag: 'Thiên nhiên', emoji: '🌿', text: 'Khu rừng thân cây phủ đầy rêu xanh, mát và yên, hợp để đi dạo chậm.' },
     { name: 'Ruộng bậc thang Xím Vàng', tag: 'Theo mùa', image_url: 'images/ruong-bac-thang.jpg', text: 'Được nhắc đến là một trong những nơi có ruộng bậc thang đẹp nhất khu vực. Đẹp nhất vào mùa lúa.' },

@@ -955,6 +955,12 @@
       .room-specs span { font-size: 11.5px; background: #f5ebe0; color: var(--nav-brown); border-radius: 999px; padding: 3px 10px; }
       .hero-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
       .hero-content { position: relative; z-index: 1; }
+      .intent-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-start; align-items: center; margin-top: 18px; }
+      .intent-lead { color: #fff; font-size: 13px; opacity: .9; }
+      .intent-row a { background: rgba(255,255,255,.92); color: var(--nav-brown); text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+      .intent-row a:hover { background: #fff; color: var(--accent-orange); }
+      .ask-cloud { margin-top: 12px; background: transparent; color: #fff; border: 1.5px dashed rgba(255,255,255,.75); border-radius: 999px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: inherit; }
+      .ask-cloud:hover { background: rgba(255,255,255,.15); }
       .kp-tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
       .kp-tip { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.07); }
       .kp-tip .ic { font-size: 26px; } .kp-tip strong { display: block; margin: 6px 0 4px; color: var(--nav-brown); }
@@ -1127,6 +1133,11 @@
           <button class="btn-hero" onclick="openBookingModal('', 0)">Khám Phá & Đặt Phòng</button>
           <a class="btn-hero btn-hero-ghost" id="hero-fb" href="#" target="_blank" rel="noopener">Nhắn Facebook</a>
         </div>
+        <div class="intent-row" aria-label="Bạn đến Tà Xùa để làm gì">
+          <span class="intent-lead">Bạn đến để:</span>
+          <a href="#tour-ta-xua">🌄 Săn mây</a><a href="#kham-pha">✨ Ngắm sao</a><a href="#dich-vu">☕ Cà phê ngắm view</a><a href="#hang-phong">🛏️ Nghỉ dưỡng</a>
+        </div>
+        <button type="button" class="ask-cloud" id="ask-cloud">☁️ Hỏi nhà: sáng mai có mây không?</button>
       </div>
     </section>
 
