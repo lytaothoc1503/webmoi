@@ -24,7 +24,7 @@ window.SITE = {
 
   // Thanh toán QR: để trống thì web chỉ nhận yêu cầu đặt phòng, không hiện mã QR.
   // bankId là mã ngân hàng theo VietQR (ví dụ MB = '970422').
-  bank: { bankName: 'MB Bank (Quân Đội)', bankId: '970422', accountNo: '8386', accountName: 'NGO BA KHA' }, // TÀI KHOẢN THỬ NGHIỆM, thay bằng tài khoản thật của nhà
+  bank: { bankName: '', bankId: '', accountNo: '', accountName: '' }, // Để trống = chưa hiện mã QR. Khi có tài khoản thật: điền đủ 4 ô (bankId theo VietQR, ví dụ MB = '970422').
 
   // Cơ sở dữ liệu Supabase (Project Settings > API). Chỉ dán 'Project URL' và khóa 'anon public'.
   // KHÔNG BAO GIỜ dán khóa 'service_role' vào đây. Để trống thì web dùng dữ liệu trong data.js, và đơn chỉ gửi qua Facebook.

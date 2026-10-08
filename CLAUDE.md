@@ -19,7 +19,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## File chính
 | File | Vai trò |
 | --- | --- |
-| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (đang là **tài khoản thử**), video, khóa công khai Supabase, `turnstileSiteKey` |
+| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (đang **để trống**, nên chưa hiện QR; điền tài khoản thật vào 4 ô `bank`), video, khóa công khai Supabase, `turnstileSiteKey` |
 | `data.js` | Phòng, tour, dịch vụ, câu chuyện, chính sách hoàn hủy, FAQ, đánh giá, thư viện ảnh |
 | `index.html`, `app.js`, `account.js` | Trang chủ, đặt phòng, tra cứu đơn, đăng ký/đăng nhập |
 | `i18n.js` | Dịch Việt ↔ Anh |
