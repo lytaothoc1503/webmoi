@@ -40,7 +40,7 @@ function toast(msg) {
 }
 
 /* ===== MENU + TÊN MỤC TRÊN TAB/THANH ĐỊA CHỈ ===== */
-const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
+const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ Thêm'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
 const NAV_MORE = ['gioi-thieu', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
@@ -129,9 +129,10 @@ async function loadTours() {
         <span class="tour-link">Xem chi tiết</span></div></div>`).join('');
 }
 function loadServices() {
-  const list = D.services || [];
+  const main = (D.coffee && D.coffee.menuFrom) || [];  // dịch vụ chính đã nằm ở mục Coffee; mục này chỉ là dịch vụ thêm
+  const list = (D.services || []).map((s, i) => ({ s, i })).filter((x) => !main.includes(x.s.name));
   $('dich-vu').hidden = !list.length;
-  $('services-grid').innerHTML = list.map((s, i) => `
+  $('services-grid').innerHTML = list.map(({ s, i }) => `
     <div class="svc-card" onclick="openInfo('s', ${i})">${s.image_url ? img(s.image_url, s.name) : `<div class="svc-ph">${esc(s.icon || '✨')}</div>`}
       <div class="svc-body"><h3>${esc(s.name)}</h3>
         <div class="svc-price">${Number(s.price) > 0 ? money(s.price) + ` <small>${esc(s.unit || '')}</small>` : 'Liên hệ báo giá'}</div>
@@ -177,6 +178,7 @@ function openInfo(kind, i) {
     </div>`;
   $('info-modal').classList.add('active');
 }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeInfo(); closeLightbox(); } });
 function closeInfo() { $('info-modal').classList.remove('active'); }
 function setupIntroVideo() {
   const v = S.introVideo, box = $('about-media');
@@ -216,8 +218,8 @@ async function loadCoffee() {
   $('cf-facts').innerHTML = (c.facts || []).filter((f) => f.value).map((f) => `<div><span>${esc(f.icon || '')} ${esc(f.label)}</span><b>${esc(f.value)}</b></div>`).join('');
   const fb = messengerHref();
   $('cf-btns').innerHTML = (C.phone ? `<a class="btn-submit-booking rd-call" href="tel:${esc(C.phone)}">📞 Gọi điện</a>` : '') + (fb ? `<a class="btn-submit-booking rd-fb" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn Messenger</a>` : '') + `<a class="btn-submit-booking" href="#hang-phong">🛏️ Xem phòng nghỉ tại nhà</a>`;
-  const menu = (c.menuFrom || []).map((n) => (D.services || []).find((s) => s.name === n)).filter(Boolean);
-  $('cf-menu').innerHTML = menu.map((s) => `<div class="cf-item">${s.image_url ? img(s.image_url, s.name) : ''}<div><strong>${esc(s.icon || '')} ${esc(s.name)}</strong><em>${Number(s.price) > 0 ? esc(money(s.price) + ' ' + (s.unit || '')) : 'Liên hệ'}</em><p>${esc(s.description || '')}${s.time ? ' (' + esc(s.time) + ')' : ''}</p></div></div>`).join('');
+  const menu = (c.menuFrom || []).map((n) => (D.services || []).findIndex((s) => s.name === n)).filter((i) => i >= 0).map((i) => Object.assign({ _i: i }, D.services[i]));
+  $('cf-menu').innerHTML = menu.map((s) => `<div class="cf-item" onclick="openInfo('s', ${s._i})" style="cursor:pointer">${s.image_url ? img(s.image_url, s.name) : ''}<div><strong>${esc(s.icon || '')} ${esc(s.name)}</strong><em>${Number(s.price) > 0 ? esc(money(s.price) + ' ' + (s.unit || '')) : 'Liên hệ'}</em><p>${esc(s.description || '')}${s.time ? ' (' + esc(s.time) + ')' : ''}</p></div></div>`).join('');
   $('cf-menu-box').hidden = !menu.length; $('cf-menu-btn').hidden = !menu.length;
   const fig = (u, cap) => `<figure data-full="${esc(safeUrl(u))}">${img(u, cap || 'Ảnh quán')}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`;
   const photos = (c.photos || []).map((u) => fig(u, '')), gp = (c.guestPhotos || []).map((g) => fig(g.image_url, g.caption));
