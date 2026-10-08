@@ -114,6 +114,10 @@ async function oauth(provider, label) {
   const { error } = await db.auth.signInWithOAuth({ provider, options: { redirectTo: location.origin + location.pathname } });
   if (error) authMsg(/not enabled|Unsupported provider|provider is not/i.test(error.message) ? `Đăng nhập ${label} đang được cài đặt. Bạn dùng số điện thoại tạm nhé.` : authErr(error));
 }
+const SOC = (window.SITE && window.SITE.socialLogin) || {};
+if (SOC.facebook) $('auth-fb').hidden = false;
+if (SOC.google) $('auth-gg').hidden = false;
+if (!SOC.facebook && !SOC.google) $('auth-or').hidden = true;
 $('auth-fb').addEventListener('click', () => oauth('facebook', 'Facebook'));
 $('auth-gg').addEventListener('click', () => oauth('google', 'Google'));
 
