@@ -8,6 +8,7 @@ Web giới thiệu + nhận đặt phòng (Tà Xùa, Bắc Yên, Sơn La).
 - `index.html` + `app.js`: trang chủ, đặt phòng, Tra cứu đơn, lịch sử đơn.
 - `admin.html`, `auth.html`: quản trị (đăng nhập bằng Supabase Auth). Mở bằng cách bấm 3 lần vào logo.
 - `supabase/migrations/`: chạy lần lượt các file SQL trong Supabase > SQL Editor.
+- `supabase/ke-hoach/`: SQL và hướng dẫn chuyển nội dung sang Supabase, chưa áp dụng.
 
 ## Cài đặt (làm 1 lần)
 1. Supabase: chạy các file SQL theo thứ tự tên file.
