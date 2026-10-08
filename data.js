@@ -10,19 +10,23 @@ window.SITE_DATA = {
     { name: 'Phòng Gia Đình', price: 1600000, image_url: 'images/hay-lay-toi-di-cabin.jpg', guests: '4 khách', bed: '2 giường đôi', view: 'View núi rừng', perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] },
     { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: 'images/bap-treo-cua-so.jpg', guests: '1 khách / giường', bed: 'Giường tầng', view: 'Không gian chung', perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] },
   ],
+  // Trải nghiệm & gợi ý lịch trình. KHÔNG bán như tour có hướng dẫn viên (hộ kinh doanh cá thể không đủ điều kiện kinh doanh lữ hành).
+  // Muốn bán tour đặt online: ký hợp đồng đại lý với công ty lữ hành có giấy phép, rồi đổi toursBookable thành true và điền giá.
+  toursBookable: false,
   tours: [
-    { name: 'Săn Mây Bình Minh', price: 300000, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.',
-      duration: 'Khoảng 3 giờ (xuất phát 4:30 sáng)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên dẫn đường', 'Nước suối', 'Đèn pin / áo ấm (mượn tại nhà)'], note: 'Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn, tour được dời ngày, nhà sẽ báo trước.', details: 'Xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Hướng dẫn viên đưa bạn tới điểm ngắm đẹp nhất trong ngày, chụp ảnh cùng bạn rồi cùng quay về ăn sáng nóng.' },
-    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 500000, image_url: 'images/ta-xua-wta-2026.jpg', description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
-      duration: 'Nửa ngày (khoảng 5 giờ)', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Nước và đồ ăn nhẹ', 'Hỗ trợ chụp ảnh'], note: 'Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.', details: 'Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động và muốn có những tấm ảnh đẹp.' },
-    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 350000, image_url: 'images/ruong-bac-thang.jpg', description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
-      duration: 'Khoảng 3 giờ', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.' },
+    { name: 'Săn Mây Bình Minh', price: 0, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.',
+      duration: 'Khoảng 3 giờ (nên xuất phát khoảng 4:30 sáng)', meet: '', includes: ['Gợi ý lộ trình và điểm ngắm đẹp trong ngày', 'Cho mượn đèn pin / áo ấm tại nhà', 'Bữa sáng nóng khi bạn quay về (đặt trước)'], note: 'Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn nên dời sang hôm sau, nhà sẽ báo tình hình trước.', details: 'Nên xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Nhà chỉ cho bạn lộ trình và điểm ngắm đẹp trong ngày, có thể giúp bạn kết nối xe ôm hoặc người địa phương quen đường, rồi chuẩn bị bữa sáng nóng khi bạn quay về.' },
+    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 0, image_url: 'images/ta-xua-wta-2026.jpg', description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
+      duration: 'Nửa ngày (khoảng 5 giờ)', meet: '', includes: ['Gợi ý lộ trình và lưu ý an toàn', 'Nước và đồ ăn nhẹ (đặt trước)'], note: 'Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.', details: 'Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động. Cung đường còn hoang sơ, nhà sẽ tư vấn lộ trình và cách đi an toàn.' },
+    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 0, image_url: 'images/ruong-bac-thang.jpg', description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
+      duration: 'Khoảng 3 giờ', meet: '', includes: ['Gợi ý điểm đến và cách đi', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ và nhâm nhi ly trà nóng ngay giữa rừng.' },
   ],
+
   // Dịch vụ & tiện ích. Giá tạm, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). 
   // Khám phá Tà Xùa: mẹo săn mây + điểm tham quan (chủ nhà sửa/bổ sung theo thực tế).
   cloudTips: [
     { icon: '📅', title: 'Mùa đẹp nhất', text: 'Từ khoảng tháng 10 đến tháng 4 năm sau, là mùa mây dày và dễ gặp biển mây nhất.' },
-    { icon: '🌅', title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà có tour Săn Mây Bình Minh xuất phát 4:30.' },
+    { icon: '🌅', title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà gợi ý lịch săn mây bình minh, nên xuất phát khoảng 4:30.' },
     { icon: '🧥', title: 'Chuẩn bị gì', text: 'Trời khoảng 15-22°C, sáng và tối khá lạnh. Mang áo ấm, áo mưa và giày chống trơn.' },
     { icon: '🌤️', title: 'Hỏi nhà trước', text: 'Mây phụ thuộc thời tiết từng ngày. Nhắn nhà để biết sáng mai có săn mây được không.' },
   ],

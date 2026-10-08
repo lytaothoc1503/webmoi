@@ -40,7 +40,7 @@ function toast(msg) {
 }
 
 /* ===== MENU + TÊN MỤC TRÊN TAB/THANH ĐỊA CHỈ ===== */
-const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ Thêm'], ['lien-he', 'Liên Hệ']];
+const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Trải Nghiệm'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ Thêm'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
 const NAV_MORE = ['gioi-thieu', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
@@ -136,7 +136,7 @@ async function loadTours() {
   $('tours-grid').innerHTML = toursData.map((t, i) => `
     <div class="tour-arch-card" onclick="openInfo('t', ${i})" style="cursor:pointer">${img(t.image_url, t.name)}
       <div class="tour-overlay"><div class="tour-name">${esc(t.name)}</div>
-        <div class="tour-price-tag">${Number(t.price) > 0 ? money(t.price) + ' / người' : 'Liên hệ báo giá'}</div>
+        <div class="tour-price-tag">${Number(t.price) > 0 && D.toursBookable ? money(t.price) + ' / người' : 'Nhắn nhà để được tư vấn'}</div>
         <span class="tour-link">Xem chi tiết</span></div></div>`).join('');
 }
 function loadServices() {
@@ -171,10 +171,11 @@ function openRoom(i) {
 function openInfo(kind, i) {
   $('info-box').style.maxWidth = '';
   const it = (kind === 't' ? toursData : (D.services || []))[i]; if (!it) return;
-  const price = Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
+  const bookable = kind === 't' && D.toursBookable;
+  const price = kind === 't' && !bookable ? 'Gợi ý từ nhà, nhắn nhà để được tư vấn' : Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
   const meta = (kind === 't' ? [['⏱', it.duration], ['📍', 'Điểm hẹn: ' + (it.meet || '')]] : [['🕒', it.time]]).filter((m) => m[1] && !/: $/.test(m[1]));
   const sample = D.catalogIsSample ? '<span class="sample-tag">giá & nội dung mẫu</span>' : '';
-  const act = kind === 't'
+  const act = bookable
     ? `<a class="btn-submit-booking" href="javascript:void(0)" onclick="closeInfo(); openBookingModal('${arg(it.name)}', ${Number(it.price) || 0})">ĐẶT TOUR NÀY</a>`
     : '';
   const fb = messengerHref();
@@ -185,7 +186,7 @@ function openInfo(kind, i) {
       <p style="font-size:14px;margin:8px 0">${esc(it.details || it.description || '')}</p>
       ${(it.includes || []).length ? `<strong style="font-size:13.5px">Bao gồm</strong><ul>${it.includes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
       ${it.note ? `<p class="info-meta">💡 ${esc(it.note)}</p>` : ''}
-      <div class="info-actions">${act}${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">${kind === 't' ? 'Hỏi thêm qua Messenger' : 'Nhắn nhà để đặt / hỏi giá'}</a>` : ''}</div>
+      <div class="info-actions">${act}${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">${kind === 't' ? (bookable ? 'Hỏi thêm qua Messenger' : 'Nhắn nhà để được tư vấn') : 'Nhắn nhà để đặt / hỏi giá'}</a>` : ''}</div>
     </div>`;
   $('info-modal').classList.add('active');
 }
@@ -286,7 +287,7 @@ function closeLightbox() { $('lightbox').classList.remove('active'); }
 function populateRoomSelect() {
   let o = '<option value="">-- Chọn hạng phòng hoặc tour --</option>';
   if (roomsData.length) o += '<optgroup label="Hạng Phòng">' + roomsData.map((r, i) => `<option value="r:${i}">${esc(r.name)} - ${Number(r.price) > 0 ? money(r.price) + '/đêm' : 'Liên hệ báo giá'}</option>`).join('') + '</optgroup>';
-  if (toursData.length) o += '<optgroup label="Tour Trải Nghiệm">' + toursData.map((t, i) => `<option value="t:${i}">${esc(t.name)} - ${money(t.price)}</option>`).join('') + '</optgroup>';
+  if (toursData.length && D.toursBookable) o += '<optgroup label="Tour Trải Nghiệm">' + toursData.map((t, i) => `<option value="t:${i}">${esc(t.name)} - ${money(t.price)}</option>`).join('') + '</optgroup>';
   $('bk-room-select').innerHTML = o;
 }
 function onRoomSelectChange() {

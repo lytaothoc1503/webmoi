@@ -41,6 +41,9 @@ Bấm vào thẻ phòng mở trang chi tiết (hàm `openRoom` trong `app.js`): 
 
 Phần "Ăn uống" trong mục Coffee lấy từ `coffee.dining` (nhóm Bữa sáng, Món chính, Đồ uống). Hiện chưa có món nào nên web ẩn; chủ dự án tự điền tên món và giá vào `items` (có dòng mẫu trong comment). Không dùng ảnh/tên của nhà hàng khác; chỉ dùng ảnh của chính Nhà của An.
 
+## Trải nghiệm / tour (quan trọng về pháp lý)
+Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh doanh lữ hành (tổ chức, bán tour) cần doanh nghiệp có giấy phép và ký quỹ; hướng dẫn viên cần thẻ hướng dẫn viên. Vì vậy web KHÔNG bán "tour có hướng dẫn viên": mục `#tour-ta-xua` là "Trải Nghiệm & Gợi Ý Lịch Trình" (nhà tư vấn lộ trình, kết nối người địa phương, cho mượn đèn/áo, bữa sáng). Cờ `toursBookable` trong `data.js` = false (không đặt tour online, không hiện giá). Chỉ bật true khi đã ký hợp đồng đại lý với công ty lữ hành có giấy phép (Điều 40). Đây là thông tin tham khảo, không phải tư vấn pháp lý; nên hỏi Sở VHTTDL Sơn La hoặc luật sư. Không dùng chữ "hướng dẫn viên", "tour trọn gói" trên web nếu chưa đủ điều kiện.
+
 ## Quy tắc khi sửa
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).
 1. `git pull --rebase` trước khi làm.
