@@ -361,7 +361,7 @@ function renderOrderView() {
           <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử, thanh toán sau</button><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button></div></div>`;
     } else {
       body = `<div class="pay-note">Mức giá hoặc thông tin thanh toán của dịch vụ này sẽ được nhà gửi cho bạn qua Messenger. Bạn hãy nhắn kèm <strong>mã đơn</strong>.</div>
-        <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử</button></div>`;
+        <div class="ov-row"><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử</button></div>`;
     }
     body += `<div class="ov-card support"><strong>🕑 Liên hệ homestay 24/7</strong><p>Cần hỏi thêm về phòng, giá, đưa đón hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.</p>${hours}${contactOthers ? `<div class="ov-others">${contactOthers}</div>` : ''}</div>`;
   } else if (st === ST.PAID) {
