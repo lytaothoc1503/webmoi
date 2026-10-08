@@ -50,10 +50,13 @@ function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hi
 function buildNav() {
   const vs = visibleSections();
   const main = vs.filter(([id]) => id !== 'trang-chu' && !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
-  const links = main.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')
+  const svc = D.services || [];
+  const svcMenu = svc.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Dịch Vụ <span class="caret">▾</span></a><ul class="nav-dropdown">${svc.map((s, i) => `<li><a href="javascript:void(0)" onclick="openInfo('s', ${i})">${esc(s.icon || '')} ${esc(s.name)}</a></li>`).join('')}</ul></li>` : '';
+  const links = main.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('') + svcMenu
     + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
   $('nav-links').innerHTML = links + accountNavHtml() + (C.phone ? `<li><a href="tel:${esc(C.phone)}" class="btn-nav-call">📞 Gọi</a></li>` : '') + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
   $('mobile-nav').innerHTML = visibleSections().map(([id, l]) => `<a href="#${id}" data-sec="${id}" onclick="closeMobileNav()">${l}</a>`).join('')
+    + (svc.length ? `<span class="mn-h">Dịch Vụ</span>` + svc.map((s, i) => `<a href="javascript:void(0)" class="mn-sub" onclick="closeMobileNav(); openInfo('s', ${i})">${esc(s.icon || '')} ${esc(s.name)}</a>`).join('') : '')
     + (currentUser ? `<a href="javascript:void(0)" onclick="closeMobileNav(); signOutUser()">Đăng xuất</a>` : (db ? `<a href="javascript:void(0)" onclick="closeMobileNav(); openAuthModal()">Đăng nhập / Đăng ký</a>` : ''))
     + `<a href="javascript:void(0)" onclick="closeMobileNav(); openBookingModal('', 0)" style="background: var(--accent-orange); text-align: center;">Đặt Phòng Ngay</a>`;
 }
@@ -131,7 +134,7 @@ async function loadTours() {
 function loadServices() {
   const main = (D.coffee && D.coffee.menuFrom) || [];  // dịch vụ chính đã nằm ở mục Coffee; mục này chỉ là dịch vụ thêm
   const list = (D.services || []).map((s, i) => ({ s, i })).filter((x) => !main.includes(x.s.name));
-  $('dich-vu').hidden = !list.length;
+  $('dich-vu').hidden = true; // dịch vụ nay nằm trong menu "Dịch Vụ", bấm vào xem chi tiết
   $('services-grid').innerHTML = list.map(({ s, i }) => `
     <div class="svc-card" onclick="openInfo('s', ${i})">${s.image_url ? img(s.image_url, s.name) : `<div class="svc-ph">${esc(s.icon || '✨')}</div>`}
       <div class="svc-body"><h3>${esc(s.name)}</h3>
