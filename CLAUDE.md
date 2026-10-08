@@ -44,6 +44,16 @@ Phần "Ăn uống" trong mục Coffee lấy từ `coffee.dining` (nhóm Bữa s
 ## Trải nghiệm / tour (quan trọng về pháp lý)
 Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh doanh lữ hành (tổ chức, bán tour) cần doanh nghiệp có giấy phép và ký quỹ; hướng dẫn viên cần thẻ hướng dẫn viên. Vì vậy web KHÔNG bán "tour có hướng dẫn viên": mục `#tour-ta-xua` là "Trải Nghiệm & Gợi Ý Lịch Trình" (nhà tư vấn lộ trình, kết nối người địa phương, cho mượn đèn/áo, bữa sáng). Cờ `toursBookable` trong `data.js` = false (không đặt tour online, không hiện giá). Chỉ bật true khi đã ký hợp đồng đại lý với công ty lữ hành có giấy phép (Điều 40). Đây là thông tin tham khảo, không phải tư vấn pháp lý; nên hỏi Sở VHTTDL Sơn La hoặc luật sư. Không dùng chữ "hướng dẫn viên", "tour trọn gói" trên web nếu chưa đủ điều kiện.
 
+## Quy trình tiêu chuẩn (làm đúng trước khi báo xong)
+1. **Rà pháp lý theo loại hình trước khi thêm hoặc đổi dịch vụ.** Chủ dự án là hộ kinh doanh cá thể. Tour, hướng dẫn viên, đưa đón thu tiền, cho thuê xe, khuyến mãi, nội dung quảng cáo đều phải kiểm tra điều kiện. Nếu có rủi ro thì tự chỉnh về hướng an toàn, để cờ bật lại sau, rồi báo ngắn gọn. Không chờ bị nhắc. Đây không phải tư vấn pháp lý, nên hướng dẫn chủ dự án hỏi cơ quan địa phương.
+2. **Không ghi nguồn/credit lên web**, viết lại bằng lời của nhà. Chỉ dùng ảnh và tên của chính Nhà của An.
+3. **Không bịa thông tin.** Chưa có giá, món, ảnh, giờ thì để trống hoặc ẩn và hỏi chủ dự án. Mọi con số do trợ lý đề xuất phải ghi rõ "đề xuất" và để chủ dự án chốt.
+4. **Không hiện ngày "cập nhật" lên web.**
+5. **Kiểm tra trước khi báo xong:** `node scripts/kiem-tra.js`, các bài test đặt phòng/tài khoản, xem cả điện thoại 390px và máy tính 1366px (không tràn ngang, không lỗi JS), chữ Việt mới đã có bản Anh trong `i18n.js`.
+6. **Đồng bộ 2 thiết bị:** `git pull --rebase`, commit tiếng Việt, `git push`, rồi xác nhận `git rev-parse HEAD origin/main` bằng nhau và tab Actions xanh.
+7. **Danh sách việc chờ:** giữ theo mức ưu tiên, làm việc quan trọng trước và nhắc lại phần chưa làm khi xong.
+8. **Báo cáo:** kết luận trước, ngắn gọn, tối đa một câu hỏi có/không. Khi đổi cấu trúc hoặc quy trình thì cập nhật file này.
+
 ## Quy tắc khi sửa
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).
 1. `git pull --rebase` trước khi làm.
