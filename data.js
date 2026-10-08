@@ -19,7 +19,7 @@ window.SITE_DATA = {
       duration: 'Khoảng 3 giờ', meet: 'Sảnh Nhà của An', includes: ['Hướng dẫn viên', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ, nghe kể về nghề chè của người dân bản địa và nhâm nhi ly trà nóng ngay giữa rừng.' },
   ],
   // Dịch vụ & tiện ích. Giá tạm, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). 
-  // Khám phá Tà Xùa: mẹo săn mây + điểm tham quan (tổng hợp từ các bài hướng dẫn du lịch công khai, chủ nhà sửa/bổ sung theo thực tế).
+  // Khám phá Tà Xùa: mẹo săn mây + điểm tham quan (chủ nhà sửa/bổ sung theo thực tế).
   cloudTips: [
     { icon: '📅', title: 'Mùa đẹp nhất', text: 'Từ khoảng tháng 10 đến tháng 4 năm sau, là mùa mây dày và dễ gặp biển mây nhất.' },
     { icon: '🌅', title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà có tour Săn Mây Bình Minh xuất phát 4:30.' },
@@ -37,7 +37,7 @@ window.SITE_DATA = {
     { name: 'Rừng rêu', tag: 'Thiên nhiên', emoji: '🌿', text: 'Khu rừng thân cây phủ đầy rêu xanh, mát và yên, hợp để đi dạo chậm.' },
     { name: 'Ruộng bậc thang Xím Vàng', tag: 'Theo mùa', image_url: 'images/ruong-bac-thang.jpg', text: 'Được nhắc đến là một trong những nơi có ruộng bậc thang đẹp nhất khu vực. Đẹp nhất vào mùa lúa.' },
   ],
-  attractionsNote: 'Thông tin tham khảo từ các bài hướng dẫn du lịch. Đường đi, thời tiết và tình trạng cung đường có thể thay đổi, hãy hỏi nhà trước khi đi.',
+  attractionsNote: 'Thông tin mang tính tham khảo. Đường đi, thời tiết và tình trạng cung đường có thể thay đổi, hãy hỏi nhà trước khi đi.',
   catalogIsSample: false,
   services: [
     { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 120000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
