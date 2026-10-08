@@ -217,11 +217,16 @@ function populateRoomSelect() {
 function onRoomSelectChange() {
   const v = $('bk-room-select').value, [k, i] = v.split(':');
   const it = v ? (k === 'r' ? roomsData : toursData)[Number(i)] : null;
-  currentItem = it ? { name: it.name, price: Number(it.price) || 0 } : { name: '', price: 0 };
+  currentItem = it ? { name: it.name, price: Number(it.price) || 0, perPerson: k === 't' } : { name: '', price: 0, perPerson: false };
+  const pr = $('bk-people-row'); if (pr) pr.style.display = currentItem.perPerson ? 'block' : 'none';
   calculateTotal();
 }
+// Ngày theo giờ máy khách (không dùng toISOString vì nó tính theo giờ quốc tế UTC, lệch ngày với Việt Nam lúc 0h-7h sáng)
+const localISO = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const todayISO = () => localISO(new Date());
+const tomorrowISO = () => { const d = new Date(); d.setDate(d.getDate() + 1); return localISO(d); };
 function openBookingModal(name, price) {
-  const today = new Date().toISOString().split('T')[0], tom = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const today = todayISO(), tom = tomorrowISO();
   $('bk-checkin').value = today; $('bk-checkout').value = tom; $('bk-checkin').min = today; $('bk-checkout').min = tom;
   const sel = $('bk-room-select'); sel.selectedIndex = 0;
   if (name) { for (const o of sel.options) { const [k, i] = o.value.split(':'); const it = o.value ? (k === 'r' ? roomsData : toursData)[Number(i)] : null; if (it && it.name === name) { o.selected = true; break; } } }
@@ -229,7 +234,7 @@ function openBookingModal(name, price) {
 }
 function closeBookingModal() { $('booking-modal').classList.remove('active'); $('booking-form-step1').reset(); }
 function validateDates() {
-  const a = $('bk-checkin').value, b = $('bk-checkout').value, err = $('date-error'), today = new Date().toISOString().split('T')[0];
+  const a = $('bk-checkin').value, b = $('bk-checkout').value, err = $('date-error'), today = todayISO();
   if (a && a < today) { err.textContent = 'Ngày nhận phòng không được trong quá khứ.'; err.classList.add('show'); return false; }
   if (a && b && (new Date(b) - new Date(a)) / 864e5 < 1) { err.textContent = 'Ngày trả phòng phải sau ngày nhận phòng ít nhất 1 ngày.'; err.classList.add('show'); return false; }
   err.classList.remove('show'); calculateTotal(); return true;
@@ -237,8 +242,11 @@ function validateDates() {
 function calculateTotal() {
   let n = Math.ceil((new Date($('bk-checkout').value) - new Date($('bk-checkin').value)) / 864e5);
   if (isNaN(n) || n < 1) n = 1;
-  const total = n * currentItem.price;
-  $('bk-total-display').textContent = currentItem.price > 0 ? total.toLocaleString('vi-VN') + ' đ' : 'Báo giá khi nhà liên hệ';
+  // Tour tính theo đầu người (giá x số người); phòng tính theo đêm (giá x số đêm)
+  const people = Math.max(1, Math.min(99, parseInt(($('bk-people') || {}).value, 10) || 1));
+  const total = currentItem.perPerson ? people * currentItem.price : n * currentItem.price;
+  const how = currentItem.perPerson ? ` (${people} người x ${currentItem.price.toLocaleString('vi-VN')} đ)` : (n > 1 ? ` (${n} đêm)` : '');
+  $('bk-total-display').textContent = currentItem.price > 0 ? total.toLocaleString('vi-VN') + ' đ' + how : 'Báo giá khi nhà liên hệ';
   return total;
 }
 function showStep(which) {

@@ -1295,6 +1295,10 @@
             </div>
           </div>
           <div class="date-error" id="date-error">Ngày trả phòng phải sau ngày nhận phòng ít nhất 1 ngày.</div>
+          <div class="form-group" id="bk-people-row" style="display:none">
+            <label>Số người tham gia tour (tính giá theo đầu người):</label>
+            <input type="number" id="bk-people" min="1" max="99" value="1" oninput="calculateTotal()" />
+          </div>
           <div class="form-group">
             <label>Số lượng khách (Người lớn + Trẻ em):</label>
             <input type="text" id="bk-guests" placeholder="Ví dụ: 2 người lớn" required />

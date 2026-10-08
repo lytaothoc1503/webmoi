@@ -353,6 +353,7 @@
 ", đồng ý để nhà lưu thông tin đặt phòng của tôi.": ", and agree that the homestay stores my booking information.",
 "Tiếp tục đồng nghĩa bạn đồng ý": "By continuing you agree to the",
 "hoặc": "or",
+"Số người tham gia tour (tính giá theo đầu người):": "Number of people joining the tour (priced per person):",
 "TIẾP TỤC VỚI FACEBOOK": "CONTINUE WITH FACEBOOK",
 "TIẾP TỤC VỚI GOOGLE": "CONTINUE WITH GOOGLE",
 "← Quay lại đăng nhập": "← Back to log in",
