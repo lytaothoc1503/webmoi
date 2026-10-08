@@ -6,6 +6,9 @@
   const DICT = /*DICT*/{
 "Trang Chủ": "Home",
 "Giới Thiệu": "About",
+"Thêm": "More",
+"📞 Gọi": "📞 Call",
+"☁️ Hỏi nhà: mai có mây không?": "☁️ Ask us: clouds tomorrow?",
 "Bạn đến để:": "You're here for:",
 "🌄 Săn mây": "🌄 Cloud hunting",
 "✨ Ngắm sao": "✨ Stargazing",

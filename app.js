@@ -43,16 +43,16 @@ function toast(msg) {
 const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Hạng Phòng'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
-const NAV_MORE = ['tour-ta-xua', 'khach-noi', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
+const NAV_MORE = ['gioi-thieu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
 function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
 document.addEventListener('click', () => document.querySelectorAll('.nav-more.open').forEach((li) => li.classList.remove('open')));
 function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden).sort((x, y) => ($(x[0]).compareDocumentPosition($(y[0])) & 4 ? -1 : 1)); } // luôn theo thứ tự trên trang
 function buildNav() {
   const vs = visibleSections();
-  const main = vs.filter(([id]) => !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
+  const main = vs.filter(([id]) => id !== 'trang-chu' && !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
   const links = main.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')
-    + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Khám Phá Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
-  $('nav-links').innerHTML = links + accountNavHtml() + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
+    + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
+  $('nav-links').innerHTML = links + accountNavHtml() + (C.phone ? `<li><a href="tel:${esc(C.phone)}" class="btn-nav-call">📞 Gọi</a></li>` : '') + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
   $('mobile-nav').innerHTML = visibleSections().map(([id, l]) => `<a href="#${id}" data-sec="${id}" onclick="closeMobileNav()">${l}</a>`).join('')
     + (currentUser ? `<a href="javascript:void(0)" onclick="closeMobileNav(); signOutUser()">Đăng xuất</a>` : (db ? `<a href="javascript:void(0)" onclick="closeMobileNav(); openAuthModal()">Đăng nhập / Đăng ký</a>` : ''))
     + `<a href="javascript:void(0)" onclick="closeMobileNav(); openBookingModal('', 0)" style="background: var(--accent-orange); text-align: center;">Đặt Phòng Ngay</a>`;
@@ -117,7 +117,7 @@ async function loadRooms() {
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
-        <ul class="room-perks">${(r.perks || []).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
+        <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         <button class="btn-book-room" onclick="openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button></div></div>`).join('');
 }
 async function loadTours() {

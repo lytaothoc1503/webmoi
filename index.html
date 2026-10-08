@@ -938,11 +938,13 @@
       @media (max-width: 1240px) { .nav-links { display: none; } .hamburger { display: flex; } }
 
       /* TRUST STRIP / CTA / STICKY BAR */
+      .btn-nav-call { border: 1.5px solid rgba(255,255,255,.7); border-radius: 999px; padding: 7px 14px; }
+      .btn-nav-call:hover { background: rgba(255,255,255,.12); }
       .trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1100px; margin: -34px auto 0; position: relative; z-index: 5; padding: 0 20px; }
       .trust-item { display: flex; gap: 12px; align-items: center; background: #fff; border-radius: 14px; padding: 14px 16px; box-shadow: 0 8px 22px rgba(0,0,0,.12); }
       .trust-ic { font-size: 24px; }
       .trust-item strong { display: block; font-size: 13.5px; color: var(--nav-brown); }
-      .trust-item small { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+      .trust-item small { display: none; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
       .cta-band { text-align: center; background: linear-gradient(135deg, var(--nav-brown), #7a4a26); color: #fff; padding: 56px 20px; }
       .cta-band h2 { font-size: 28px; margin-bottom: 8px; }
       .cta-band p { opacity: .9; margin-bottom: 22px; }
@@ -959,7 +961,7 @@
       .intent-lead { color: #fff; font-size: 13px; opacity: .9; }
       .intent-row a { background: rgba(255,255,255,.92); color: var(--nav-brown); text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
       .intent-row a:hover { background: #fff; color: var(--accent-orange); }
-      .ask-cloud { margin-top: 12px; background: transparent; color: #fff; border: 1.5px dashed rgba(255,255,255,.75); border-radius: 999px; padding: 8px 16px; font-size: 13px; cursor: pointer; font-family: inherit; }
+      .ask-cloud { background: transparent; color: #fff; border: 1.5px dashed rgba(255,255,255,.75); border-radius: 999px; padding: 7px 14px; font-size: 13px; cursor: pointer; font-family: inherit; }
       .ask-cloud:hover { background: rgba(255,255,255,.15); }
       .kp-tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 28px; }
       .kp-tip { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 4px 14px rgba(0,0,0,.07); }
@@ -1135,9 +1137,8 @@
         </div>
         <div class="intent-row" aria-label="Bạn đến Tà Xùa để làm gì">
           <span class="intent-lead">Bạn đến để:</span>
-          <a href="#tour-ta-xua">🌄 Săn mây</a><a href="#kham-pha">✨ Ngắm sao</a><a href="#dich-vu">☕ Cà phê ngắm view</a><a href="#hang-phong">🛏️ Nghỉ dưỡng</a>
+          <a href="#tour-ta-xua">🌄 Săn mây</a><a href="#kham-pha">✨ Ngắm sao</a><a href="#dich-vu">☕ Cà phê ngắm view</a><a href="#hang-phong">🛏️ Nghỉ dưỡng</a><button type="button" class="ask-cloud" id="ask-cloud">☁️ Hỏi nhà: mai có mây không?</button>
         </div>
-        <button type="button" class="ask-cloud" id="ask-cloud">☁️ Hỏi nhà: sáng mai có mây không?</button>
       </div>
     </section>
 
