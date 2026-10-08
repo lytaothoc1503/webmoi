@@ -40,6 +40,44 @@ window.SITE_DATA = {
     { name: 'Ruộng bậc thang Xím Vàng', tag: 'Theo mùa', image_url: 'images/ruong-bac-thang.jpg', text: 'Được nhắc đến là một trong những nơi có ruộng bậc thang đẹp nhất khu vực. Đẹp nhất vào mùa lúa.' },
   ],
   attractionsNote: 'Thông tin mang tính tham khảo. Đường đi, thời tiết và tình trạng cung đường có thể thay đổi, hãy hỏi nhà trước khi đi.',
+  // Mục Coffee (ngang hàng Homestay). Thiếu gì chủ nhà bổ sung ở đây; ô nào để trống thì web tự ẩn.
+  coffee: {
+    sub: 'Quán cà phê trên Đỉnh Gió',
+    title: 'Nhà của An Coffee',
+    tagline: 'Một ly cà phê nóng, một chiếc ghế gỗ và biển mây dưới chân bạn.',
+    image_url: 'images/hoang-hon-quan-cafe.jpg',
+    intro: [
+      'Quán cà phê của Nhà của An nằm ở khu vực Đỉnh Gió, một trong những vị trí ngắm mây đẹp nhất Tà Xùa, nơi được mệnh danh là thiên đường săn mây của vùng cao.',
+      'Quán làm bằng gỗ tự nhiên, mộc mạc, mở ra không gian khoáng đạt để bạn ngồi nhâm nhi và nhìn mây trôi giữa núi rừng.',
+      'Bạn có thể ghé chỉ để uống cà phê, ngắm hoàng hôn, hoặc ở lại homestay cùng nơi để sáng hôm sau thức dậy ngay giữa biển mây.',
+    ],
+    highlights: [
+      { icon: '☁️', title: 'Mây', text: 'Ngồi ngay tầm mây. Những ngày thuận lợi, biển mây phủ kín thung lũng ngay trước mắt.' },
+      { icon: '🌄', title: 'Trải nghiệm', text: 'Cà phê buổi sáng trên mây, trà chiều ngắm hoàng hôn, bữa sáng nóng giữa trời mây.' },
+      { icon: '🍃', title: 'Chill', text: 'Ghế gỗ, ban công mở, không ai giục. Hợp để ngồi cả buổi và chậm lại.' },
+      { icon: '💬', title: 'Khách kể lại', text: 'Khách khen phòng và quán view đẹp, dễ săn mây, nhân viên nhiệt tình, giá hợp lý.' },
+    ],
+    facts: [
+      { icon: '📍', label: 'Khu vực', value: 'Đỉnh Gió, Tà Xùa' },
+      { icon: '☁️', label: 'View săn mây', value: 'Có' },
+      { icon: '🕒', label: 'Giờ mở cửa', value: '7:00 - 21:00' },
+      { icon: '☕', label: 'Đồ uống từ', value: '30.000 đ / ly' },
+      { icon: '🅿️', label: 'Chỗ đỗ xe', value: 'Có' },
+    ],
+    menuFrom: ['Cà phê & đồ uống', 'Trà chiều ngắm hoàng hôn', 'Bữa sáng trên mây'],
+    goods: ['Vị trí đẹp ngay Đỉnh Gió', 'Không khí thư thái, chữa lành', 'Khách ở nhà được giảm khi gọi đồ uống'],
+    notes: ['Trải nghiệm phụ thuộc thời tiết, mây không có mỗi ngày. Nhắn nhà để biết tình hình trước khi lên.'],
+    photos: [
+      'images/tram-mam-xoi.jpg', 'images/ban-ghe-ngam-may.jpg', 'images/hoang-hon-quan-cafe.jpg',
+      'images/bua-sang-tren-may.jpg', 'images/ngam-bien-may.jpg', 'images/hoang-hon-fisheye.jpg',
+    ],
+    guestPhotos: [
+      { image_url: 'images/bang-hay-lay-toi-di.jpg', caption: 'Bữa sáng "Hãy lấy tôi đi"' },
+      { image_url: 'images/hay-lay-toi-di-cabin.jpg', caption: 'Góc check-in ở nhà gỗ' },
+      { image_url: 'images/vay-tay-bien-may.jpg', caption: 'Chào buổi sáng trên mây' },
+      { image_url: 'images/den-long-hoang-hon.jpg', caption: 'Đèn lồng lên đèn trên biển mây' },
+    ],
+  },
   catalogIsSample: false,
   services: [
     { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 120000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },

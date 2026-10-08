@@ -40,10 +40,10 @@ function toast(msg) {
 }
 
 /* ===== MENU + TÊN MỤC TRÊN TAB/THANH ĐỊA CHỈ ===== */
-const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Hạng Phòng'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
+const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Tour Tà Xùa'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
-const NAV_MORE = ['gioi-thieu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
+const NAV_MORE = ['gioi-thieu', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
 function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
 document.addEventListener('click', () => document.querySelectorAll('.nav-more.open').forEach((li) => li.classList.remove('open')));
 function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden).sort((x, y) => ($(x[0]).compareDocumentPosition($(y[0])) & 4 ? -1 : 1)); } // luôn theo thứ tự trên trang
@@ -202,6 +202,31 @@ function askCloud() {
   if (!h) { toast('Facebook của nhà đang được cập nhật. Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi nhé.'); return; }
   const pr = copyText(msg); window.open(h, '_blank', 'noopener');
   pr.then((ok) => toast(ok ? 'Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.' : 'Hãy nhắn nhà để hỏi về mây sáng mai.'));
+}
+async function loadCoffee() {
+  const c = D.coffee; if (!c) { $('coffee').hidden = true; return; }
+  const set = (id, v) => { $(id).textContent = v || ''; };
+  set('cf-sub', c.sub); set('cf-title', c.title); set('cf-tagline', c.tagline);
+  if (c.image_url) $('cf-hero').style.setProperty('--cf-bg', `url('${safeUrl(c.image_url)}')`);
+  $('cf-map').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
+  $('cf-intro').innerHTML = (c.intro || []).map((t) => `<p>${esc(t)}</p>`).join('');
+  $('cf-hl').innerHTML = (c.highlights || []).map((x) => `<div><span>${esc(x.icon || '')}</span><strong>${esc(x.title)}</strong><p>${esc(x.text)}</p></div>`).join('');
+  const li = (arr) => `<ul>${arr.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`;
+  $('cf-pn').innerHTML = ((c.goods || []).length ? `<div class="cf-good"><strong>👍 Điểm nổi bật</strong>${li(c.goods)}</div>` : '') + ((c.notes || []).length ? `<div class="cf-note"><strong>💡 Lưu ý</strong>${li(c.notes)}</div>` : '');
+  $('cf-facts').innerHTML = (c.facts || []).filter((f) => f.value).map((f) => `<div><span>${esc(f.icon || '')} ${esc(f.label)}</span><b>${esc(f.value)}</b></div>`).join('');
+  const fb = messengerHref();
+  $('cf-btns').innerHTML = (C.phone ? `<a class="btn-submit-booking rd-call" href="tel:${esc(C.phone)}">📞 Gọi điện</a>` : '') + (fb ? `<a class="btn-submit-booking rd-fb" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn Messenger</a>` : '') + `<a class="btn-submit-booking" href="#hang-phong">🛏️ Xem phòng nghỉ tại nhà</a>`;
+  const menu = (c.menuFrom || []).map((n) => (D.services || []).find((s) => s.name === n)).filter(Boolean);
+  $('cf-menu').innerHTML = menu.map((s) => `<div class="cf-item">${s.image_url ? img(s.image_url, s.name) : ''}<div><strong>${esc(s.icon || '')} ${esc(s.name)}</strong><em>${Number(s.price) > 0 ? esc(money(s.price) + ' ' + (s.unit || '')) : 'Liên hệ'}</em><p>${esc(s.description || '')}${s.time ? ' (' + esc(s.time) + ')' : ''}</p></div></div>`).join('');
+  $('cf-menu-box').hidden = !menu.length; $('cf-menu-btn').hidden = !menu.length;
+  const fig = (u, cap) => `<figure data-full="${esc(safeUrl(u))}">${img(u, cap || 'Ảnh quán')}${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}</figure>`;
+  const photos = (c.photos || []).map((u) => fig(u, '')), gp = (c.guestPhotos || []).map((g) => fig(g.image_url, g.caption));
+  $('cf-photos').innerHTML = photos.join(''); $('cf-photos-box').hidden = !photos.length;
+  $('cf-guest').innerHTML = gp.join(''); $('cf-guest-box').hidden = !gp.length;
+  document.querySelectorAll('#cf-photos figure, #cf-guest figure').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full)));
+  const rv = (await getList('reviews', D.reviews, 'is_published')).filter((r) => /caf[eé]|cà phê|ca phe|quán/i.test(r.content || '')).slice(0, 4);
+  $('cf-rv').innerHTML = rv.map((r) => `<blockquote>${esc(String(r.content).slice(0, 260))}${String(r.content).length > 260 ? '…' : ''}<cite>${'★'.repeat(Math.min(5, Math.max(1, Number(r.rating) || 5)))} ${esc(r.author_name)}</cite></blockquote>`).join('');
+  $('cf-rv-box').hidden = !rv.length;
 }
 function loadExplore() {
   const tips = D.cloudTips || [], at = D.attractions || [];
@@ -537,7 +562,7 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); $('ask-cloud').addEventListener('click', askCloud);
+  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); loadCoffee(); $('ask-cloud').addEventListener('click', askCloud);
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
