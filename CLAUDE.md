@@ -34,6 +34,8 @@ Mục `#kham-pha` (mẹo săn mây + 9 địa điểm) lấy dữ liệu từ `c
 
 Đầu trang có hàng nút "Bạn đến để:" (Săn mây, Ngắm sao, Cà phê, Nghỉ dưỡng) và nút "Hỏi nhà: sáng mai có mây không?" (sao chép câu hỏi + mở Messenger). Đồng bộ 2 thiết bị: mọi thay đổi phải nằm trên `main` của GitHub (máy tính và điện thoại đều `git pull --rebase` từ đó); kiểm tra `git rev-parse HEAD origin/main` bằng nhau sau khi đẩy.
 
+Bấm vào thẻ phòng mở trang chi tiết (hàm `openRoom` trong `app.js`): ảnh lớn, ô giá và thông tin bên phải, nút Đặt phòng, Gọi, Messenger. Phòng có thể thêm `images: [...]` và `description` trong `data.js` để hiện thêm ảnh nhỏ và mô tả.
+
 ## Quy tắc khi sửa
 1. `git pull --rebase` trước khi làm.
 2. Không để chữ "mẫu" hay dữ liệu thử hiển thị cho khách (cờ `catalogIsSample`, `storyIsSample`, `policyIsSample` trong `data.js` phải là `false`).

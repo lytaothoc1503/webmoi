@@ -938,6 +938,20 @@
       @media (max-width: 1240px) { .nav-links { display: none; } .hamburger { display: flex; } }
 
       /* TRUST STRIP / CTA / STICKY BAR */
+      .room-more { display: block; text-align: center; font-size: 12.5px; color: var(--accent-orange); margin-top: 8px; font-weight: 600; }
+      .rd-wrap { max-height: 86vh; max-height: 86dvh; overflow: auto; padding: 18px; }
+      .rd-grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start; }
+      .rd-main { width: 100%; height: 340px; object-fit: cover; border-radius: 14px; display: block; }
+      .rd-thumbs { display: flex; gap: 8px; margin-top: 8px; overflow-x: auto; } .rd-thumbs button { border: 0; padding: 0; background: none; cursor: pointer; flex: none; } .rd-thumbs img { width: 76px; height: 56px; object-fit: cover; border-radius: 8px; display: block; }
+      .rd-title { font-size: 20px; color: var(--nav-brown); margin: 14px 0 4px; } .rd-desc { font-size: 13.5px; color: var(--text-muted); margin: 0 0 8px; }
+      .rd-perks { list-style: none; padding: 0; margin: 6px 0 0; font-size: 13.5px; color: var(--text-muted); } .rd-perks li { margin: 4px 0; }
+      .rd-card { border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(0,0,0,.1); background: #fff; }
+      .rd-head { background: var(--nav-brown); color: #fff; padding: 14px 18px; } .rd-head small { display: block; font-size: 11px; letter-spacing: .08em; opacity: .85; } .rd-head strong { font-size: 24px; } .rd-head span { font-size: 13px; font-weight: 400; opacity: .85; }
+      .rd-rows { padding: 6px 18px; } .rd-rows div { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0e6dc; font-size: 13.5px; } .rd-rows div:last-child { border: 0; } .rd-rows span { color: var(--text-muted); } .rd-rows b { text-align: right; color: var(--nav-brown); }
+      .rd-btns { padding: 6px 18px 18px; display: flex; flex-direction: column; gap: 8px; }
+      .rd-btns .btn-submit-booking { display: block; text-align: center; text-decoration: none; margin: 0; padding: 13px 10px; }
+      .rd-btns .rd-call { background: #fff; color: var(--nav-brown); border: 2px solid var(--nav-brown); } .rd-btns .rd-fb { background: #1877f2; }
+      @media (max-width: 760px) { .rd-grid { grid-template-columns: 1fr; } .rd-main { height: 220px; } .rd-wrap { padding: 12px; } }
       .btn-nav-call { border: 1.5px solid rgba(255,255,255,.7); border-radius: 999px; padding: 7px 14px; }
       .btn-nav-call:hover { background: rgba(255,255,255,.12); }
       .trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1100px; margin: -34px auto 0; position: relative; z-index: 5; padding: 0 20px; }
@@ -1402,7 +1416,7 @@
 
     <!-- INFO MODAL (chi tiết tour / dịch vụ, ai cũng xem được) -->
     <div id="info-modal" class="modal-overlay" onclick="if(event.target===this)closeInfo()">
-      <div class="modal-box" style="max-width:560px;padding:0;overflow:hidden">
+      <div class="modal-box" id="info-box" style="max-width:560px;padding:0;overflow:hidden">
         <span class="modal-close" onclick="closeInfo()" style="z-index:2;background:rgba(255,255,255,.9);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;top:10px;right:10px">&times;</span>
         <div id="info-body"></div>
       </div>

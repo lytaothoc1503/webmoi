@@ -113,12 +113,12 @@ const arg = (s) => esc(String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 async function loadRooms() {
   roomsData = await getList('rooms', D.rooms, 'is_active');
   $('rooms-grid').innerHTML = roomsData.map((r) => `
-    <div class="room-card">${img(r.image_url, r.name, 'room-thumb')}
+    <div class="room-card" onclick="openRoom(${roomsData.indexOf(r)})" style="cursor:pointer">${img(r.image_url, r.name, 'room-thumb')}
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
-        <button class="btn-book-room" onclick="openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button></div></div>`).join('');
+        <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
 }
 async function loadTours() {
   toursData = await getList('tours', D.tours, 'is_active');
@@ -137,7 +137,27 @@ function loadServices() {
         <div class="svc-price">${Number(s.price) > 0 ? money(s.price) + ` <small>${esc(s.unit || '')}</small>` : 'Liên hệ báo giá'}</div>
         <p>${esc(s.description || '')}</p><span class="svc-more">Xem chi tiết →</span></div></div>`).join('');
 }
+function openRoom(i) {
+  const r = roomsData[i]; if (!r) return;
+  const imgs = [r.image_url].concat(r.images || []).filter(Boolean);
+  const rows = [['👥', 'Sức chứa', r.guests], ['🛏️', 'Giường', r.bed], ['🏔️', 'View', r.view], ['⏰', 'Nhận phòng', S.checkin], ['🚪', 'Trả phòng', S.checkout]].filter((x) => x[2]);
+  const fb = messengerHref(), tel = C.phone;
+  $('info-box').style.maxWidth = '900px';
+  $('info-body').innerHTML = `<div class="rd-wrap"><div class="rd-grid">
+    <div class="rd-left">${img(imgs[0], r.name, 'rd-main')}
+      ${imgs.length > 1 ? `<div class="rd-thumbs">${imgs.map((u) => `<button type="button" onclick="document.querySelector('.rd-main').src='${arg(safeUrl(u))}'">${img(u, r.name)}</button>`).join('')}</div>` : ''}
+      <h3 class="rd-title">${esc(r.name)}</h3>
+      ${r.description ? `<p class="rd-desc">${esc(r.description)}</p>` : ''}
+      ${(r.perks || []).length ? `<ul class="rd-perks">${r.perks.map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>` : ''}</div>
+    <div class="rd-card"><div class="rd-head"><small>GIÁ THAM KHẢO</small><strong>${Number(r.price) > 0 ? esc(money(r.price)) + ' <span>/ đêm</span>' : 'Liên hệ'}</strong></div>
+      <div class="rd-rows">${rows.map((x) => `<div><span>${x[0]} ${x[1]}</span><b>${esc(x[2])}</b></div>`).join('')}</div>
+      <div class="rd-btns"><a class="btn-submit-booking" href="javascript:void(0)" onclick="closeInfo(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">ĐẶT PHÒNG NGAY</a>
+        ${tel ? `<a class="btn-submit-booking rd-call" href="tel:${esc(tel)}">📞 Gọi điện</a>` : ''}
+        ${fb ? `<a class="btn-submit-booking rd-fb" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn Messenger</a>` : ''}</div></div></div></div>`;
+  $('info-modal').classList.add('active');
+}
 function openInfo(kind, i) {
+  $('info-box').style.maxWidth = '';
   const it = (kind === 't' ? toursData : (D.services || []))[i]; if (!it) return;
   const price = Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
   const meta = (kind === 't' ? [['⏱', it.duration], ['📍', 'Điểm hẹn: ' + (it.meet || '')]] : [['🕒', it.time]]).filter((m) => m[1] && !/: $/.test(m[1]));
