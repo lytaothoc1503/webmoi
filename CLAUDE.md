@@ -51,5 +51,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 
 - **Đăng nhập Facebook/Google:** nút đang ẩn (`socialLogin` trong `config.js` = false) vì chưa cấu hình nhà cung cấp trong Supabase. Khi có tên miền và đã bật Providers thì đổi thành true.
 
+- **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js` (mất số khách/giường/thời lượng tour...). Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
+
 ## Điểm bảo mật đã rà (không cần sửa)
 RLS bật cả 7 bảng; mã đơn 8 ký tự ngẫu nhiên; tra cứu theo SĐT chỉ trả thông tin tối thiểu; không có khóa bí mật trong code/lịch sử git; hàm đăng ký có giới hạn theo IP. Chấp nhận có chủ ý: đăng ký SĐT không xác minh.
