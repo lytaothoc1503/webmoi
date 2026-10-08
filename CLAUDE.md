@@ -50,7 +50,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## Việc đang làm (chia phần, mỗi phần chờ chủ dự án đồng ý)
 - **A (xong):** bỏ mọi nhãn "mẫu" hiển thị công khai.
 - **B (xong, commit `7a883d6`):** ảnh phòng/tour dùng ảnh trong `images/`, ép giao diện sáng (`color-scheme`), bỏ `backdrop-filter` ở hộp thoại, dùng `dvh`. Còn chờ chủ dự án nói rõ lỗi "tiện ích" là mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
-- **C (xong phần rà soát):** điện thoại 390px và máy tính 1366px cùng dữ liệu (3 phòng, 3 tour, 6 dịch vụ), không tràn ngang, không lỗi JS. Bảng Supabase `rooms/tours/gallery/faq/reviews` đang **trống**, web dùng `data.js` làm nguồn; `bookings` có 2 đơn, `admins` có 1.
+- **C (xong phần rà soát):** điện thoại 390px và máy tính 1366px cùng dữ liệu (3 phòng, 3 tour, 6 dịch vụ), không tràn ngang, không lỗi JS. Bảng Supabase `rooms/tours/gallery/faq/reviews` đang **trống**, web dùng `data.js` làm nguồn; `bookings` có 3 đơn thử (mã NA2610015U2R, NARKZECA5R, NAWLQG7LEF; chờ chủ dự án tự xóa), `admins` có 1.
 
 - **Đăng nhập Facebook/Google:** nút đang ẩn (`socialLogin` trong `config.js` = false) vì chưa cấu hình nhà cung cấp trong Supabase. Khi có tên miền và đã bật Providers thì đổi thành true.
 
@@ -65,4 +65,5 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 6. Hướng 2 (chuyển nội dung sang Supabase): làm sau khi khách đông, xem `supabase/ke-hoach/`.
 
 ## Điểm bảo mật đã rà (không cần sửa)
+Đã siết CSDL bằng `supabase/migrations/20261009000000_harden_bookings_and_grants.sql` (đã áp dụng): bỏ quyền thừa của khách chưa đăng nhập, giới hạn giá/độ dài/ngày của đơn. Chưa kiểm tra giá phía máy chủ vì giá nằm ở `data.js` (làm khi chuyển Hướng 2).
 RLS bật cả 7 bảng; mã đơn 8 ký tự ngẫu nhiên; tra cứu theo SĐT chỉ trả thông tin tối thiểu; không có khóa bí mật trong code/lịch sử git; hàm đăng ký có giới hạn theo IP. Chấp nhận có chủ ý: đăng ký SĐT không xác minh.
