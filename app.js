@@ -136,7 +136,7 @@ async function loadTours() {
   $('tours-grid').innerHTML = toursData.map((t, i) => `
     <div class="tour-arch-card" onclick="openInfo('t', ${i})" style="cursor:pointer">${img(t.image_url, t.name)}
       <div class="tour-overlay"><div class="tour-name">${esc(t.name)}</div>
-        <div class="tour-price-tag">${Number(t.price) > 0 && D.toursBookable ? money(t.price) + ' / người' : 'Nhắn nhà để được tư vấn'}</div>
+        <div class="tour-price-tag">${Number(t.price) > 0 && D.toursBookable ? money(t.price) + ' / người' : 'Trao đổi rồi báo giá sau'}</div>
         <span class="tour-link">Xem chi tiết</span></div></div>`).join('');
 }
 function loadServices() {
@@ -172,8 +172,8 @@ function openInfo(kind, i) {
   $('info-box').style.maxWidth = '';
   const it = (kind === 't' ? toursData : (D.services || []))[i]; if (!it) return;
   const bookable = kind === 't' && D.toursBookable;
-  const price = kind === 't' && !bookable ? 'Gợi ý từ nhà, nhắn nhà để được tư vấn' : Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
-  const meta = (kind === 't' ? [['⏱', it.duration], ['📍', 'Điểm hẹn: ' + (it.meet || '')]] : [['🕒', it.time]]).filter((m) => m[1] && !/: $/.test(m[1]));
+  const price = kind === 't' && !bookable ? 'Chi phí tùy nhu cầu, nhà trao đổi với bạn rồi báo sau' : Number(it.price) > 0 ? money(it.price) + (kind === 't' ? ' / người' : ' ' + (it.unit || '')) : 'Liên hệ báo giá';
+  const meta = (kind === 't' ? [['⏱', it.duration], ['⛰️', it.level && 'Mức độ: ' + it.level], ['📅', it.best && 'Thời điểm đẹp: ' + it.best], ['📍', 'Điểm hẹn: ' + (it.meet || '')]] : [['🕒', it.time]]).filter((m) => m[1] && !/: $/.test(m[1]));
   const sample = D.catalogIsSample ? '<span class="sample-tag">giá & nội dung mẫu</span>' : '';
   const act = bookable
     ? `<a class="btn-submit-booking" href="javascript:void(0)" onclick="closeInfo(); openBookingModal('${arg(it.name)}', ${Number(it.price) || 0})">ĐẶT TOUR NÀY</a>`
