@@ -330,7 +330,7 @@ function openPlace(i) {
       <p style="font-size:14px;margin:8px 0">${esc(x.text)}</p>
       ${(x.more || []).map((p) => `<p style="font-size:14px;margin:8px 0">${esc(p)}</p>`).join('')}
       ${x.tip ? `<p class="info-meta">💡 <strong>Lưu ý:</strong> ${esc(x.tip)}</p>` : ''}
-      <div class="info-actions">${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn nhà để hỏi thêm</a>` : ''}<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="closeInfo()">Đóng</a></div>
+      <div class="info-actions">${fb ? `<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="askPlace(${i})">Hỏi nhà về điểm này</a>` : ''}<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="closeInfo()">Đóng</a></div>
     </div>`;
   $('info-modal').classList.add('active');
 }
@@ -359,6 +359,13 @@ function askCloud() {
   if (!h) { toast('Facebook của nhà đang được cập nhật. Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi nhé.'); return; }
   const pr = copyText(msg); window.open(h, '_blank', 'noopener');
   pr.then((ok) => toast(ok ? 'Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.' : 'Hãy nhắn nhà để hỏi về mây sáng mai.'));
+}
+function askPlace(i) { // sao chép sẵn câu hỏi về địa điểm rồi mở Messenger (giống askCloud)
+  const x = placesList[i], h = messengerHref(); if (!x) return;
+  const msg = 'Chào nhà, mình muốn hỏi về ' + x.name + ': hôm nay đường đi và thời tiết thế nào ạ?';
+  if (!h) { toast('Facebook của nhà đang được cập nhật. Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi nhé.'); return; }
+  const pr = copyText(msg); window.open(h, '_blank', 'noopener');
+  pr.then((ok) => toast(ok ? 'Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.' : 'Hãy nhắn nhà để hỏi về ' + x.name + '.'));
 }
 async function loadCoffee() {
   const c = D.coffee; if (!c) { $('coffee').hidden = true; return; }
