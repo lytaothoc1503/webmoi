@@ -132,17 +132,20 @@
       .manage-card-actions { display: flex; gap: 6px; }
 
       @media (max-width: 768px) {
-        aside { width: 60px; padding: 16px 8px; }
-        aside .brand-title { font-size: 10px; }
-        .menu-item { font-size: 10px; padding: 10px 8px; text-align: center; }
-        main { padding: 16px; }
+        body { flex-direction: column; }
+        aside { width: 100%; height: auto; position: sticky; top: 0; z-index: 50; flex-direction: row; align-items: center; gap: 6px; padding: 8px 10px; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+        aside .brand-title { display: flex; align-items: center; gap: 8px; font-size: 10px; line-height: 1.2; text-align: left; margin: 0 8px 0 0; padding: 0 10px 0 0; border: 0; border-right: 1px solid rgba(255,255,255,.15); flex-shrink: 0; }
+        aside .brand-title svg { width: 30px; height: 30px; margin: 0 !important; flex-shrink: 0; }
+        .menu-group { display: none; }
+        .menu-item { flex-shrink: 0; white-space: nowrap; font-size: 12px; padding: 9px 12px; margin: 0; text-align: center; }
+        main { padding: 14px; }
       }
       .slip-ov { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; overflow: auto; }
       .slip-ov.open { display: flex; }
       .slip { background: #fff; width: 100%; max-width: 560px; border: 3px double var(--primary); border-radius: 6px; padding: 28px 30px; position: relative; }
       .slip h3 { text-align: center; color: var(--primary); letter-spacing: .06em; font-size: 17px; margin-bottom: 4px; }
       .slip .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-      .slip table { width: 100%; font-size: 13px; margin-bottom: 14px; } .slip td { padding: 6px 4px; border-bottom: 1px dashed var(--border); } .slip td:first-child { color: var(--muted); width: 42%; }
+      .slip .rows { margin-bottom: 14px; font-size: 13px; } .slip .r { display: flex; gap: 12px; justify-content: space-between; padding: 7px 2px; border-bottom: 1px dashed var(--border); } .slip .r span { color: var(--muted); flex: 0 0 42%; } .slip .r b { text-align: right; word-break: break-word; }
       .slip .sign { display: flex; gap: 12px; margin-top: 18px; text-align: center; font-size: 12px; } .slip .sign div { flex: 1; } .slip .sign b { display: block; min-height: 54px; margin-top: 4px; }
       .slip .sign input { width: 100%; border: 0; border-bottom: 1px solid #999; text-align: center; font: inherit; margin-top: 30px; padding: 4px; }
       .slip .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
@@ -423,8 +426,8 @@
       function openSlip(id) {
         const b = allBookings.find(x => x.id === id); if (!b) return;
         const S = window.SITE || {}, f = (d) => d ? new Date(d).toLocaleString('vi-VN') : '—';
-        const rows = [['Mã đơn', b.booking_code], ['Khách đặt', b.fullname + ' · ' + b.phone], ['Hạng phòng', b.room], ['Nhận phòng - Trả phòng', b.checkin + ' → ' + b.checkout], ['Số tiền', vnd(b.total_price)], ['Nội dung chuyển khoản', b.transfer_code || '—'], ['Ngày giờ đặt', f(b.created_at)], ['Ngày giờ báo thanh toán', f(b.paid_at)], ['Ngày giờ xác nhận', f(b.confirmed_at)], ['Trạng thái', normStatus(b.status)], ['Đơn vị nhận tiền', S.name || 'Nhà của An Homestay Tà Xùa']];
-        document.getElementById('slip-body').innerHTML = rows.map(r => `<tr><td>${esc(r[0])}</td><td><b>${esc(r[1] || '')}</b></td></tr>`).join('');
+        const rows = [['Mã đơn', b.booking_code], ['Khách đặt', b.fullname + ' · ' + b.phone], ['Hạng phòng', b.room], ['Nhận phòng - Trả phòng', (b.checkin || '—') + ' → ' + (b.checkout || '—')], ['Số tiền', vnd(b.total_price)], ['Nội dung chuyển khoản', b.transfer_code || '—'], ['Ngày giờ đặt', f(b.created_at)], ['Ngày giờ báo thanh toán', f(b.paid_at)], ['Ngày giờ xác nhận', f(b.confirmed_at)], ['Trạng thái', normStatus(b.status)], ['Đơn vị nhận tiền', S.name || 'Nhà của An Homestay Tà Xùa']];
+        document.getElementById('slip-body').innerHTML = rows.map(r => `<div class="r"><span>${esc(r[0])}</span><b>${esc(r[1] || '—')}</b></div>`).join('');
         document.getElementById('slip-date').textContent = 'Lập ngày ' + new Date().toLocaleDateString('vi-VN');
         document.getElementById('slip-ov').classList.add('open');
       }
@@ -1038,7 +1041,7 @@
   <div class="slip-ov" id="slip-ov"><div class="slip">
       <h3>PHIẾU XÁC NHẬN ĐẶT PHÒNG &amp; THANH TOÁN</h3>
       <div class="sub">Hệ Thống Đối soát &amp; Xử lý Hoàn trả · <span id="slip-date"></span></div>
-      <table><tbody id="slip-body"></tbody></table>
+      <div class="rows" id="slip-body"></div>
       <div class="sign"><div>Người lập phiếu<input placeholder="Họ tên" maxlength="60" /></div><div>Kế toán / người xác nhận<input placeholder="Họ tên (nếu có)" maxlength="60" /></div></div>
       <div class="acts"><button class="btn-export" onclick="closeSlip()">Đóng</button><button class="btn-add" onclick="window.print()">In / Lưu PDF</button></div>
     </div></div>
