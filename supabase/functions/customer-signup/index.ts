@@ -28,6 +28,6 @@ Deno.serve(async (req) => {
   const meta: Record<string, unknown> = { full_name: name, phone, accepted_policy_at: new Date().toISOString() };
   if (year) meta.birth_year = year;
   const { error } = await admin.auth.admin.createUser({ email: `${phone}@example.com`, password, email_confirm: true, user_metadata: meta });
-  if (error) { if (/already|registered|exists/i.test(error.message)) return json({ code: "exists" }, 409); console.error("createUser", error.message); return json({ code: "failed", detail: error.message }, 400); }
+  if (error) { if (/already|registered|exists/i.test(error.message)) return json({ code: "exists" }, 409); console.error("createUser", error.message); return json({ code: "failed" }, 400); }
   return json({ ok: true });
 });
