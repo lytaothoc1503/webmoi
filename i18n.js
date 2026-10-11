@@ -4,6 +4,12 @@
    Muốn dịch câu mới: thêm dòng  "câu tiếng Việt": "English text"  vào DICT. Câu chưa có trong DICT sẽ giữ nguyên tiếng Việt. */
 (function () {
   const DICT = /*DICT*/{
+"Combo Săn Mây": "Cloud-Hunting Combo",
+"Gói nổi bật": "Featured package",
+"/ người / đêm": "/ person / night",
+"Chọn phòng + combo": "Choose room + combo",
+"Giá chỉ gồm tiền phòng. Muốn kèm ăn sáng và trà chiều: xem": "Price covers the room only. Want breakfast and afternoon tea included? See",
+"Tặng kèm nước uống": "Complimentary drinking water",
 "Phòng Gỗ Ngắm Biển Mây": "Wooden Room with Sea-of-Clouds View",
 "Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.": "A private wooden room with large glass windows facing the sea of clouds and the valley. All rooms share the same design. Hot and cold water, electric kettle, hair dryer; towels, toothbrush and toothpaste provided.",
 "2 khách (tối đa 3)": "2 guests (up to 3)",

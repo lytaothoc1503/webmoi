@@ -124,7 +124,29 @@ async function loadRooms() {
         <div class="room-price">${r.rates ? 'Từ ' : ''}${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
+        ${comboPerPerson() > 0 ? `<a class="room-combo-hint" href="#combo" onclick="event.stopPropagation(); event.preventDefault(); scrollToCombo()"><span>Giá chỉ gồm tiền phòng. Muốn kèm ăn sáng và trà chiều: xem</span> <b>${esc(D.combo.name || 'Combo')}</b></a>` : ''}
         <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
+  renderComboCard();
+}
+// Thẻ nổi bật Combo: đọc hoàn toàn từ D.combo + D.services; ẩn hẳn nếu không có combo hoặc giá = 0
+function renderComboCard() {
+  const el = $('combo'); if (!el) return;
+  const per = comboPerPerson(), c = D.combo;
+  if (!c || per <= 0) { el.hidden = true; el.innerHTML = ''; return; }
+  const items = (c.items || []).map((nm) => (D.services || []).find((x) => x.name === nm)).filter(Boolean);
+  el.innerHTML = `<div class="combo-card"><div class="combo-head"><span class="combo-badge">☁️ Gói nổi bật</span><h3 class="combo-name">${esc(c.name || 'Combo')}</h3></div>
+    <ul class="combo-list">${items.map((s) => `<li>✓ <span>${esc(s.name)}</span></li>`).join('')}${c.waterNote ? `<li>✓ <span>${esc(c.waterNote.charAt(0).toUpperCase() + c.waterNote.slice(1))}</span></li>` : ''}</ul>
+    <div class="combo-foot"><div class="combo-price"><span>Từ</span> <b>${esc(money(per))}</b> <span>/ người / đêm</span></div>
+    <button type="button" class="btn-book-room combo-btn" onclick="openBookingWithCombo()">Chọn phòng + combo</button></div></div>`;
+  el.hidden = false;
+  if (location.hash === '#combo') scrollToCombo();
+}
+function scrollToCombo() { const el = $('combo'); if (el && !el.hidden) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+function openBookingWithCombo() {
+  const r = roomsData[0];
+  openBookingModal(r ? r.name : '', r ? Number(r.price) || 0 : 0);
+  const cb = $('bk-combo'), cr = $('bk-combo-row');
+  if (cb && cr && cr.style.display !== 'none') { cb.checked = true; calculateTotal(); }
 }
 function syncLodgingPrice() { // giữ priceRange trong dữ liệu có cấu trúc đúng theo giá phòng hiện tại
   try {

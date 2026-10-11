@@ -291,6 +291,15 @@
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 28px;
       }
+      #combo { margin: 0 0 28px; scroll-margin-top: 90px; }
+      .combo-card { background: linear-gradient(135deg, #fff7ea, #ffe9cc); border: 2px solid var(--accent-orange); border-radius: 16px; padding: 20px; color: #3a2a14; display: grid; gap: 12px; }
+      .combo-badge { display: inline-block; font-size: 12px; font-weight: 700; background: var(--accent-orange); color: #fff; padding: 3px 10px; border-radius: 99px; }
+      .combo-name { margin: 8px 0 0; font-size: 24px; }
+      .combo-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+      .combo-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+      .combo-price b { font-size: 22px; color: #b45a00; }
+      .combo-btn { width: auto; padding: 12px 22px; }
+      .room-combo-hint { display: block; margin: 8px 0; font-size: 13px; color: var(--accent-orange); text-decoration: underline; }
       .room-card {
         background: var(--card-bg);
         border-radius: 16px;
@@ -1256,6 +1265,7 @@
         <small class="gh-ok" id="gh-ok" role="status"></small>
         <small class="gh-terms">Xem nhanh <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách</a> của nhà.</small>
       </form>
+      <div id="combo" hidden></div>
       <div class="rooms-grid" id="rooms-grid">
         <div style="text-align: center; color: var(--text-muted); padding: 40px;">Đang tải...</div>
       </div>
