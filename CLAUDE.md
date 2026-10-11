@@ -89,16 +89,14 @@ STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa
 Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web là HTML tĩnh, GitHub Pages tự build). File trong `supabase/migrations/` đã chạy rồi thì KHÔNG sửa hay dán đè; muốn đổi thì tạo file mới.
 `.github/workflows/kiem-tra.yml` chạy `node scripts/kiem-tra.js` mỗi lần đẩy lên `main`: cú pháp JS, ảnh trong `data.js` có file thật, cờ "mẫu" = false, không có khóa bí mật. Chỉ báo lỗi, không chặn đưa web lên GitHub Pages. Chạy tay: `node scripts/kiem-tra.js`.
 
-## Việc đang làm (chia phần, mỗi phần chờ chủ dự án đồng ý)
-- **A (xong):** bỏ mọi nhãn "mẫu" hiển thị công khai.
-- **B (xong, commit `7a883d6`):** ảnh phòng/tour dùng ảnh trong `images/`, ép giao diện sáng (`color-scheme`), bỏ `backdrop-filter` ở hộp thoại, dùng `dvh`. Còn chờ chủ dự án nói rõ lỗi "tiện ích" là mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
-- **C (xong phần rà soát):** điện thoại 390px và máy tính 1366px cùng dữ liệu (3 phòng, 3 tour, 6 dịch vụ), không tràn ngang, không lỗi JS. Bảng Supabase `rooms/tours/gallery/faq/reviews` đang **trống**, web dùng `data.js` làm nguồn; 3 đơn thử cũ đã xóa; `bookings` hiện còn 3 đơn (chủ dự án rà xem là đơn thật hay thử), `admins` có 1.
-
+## Việc đang làm (cập nhật 11/10)
+- **Xong:** phần A (bỏ nhãn "mẫu"), B (ảnh, giao diện sáng), C (rà soát điện thoại/máy tính, đồng bộ dữ liệu), khóa admin PIN + 2 bước, hoàn trả + thẻ tiến độ (SQL đã chạy), số thực nhận (SQL đã chạy), phiếu `phieu.html?ma=`, STK MB + QR chỉ hiện đúng chỗ, chống cache `?v=`, cấu hình VS Code + Claude Code. Danh sách tiến độ cũ hiện trong VS Code ("Đang làm phần B") là bản cũ, bỏ qua.
+- **Không còn việc nào chờ trợ lý.** Mọi mục còn lại ở dưới đều cần thông tin hoặc hành động từ chủ dự án.
 - **Đăng nhập Facebook/Google:** nút đang ẩn (`socialLogin` trong `config.js` = false) vì chưa cấu hình nhà cung cấp trong Supabase. Khi có tên miền và đã bật Providers thì đổi thành true.
-
-- **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js` (mất số khách/giường/thời lượng tour...). Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
+- **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`. Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
 
 ## Việc còn lại (nhắc chủ dự án khi phù hợp)
+0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`); ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
 1. Giá thật phòng/tour/dịch vụ (đang là giá tạm trong `data.js`).
 2. Ảnh thật phòng Gia Đình và Dorm (đang dùng ảnh thư viện làm ảnh tạm).
 3. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
