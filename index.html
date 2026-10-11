@@ -30,7 +30,7 @@
     <link rel="preload" as="image" href="images/hero-san-may.jpg" fetchpriority="high" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet" />
     <script type="application/ld+json" id="ld-lodging">
-    {"@context":"https://schema.org","@type":"LodgingBusiness","name":"Nhà của An Homestay Tà Xùa","url":"https://lytaothoc1503.github.io/webmoi/","description":"Homestay mộc mạc giữa Tà Xùa, nơi săn mây và nghỉ dưỡng.","image":["https://lytaothoc1503.github.io/webmoi/images/hero-san-may.jpg","https://lytaothoc1503.github.io/webmoi/images/phong-view-may.jpg","https://lytaothoc1503.github.io/webmoi/images/nha-go-den-long.jpg"],"priceRange":"250.000₫ - 1.600.000₫","checkinTime":"14:00","checkoutTime":"12:00","inLanguage":"vi","hasMap":"https://www.google.com/maps/search/?api=1&query=T%C3%A0+X%C3%B9a%2C+B%E1%BA%AFc+Y%C3%AAn%2C+S%C6%A1n+La","address":{"@type":"PostalAddress","addressLocality":"Tà Xùa, Bắc Yên","addressRegion":"Sơn La","addressCountry":"VN"},"telephone":"+84352554863","sameAs":["https://www.facebook.com/share/1dCcJYWvU1/"]}
+    {"@context":"https://schema.org","@type":"LodgingBusiness","name":"Nhà của An Homestay Tà Xùa","url":"https://lytaothoc1503.github.io/webmoi/","description":"Homestay mộc mạc giữa Tà Xùa, nơi săn mây và nghỉ dưỡng.","image":["https://lytaothoc1503.github.io/webmoi/images/hero-san-may.jpg","https://lytaothoc1503.github.io/webmoi/images/phong-view-may.jpg","https://lytaothoc1503.github.io/webmoi/images/nha-go-den-long.jpg"],"priceRange":"700.000₫ - 1.100.000₫","checkinTime":"14:00","checkoutTime":"12:00","inLanguage":"vi","hasMap":"https://www.google.com/maps/search/?api=1&query=T%C3%A0+X%C3%B9a%2C+B%E1%BA%AFc+Y%C3%AAn%2C+S%C6%A1n+La","address":{"@type":"PostalAddress","addressLocality":"Tà Xùa, Bắc Yên","addressRegion":"Sơn La","addressCountry":"VN"},"telephone":"+84352554863","sameAs":["https://www.facebook.com/share/1dCcJYWvU1/"]}
     </script>
     <script type="application/ld+json" id="ld-cafe">
     {"@context": "https://schema.org", "@type": "CafeOrCoffeeShop", "name": "Nhà của An Coffee", "url": "https://lytaothoc1503.github.io/webmoi/#coffee", "description": "Quán cà phê gỗ trên Đỉnh Gió, Tà Xùa, ngắm biển mây và hoàng hôn.", "image": ["https://lytaothoc1503.github.io/webmoi/images/hoang-hon-quan-cafe.jpg", "https://lytaothoc1503.github.io/webmoi/images/ban-ghe-ngam-may.jpg"], "openingHours": "Mo-Su 07:00-21:00", "telephone": "+84352554863", "address": {"@type": "PostalAddress", "addressLocality": "Tà Xùa, Bắc Yên", "addressRegion": "Sơn La", "addressCountry": "VN"}, "sameAs": ["https://www.facebook.com/share/1dCcJYWvU1/"]}
@@ -1235,7 +1235,7 @@
       <div class="trust-item"><span class="trust-ic">⏰</span><div><strong>Nhận 14:00 · Trả 12:00</strong><small>Báo trước nếu cần gửi hành lý</small></div></div>
       <div class="trust-item"><span class="trust-ic">💰</span><div><strong>Giá hiển thị rõ ràng</strong><small>Thấy giá trước khi đặt, không phí ẩn</small></div></div>
       <div class="trust-item"><span class="trust-ic">💬</span><div><strong>Hỗ trợ 24/7</strong><small>Nhắn Messenger bất cứ lúc nào</small></div></div>
-      <div class="trust-item" id="trust-reviews"><span class="trust-ic">⭐</span><div><strong>Khách đánh giá 5★</strong><small>Đánh giá thật trên Google Maps</small></div></div>
+      <div class="trust-item" id="trust-reviews"><span class="trust-ic">⭐</span><div><strong>Đánh giá thật từ khách</strong><small>Nhận xét khách đã đăng công khai trên Google Maps</small></div></div>
     </div>
 
     <!-- HAI MẢNG CHÍNH -->
@@ -1447,11 +1447,11 @@
           </div>
           <div class="form-group">
             <label>Họ và tên người đặt:</label>
-            <input type="text" id="bk-name" required placeholder="Ví dụ: Hoàng Minh Anh" />
+            <input type="text" id="bk-name" required maxlength="80" placeholder="Ví dụ: Hoàng Minh Anh" />
           </div>
           <div class="form-group">
             <label>Số điện thoại liên hệ:</label>
-            <input type="tel" id="bk-phone" required placeholder="09xxxxxxxx" />
+            <input type="tel" id="bk-phone" required maxlength="20" placeholder="09xxxxxxxx" />
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
             <div class="form-group">
@@ -1470,21 +1470,22 @@
           </div>
           <div class="form-group">
             <label>Số lượng khách (Người lớn + Trẻ em):</label>
-            <input type="text" id="bk-guests" placeholder="Ví dụ: 2 người lớn" required oninput="calculateTotal()" />
+            <input type="text" id="bk-guests" maxlength="100" placeholder="Ví dụ: 2 người lớn" required oninput="calculateTotal()" />
           </div>
           <div class="form-group" id="bk-combo-row" style="display:none">
             <label style="display:flex;gap:8px;align-items:flex-start;font-weight:600"><input type="checkbox" id="bk-combo" onchange="calculateTotal()" style="margin-top:3px" /> <span>Thêm Combo Săn Mây: bữa sáng trên mây + set trà chiều + nước uống</span></label>
             <small style="color:var(--text-muted)">Cộng thêm <b id="bk-combo-money"></b> mỗi khách, mỗi đêm. Trẻ dưới 6 tuổi miễn phí phòng, không tính vào số khách.</small>
           </div>
           <div class="form-group">
-            <label>Ghi chú thêm (Đưa đón, tiệc BBQ...):</label>
-            <input type="text" id="bk-notes" placeholder="Yêu cầu thêm nếu có..." />
+            <label>Ghi chú thêm (giờ dự kiến đến, yêu cầu đặc biệt, dị ứng thực phẩm...):</label>
+            <input type="text" id="bk-notes" maxlength="500" placeholder="Yêu cầu thêm nếu có..." />
           </div>
 
           <div style="background: #faf4ef; padding: 12px 14px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
             <span style="font-size: 13px; font-weight: 600">Tổng tiền dự tính:</span>
             <span id="bk-total-display" style="font-size: 18px; font-weight: 700; color: var(--accent-orange);">0 đ</span>
           </div>
+          <small style="display:block;margin:-4px 0 12px;color:var(--text-muted);line-height:1.5">Giá tính theo từng đêm trong tuần. Chưa gồm bữa sáng (có thể thêm Combo Săn Mây). Trẻ dưới 6 tuổi miễn phí.</small>
 
           <button type="submit" class="btn-submit-booking">TẠO ĐƠN & XEM THÔNG TIN THANH TOÁN →</button>
         </form>
@@ -1559,11 +1560,11 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
-    <script src="config.js?v=20261011o"></script>
-    <script src="data.js?v=20261011o"></script>
-    <script src="phieu.js?v=20261011o"></script>
-    <script src="app.js?v=20261011o"></script>
-    <script src="account.js?v=20261011o"></script>
-    <script src="i18n.js?v=20261011o"></script>
+    <script src="config.js?v=20261011p"></script>
+    <script src="data.js?v=20261011p"></script>
+    <script src="phieu.js?v=20261011p"></script>
+    <script src="app.js?v=20261011p"></script>
+    <script src="account.js?v=20261011p"></script>
+    <script src="i18n.js?v=20261011p"></script>
   </body>
 </html>

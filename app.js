@@ -117,7 +117,8 @@ $('admin-logo-trigger').addEventListener('click', () => {
 async function getList(table, fallback, flag) {
   if (db) {
     try {
-      const { data, error } = await db.from(table).select('*').eq(flag, true).order('sort_order');
+      const cols = table === 'reviews' ? 'id,author_name,author_avatar,rating,content,is_published,sort_order,created_at' : '*'; // không tải booking_code của đánh giá
+      const { data, error } = await db.from(table).select(cols).eq(flag, true).order('sort_order');
       if (!error && data && data.length) return data;
     } catch (e) { /* dùng dữ liệu có sẵn */ }
   }
@@ -432,7 +433,7 @@ function closeLightbox() { $('lightbox').classList.remove('active'); }
 
 /* ===== ĐẶT PHÒNG ===== */
 function populateRoomSelect() {
-  let o = '<option value="">-- Chọn hạng phòng hoặc tour --</option>';
+  let o = '<option value="">-- Chọn hạng phòng' + (D.toursBookable ? ' hoặc tour' : '') + ' --</option>';
   if (roomsData.length) o += '<optgroup label="Hạng Phòng">' + roomsData.map((r, i) => `<option value="r:${i}">${esc(r.name)} - ${Number(r.price) > 0 ? (r.rates ? 'từ ' : '') + money(r.price) + '/đêm' : 'Liên hệ báo giá'}</option>`).join('') + '</optgroup>';
   if (toursData.length && D.toursBookable) o += '<optgroup label="Tour Trải Nghiệm">' + toursData.map((t, i) => `<option value="t:${i}">${esc(t.name)} - ${money(t.price)}</option>`).join('') + '</optgroup>';
   $('bk-room-select').innerHTML = o;
@@ -580,7 +581,8 @@ $('booking-form-step1').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!validateDates()) return;
   if (db && !currentUser) { pendingBooking = true; openAuthModal('Vui lòng đăng nhập hoặc đăng ký để đặt dịch vụ. Thông tin bạn vừa điền được giữ nguyên.'); return; }
-  if (!currentItem.name) { alert('Vui lòng chọn hạng phòng hoặc tour.'); return; }
+  if (!currentItem.name) { alert(D.toursBookable ? 'Vui lòng chọn hạng phòng hoặc tour.' : 'Vui lòng chọn hạng phòng.'); return; }
+  if (!/\d/.test($('bk-guests').value)) { alert('Vui lòng ghi số khách bằng chữ số, ví dụ: 2 người lớn.'); return; }
   if (currentItem.rates && currentItem.maxGuests && guestCount() > currentItem.maxGuests) { alert('Mỗi phòng ở tối đa ' + currentItem.maxGuests + ' khách. Bạn đặt thêm phòng hoặc nhắn nhà để được hỗ trợ nhé.'); return; }
   const phone = $('bk-phone').value.trim();
   if (phone.replace(/\D/g, '').length < 9) { alert('Số điện thoại chưa hợp lệ.'); return; }
@@ -620,7 +622,7 @@ function renderOrderView() {
       body = `<div class="pay-note">Mức giá hoặc thông tin thanh toán của dịch vụ này sẽ được nhà gửi cho bạn qua Messenger. Bạn hãy nhắn kèm <strong>mã đơn</strong>.</div>
         <div class="ov-row"><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử</button></div>`;
     }
-    body += `<div class="ov-card support"><strong>🕑 Liên hệ homestay 24/7</strong><p>Cần hỏi thêm về phòng, giá, đưa đón hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.</p>${hours}${contactOthers ? `<div class="ov-others">${contactOthers}</div>` : ''}</div>`;
+    body += `<div class="ov-card support"><strong>🕑 Liên hệ homestay 24/7</strong><p>Cần hỏi thêm về phòng, giá, đường đi hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.</p>${hours}${contactOthers ? `<div class="ov-others">${contactOthers}</div>` : ''}</div>`;
   } else if (st === ST.PAID) {
     body = `<div class="pay-note ok">Đã ghi nhận bạn chuyển khoản. Nhà đang đối chiếu giao dịch.</div>
       <div class="ov-card confirm"><strong>📄 Nhận phiếu xác nhận dịch vụ chính thức</strong><p>Liên hệ homestay qua Messenger kèm <strong>mã đơn ${esc(o.code)}</strong> và ảnh chụp giao dịch. Nhà sẽ gửi phiếu xác nhận dịch vụ chính thức cho bạn.</p>
@@ -673,7 +675,7 @@ function orderCard(o, opt) {
   }
   if (!opt.lookup) act.push(`<button class="oc-link" data-act="remove" data-code="${c}">Xóa khỏi lịch sử</button>`);
   const note = o.gone ? 'Không tìm thấy đơn này trên hệ thống của nhà (có thể đã được xóa).' : !o.synced && !db ? 'Đơn lưu trên thiết bị này. Hãy nhắn Facebook của nhà kèm mã đơn để được xác nhận.' : STMSG[st] || '';
-  return `<div class="oc ${cancel ? 'is-cancel' : ''}"><div class="oc-head"><div><strong class="oc-code">${c}</strong><small>${esc(vdate((o.created || '').slice(0, 10)))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
+  return `<div class="oc ${cancel ? 'is-cancel' : ''}"><div class="oc-head"><div><strong class="oc-code">${c}</strong><small>${esc(vdate(o.created ? localISO(new Date(o.created)) : ''))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
     <div class="oc-body"><strong>${esc(o.room)}</strong><br>${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))}${o.guests ? ' · ' + esc(o.guests) : ''} · ${Number(o.total) > 0 ? Number(o.total).toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}</div>
     ${cancel ? '' : `<ol class="oc-steps">${steps}</ol>`}
     ${NEXT[st] ? `<p class="oc-note oc-next"><strong>Bước tiếp theo:</strong> ${esc(NEXT[st])}${st === ST.CANCEL ? ' <a href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">Chính sách hoàn hủy</a>' : ''}</p>` : ''}

@@ -184,7 +184,7 @@
     if (f.ma && !/^[A-Za-z0-9]{6,20}$/.test(f.ma)) m.push('mã đơn (6-20 chữ/số, không dấu)');
     return m;
   };
-  const newCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = 'NA'; for (let i = 0; i < 8; i++) c += a[Math.floor(Math.random() * a.length)]; return c; };
+  const newCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = new Uint32Array(8); (window.crypto || window.msCrypto).getRandomValues(r); return 'NA' + [...r].map((n) => a[n % a.length]).join(''); };
   const payloadOf = () => { const f = state.f; return { fullname: String(f.b_ten || '').trim().slice(0, 80), phone: String(f.b_sdt || '').replace(/[^\d+]/g, '').slice(0, 20), room: String(f.phong || '').trim().slice(0, 120), checkin: f.nhan, checkout: f.tra, guests: String(f.khach || '').slice(0, 100) || null, total_price: Math.round(Number(f.tien)) }; };
   const diffOf = (b) => {
     const p = payloadOf(), L = { fullname: 'họ tên', phone: 'SĐT', room: 'hạng phòng', checkin: 'ngày nhận', checkout: 'ngày trả', guests: 'số khách', total_price: 'số tiền' };

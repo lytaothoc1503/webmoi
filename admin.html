@@ -470,6 +470,8 @@
       let refundsData = [], entriesData = [];
       const finMissing = (error) => { if (error) { document.getElementById('fin-setup-note').style.display = 'block'; console.error(error.message); return true; } return false; };
       const isRevenue = (b) => [ST.OK, ST.DONE].includes(normStatus(b.status));
+      // Đã thu tiền thật (kể cả đơn bị hủy sau khi nhận tiền): dùng cho sổ thu chi để khoản hoàn trả không bị trừ hai lần
+      const isCollected = (b) => isRevenue(b) || (normStatus(b.status) === ST.CANCEL && !!b.confirmed_at);
 
       function loadRecon() {
         const rows = allBookings.filter(b => [ST.WAIT, ST.PAID, ST.OK, ST.DONE].includes(normStatus(b.status)));
@@ -609,7 +611,7 @@
         entriesData = e.data || []; refundsData = r.data || [];
         const mk = new Date().toISOString().slice(0, 7);
         const inMonth = (d) => String(d).slice(0, 7) === mk;
-        const bookingIn = allBookings.filter(b => isRevenue(b) && inMonth(b.created_at)).reduce((a, b) => a + paidOf(b), 0);
+        const bookingIn = allBookings.filter(b => isCollected(b) && inMonth(b.created_at)).reduce((a, b) => a + paidOf(b), 0);
         const thu = bookingIn + entriesData.filter(x => x.kind === 'thu' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
         const chi = entriesData.filter(x => x.kind === 'chi' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
         const ref = refundsData.filter(x => x.status === 'Đã hoàn' && inMonth(x.done_at || x.created_at)).reduce((a, x) => a + Number(x.amount), 0);
@@ -620,7 +622,7 @@
         el.textContent = vnd(net); el.style.color = net >= 0 ? 'var(--green)' : '#b91c1c';
         const mm = {};
         const slot = (k) => (mm[k] = mm[k] || { t: 0, c: 0, h: 0 });
-        allBookings.filter(isRevenue).forEach(b => { slot(String(b.created_at).slice(0, 7)).t += paidOf(b); });
+        allBookings.filter(isCollected).forEach(b => { slot(String(b.created_at).slice(0, 7)).t += paidOf(b); });
         entriesData.forEach(x => { const m = slot(String(x.entry_date).slice(0, 7)); if (x.kind === 'thu') m.t += Number(x.amount); else m.c += Number(x.amount); });
         refundsData.filter(x => x.status === 'Đã hoàn').forEach(x => { slot(String(x.done_at || x.created_at).slice(0, 7)).h += Number(x.amount); });
         document.getElementById('month-tbody').innerHTML = Object.keys(mm).sort().reverse().slice(0, 12).map(k => `<tr><td>${esc(k)}</td><td>${esc(vnd(mm[k].t))}</td><td>${esc(vnd(mm[k].c))}</td><td>${esc(vnd(mm[k].h))}</td><td><strong>${esc(vnd(mm[k].t - mm[k].c - mm[k].h))}</strong></td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Chưa có số liệu</td></tr>';
@@ -922,7 +924,7 @@
 
       /* ===== REVIEWS CRUD ===== */
       async function loadReviewsManage() {
-        const { data } = await supabaseClient.from('reviews').select('*').order('is_published', { ascending: true }).order('created_at', { ascending: false });
+        const { data } = await supabaseClient.from('reviews').select('id,author_name,author_avatar,rating,content,is_published,sort_order,created_at').order('is_published', { ascending: true }).order('created_at', { ascending: false });
         const grid = document.getElementById('reviews-manage-grid');
         if (!data || data.length === 0) { grid.innerHTML = '<p style="color: var(--muted);">Chưa có đánh giá.</p>'; return; }
         grid.innerHTML = data.map(r => `
@@ -966,7 +968,7 @@
           <div class="form-group"><label>Hiển thị:</label><select id="f-active"><option value="true">Có</option><option value="false">Không</option></select></div>
         `;
         if (id) {
-          supabaseClient.from('reviews').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+          supabaseClient.from('reviews').select('id,author_name,author_avatar,rating,content,is_published,sort_order,created_at').eq('id', id).maybeSingle().then(({ data }) => {
             if (!data) return;
             document.getElementById('f-name').value = data.author_name;
             document.getElementById('f-avatar').value = data.author_avatar || '';

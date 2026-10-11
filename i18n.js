@@ -4,6 +4,22 @@
    Muốn dịch câu mới: thêm dòng  "câu tiếng Việt": "English text"  vào DICT. Câu chưa có trong DICT sẽ giữ nguyên tiếng Việt. */
 (function () {
   const DICT = /*DICT*/{
+"-- Chọn hạng phòng --": "-- Choose a room --",
+"Vui lòng chọn hạng phòng.": "Please choose a room.",
+"Vui lòng ghi số khách bằng chữ số, ví dụ: 2 người lớn.": "Please write the number of guests in digits, e.g. 2 adults.",
+"Cần hỏi thêm về phòng, giá, đường đi hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.": "Questions about rooms, prices, directions or itineraries? Message us now, no prepayment needed.",
+"Ghi chú thêm (giờ dự kiến đến, yêu cầu đặc biệt, dị ứng thực phẩm...):": "Additional notes (expected arrival time, special requests, food allergies...):",
+"Đánh giá thật từ khách": "Real guest reviews",
+"Nhận xét khách đã đăng công khai trên Google Maps": "Comments guests posted publicly on Google Maps",
+"Giá tính theo từng đêm trong tuần. Chưa gồm bữa sáng (có thể thêm Combo Săn Mây). Trẻ dưới 6 tuổi miễn phí.": "Prices are calculated per night by day of the week. Breakfast is not included (you can add the Cloud-Hunting Combo). Children under 6 stay free.",
+"Gợi ý Combo Săn Mây: phòng + bữa sáng + trà chiều (xem giá ở mục Hạng phòng)": "Cloud-Hunting Combo suggestion: room + breakfast + afternoon tea (see the price in the Rooms section)",
+"Mùa săn mây ở Tà Xùa thường từ khoảng tháng 10 đến tháng 4 năm sau. Thời tiết thay đổi theo ngày nên nhà sẽ tư vấn thêm khi bạn liên hệ.": "Cloud season in Ta Xua usually runs from about October to April of the following year. The weather changes daily, so we will advise you when you get in touch.",
+"Nhận phòng cần giấy tờ gì?": "What documents do I need at check-in?",
+"Người đại diện đặt phòng mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Khách đi cùng gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định.": "The person who made the booking brings a citizen ID card or VNeID (foreign guests: passport). Companions send us their full names and ID numbers so we can register their stay as required.",
+"Giá phòng có gồm bữa sáng không?": "Is breakfast included in the room rate?",
+"Giá phòng chưa gồm bữa sáng. Bạn có thể thêm Combo Săn Mây (bữa sáng trên mây + trà chiều, tặng kèm nước uống) khi đặt phòng.": "The room rate does not include breakfast. You can add the Cloud-Hunting Combo (breakfast above the clouds + afternoon tea, with complimentary water) when booking.",
+"Hãy nhắn nhà để hỏi về mây sáng mai.": "Message us to ask about tomorrow morning's clouds.",
+"Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.": "Question copied. Please paste it into your message to us.",
 "Combo Săn Mây": "Cloud-Hunting Combo",
 "Gói nổi bật": "Featured package",
 "/ người / đêm": "/ person / night",
@@ -782,6 +798,10 @@
   const vnd = (n) => n.replace(/\./g, ',') + ' VND';
   const UNIT = { 'người': '/ person', 'đêm': '/ night', 'ngày': '/ day' };
   const PATTERNS = [
+    [/^([\d.]+) đ \((\d+) đêm\)$/, (m, a, n) => `${a.replace(/\./g, ',')} VND (${n} night${n === '1' ? '' : 's'})`],
+    [/^([\d.]+) đ \((\d+) đêm, (.*)\)$/, (m, a, n, rest) => `${a.replace(/\./g, ',')} VND (${n} night${n === '1' ? '' : 's'}, ` + rest.replace(/phụ thu khách thứ 3: ([\d.]+) đ/, (x, v) => `3rd guest surcharge: ${v.replace(/\./g, ',')} VND`).replace(/combo: ([\d.]+) đ/, (x, v) => `combo: ${v.replace(/\./g, ',')} VND`) + ')'],
+    [/^Mỗi phòng ở tối đa (\d+) khách\. Bạn đặt thêm phòng hoặc nhắn nhà để được hỗ trợ nhé\.$/, (m, n) => `Each room sleeps up to ${n} guests. Please book another room or message us for help.`],
+    [/^Đã lưu\. Nhà sẽ gọi bạn là (.*)\.$/, (m, n) => `Saved. We will call you ${n}.`],
     [/^Tìm thấy (\d+) đơn với số điện thoại này\. (.*)$/, (m, n, rest) => `Found ${n} order${n === '1' ? '' : 's'} for this phone number. ` + core(rest)],
     [/^Đã lưu đơn (\S+) vào lịch sử\. Bạn có thể thanh toán sau\.$/, (m, c) => `Order ${c} saved to history. You can pay later.`],
     [/^Hãy gửi mã đơn (\S+) cho nhà qua Facebook\.$/, (m, c) => `Please send booking code ${c} to us on Facebook.`],

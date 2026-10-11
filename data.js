@@ -123,7 +123,7 @@ window.SITE_DATA = {
     ],
     diningNote: '',
     menuFrom: ['Cà phê & đồ uống', 'Trà chiều ngắm hoàng hôn', 'Bữa sáng trên mây'],
-    goods: ['Vị trí đẹp ngay Đỉnh Gió', 'Không khí thư thái, chữa lành', 'Khách ở nhà được giảm khi gọi đồ uống'],
+    goods: ['Vị trí đẹp ngay Đỉnh Gió', 'Không khí thư thái, chữa lành'],
     notes: ['Trải nghiệm phụ thuộc thời tiết, mây không có mỗi ngày. Nhắn nhà để biết tình hình trước khi lên.'],
     photos: [
       'images/tram-mam-xoi.webp', 'images/ban-ghe-ngam-may.webp', 'images/hoang-hon-quan-cafe.webp',
@@ -145,8 +145,8 @@ window.SITE_DATA = {
   services: [
     { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 100000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.webp', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
     { icon: '🍜', name: 'Bữa sáng trên mây', price: 70000, unit: '/ người', image_url: 'images/bua-sang-tren-may.webp', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
-    { icon: '☕', name: 'Cà phê & đồ uống', price: 30000, unit: 'từ / ly', image_url: 'images/ban-ghe-ngam-may.webp', time: '7:00 - 21:00', description: 'Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.', includes: ['Cà phê, trà, nước ép', 'Chỗ ngồi ngoài trời ngắm mây'], note: 'Khách ở nhà được giảm khi gọi đồ uống tại quán.' },
-    { icon: '🧭', name: 'Tư vấn lịch trình', price: 0, unit: '', time: 'Miễn phí', description: 'Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.', includes: ['Gợi ý theo mùa và thời tiết', 'Combo phòng, ăn sáng, xe khứ hồi (nhắn nhà để biết giá)'], note: 'Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.' },
+    { icon: '☕', name: 'Cà phê & đồ uống', price: 30000, unit: 'từ / ly', image_url: 'images/ban-ghe-ngam-may.webp', time: '7:00 - 21:00', description: 'Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.', includes: ['Cà phê, trà, nước ép', 'Chỗ ngồi ngoài trời ngắm mây'] },
+    { icon: '🧭', name: 'Tư vấn lịch trình', price: 0, unit: '', time: 'Miễn phí', description: 'Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.', includes: ['Gợi ý theo mùa và thời tiết', 'Gợi ý Combo Săn Mây: phòng + bữa sáng + trà chiều (xem giá ở mục Hạng phòng)'], note: 'Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.' },
   ],
   // Combo (chủ nhà đồng ý): chọn phòng rồi thêm bữa sáng + trà chiều + nước. KHÔNG kèm xe/vận chuyển (web không bán vận chuyển).
   // Giá combo = tổng giá các dịch vụ trong `items` (lấy từ services) x số khách x số đêm; nước uống tặng kèm.
@@ -195,10 +195,12 @@ window.SITE_DATA = {
     'Thời tiết xấu, đường bị chặn khiến không thể lên Tà Xùa: nhà hỗ trợ đổi ngày hoặc hoàn tiền, báo cho nhà qua Messenger.',
   ],
   faq: [
+    { question: 'Nhận phòng cần giấy tờ gì?', answer: 'Người đại diện đặt phòng mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Khách đi cùng gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định.' },
+    { question: 'Giá phòng có gồm bữa sáng không?', answer: 'Giá phòng chưa gồm bữa sáng. Bạn có thể thêm Combo Săn Mây (bữa sáng trên mây + trà chiều, tặng kèm nước uống) khi đặt phòng.' },
     { question: 'Chính sách hoàn / hủy phòng thế nào?', answer: 'Hủy trước 7 ngày hoàn 100%, từ 3 đến 6 ngày hoàn 50%, dưới 3 ngày không hoàn. Xem chi tiết ở trang Chính sách. Nếu thời tiết xấu khiến bạn không lên được, hãy nhắn nhà để được hỗ trợ.' },
     { question: 'Làm sao để đặt phòng?', answer: 'Bạn bấm "Đặt Phòng" và điền thông tin, hoặc nhắn trực tiếp qua Facebook của nhà. Nhà sẽ liên hệ xác nhận với bạn.' },
     { question: 'Giờ nhận và trả phòng như thế nào?', answer: 'Nhận phòng từ 14:00 và trả phòng trước 12:00. Nếu cần đến sớm hoặc gửi hành lý, hãy báo trước cho nhà.' },
-    { question: 'Thời điểm nào săn mây đẹp nhất?', answer: 'Mùa săn mây ở Tà Xùa thường từ cuối tháng 9 đến tháng 4 năm sau. Thời tiết thay đổi theo ngày nên nhà sẽ tư vấn thêm khi bạn liên hệ.' },
+    { question: 'Thời điểm nào săn mây đẹp nhất?', answer: 'Mùa săn mây ở Tà Xùa thường từ khoảng tháng 10 đến tháng 4 năm sau. Thời tiết thay đổi theo ngày nên nhà sẽ tư vấn thêm khi bạn liên hệ.' },
     { question: 'Nhà có hỗ trợ tư vấn lịch trình không?', answer: 'Có. Bạn nhắn cho nhà thời gian dự định đến, nhà sẽ gợi ý lịch trình săn mây và các điểm tham quan gần đó.' },
   ],
 };

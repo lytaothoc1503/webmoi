@@ -8,7 +8,7 @@ function limited(ip: string) { const now = Date.now(); const a = (hits.get(ip) |
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
   if (req.method !== "POST") return json({ code: "method" }, 405);
-  const ip = (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "?";
+  const ip = req.headers.get("cf-connecting-ip") || (req.headers.get("x-forwarded-for") || "").split(",").pop()!.trim() || "?"; // IP do hạ tầng gắn, không lấy phần client tự đặt
   if (limited(ip)) return json({ code: "rate" }, 429);
   let b: Record<string, unknown>; try { b = await req.json(); } catch { return json({ code: "bad_request" }, 400); }
   let phone = String(b.phone || "").replace(/[\s.\-()]/g, "");
