@@ -149,6 +149,15 @@
         body.print-doc { background: #fff; display: block; } body.print-doc .dpaper { box-shadow: none; border: 0; padding: 0; max-width: none; }
       }
       .fm-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; } .fm-bar select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; min-width: 240px; flex: 1; }
+      .rp-card { max-width: 400px; margin: 0 auto; background: #fffaf0; border: 2px solid #c8902e; border-radius: 14px; overflow: hidden; color: #1d2b2e; font-size: 14px; }
+      .rp-head { background: linear-gradient(180deg,#0b3b46,#082a32); color: #f6e4bd; text-align: center; padding: 14px 10px 12px; } .rp-head b { letter-spacing: .14em; display: block; } .rp-head small { letter-spacing: .3em; font-size: 9px; opacity: .85; } .rp-head h3 { margin: 8px 0 0; font-size: 19px; color: #fff; }
+      .rp-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px 14px 4px; } .rp-info small { display: block; color: #6b7a7d; font-size: 11px; } .rp-info b { font-size: 13.5px; word-break: break-word; } .rp-wide { grid-column: 1 / -1; }
+      .rp-steps { padding: 8px 14px; } .rp-step { display: flex; gap: 10px; align-items: center; padding: 6px 0; position: relative; } .rp-step:not(:last-child)::after { content: ''; position: absolute; left: 13px; top: 32px; width: 2px; height: calc(100% - 14px); background: #d9e2e4; }
+      .rp-dot { flex: none; width: 28px; height: 28px; border-radius: 50%; background: #e4eaec; color: #7a8a8d; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; z-index: 1; } .rp-st b { display: block; font-size: 13.5px; color: #6b7a7d; } .rp-st small { color: #8a9a9d; font-size: 11.5px; }
+      .rp-step.done .rp-dot { background: #1aa56b; color: #fff; } .rp-step.done .rp-st b { color: #14532d; } .rp-step.done:not(:last-child)::after { background: #1aa56b; }
+      .rp-step.now .rp-dot { background: #e8890c; color: #fff; box-shadow: 0 0 0 4px rgba(232,137,12,.25); } .rp-step.now .rp-st b { color: #8a4b00; font-size: 14.5px; }
+      .rp-now { margin: 4px 14px 10px; background: #fff3dc; border: 1px solid #f0cf8a; border-radius: 10px; padding: 10px 12px; } .rp-now b { color: #8a4b00; } .rp-now p { margin: 6px 0 0; line-height: 1.5; font-size: 13px; } .rp-now.rp-bad { background: #fdecec; border-color: #f2b8b8; } .rp-now.rp-bad b { color: #b91c1c; } .rp-msg { font-style: italic; border-top: 1px dashed #e2c27a; padding-top: 6px; }
+      .rp-foot { text-align: center; font-size: 11.5px; color: #6b7a7d; padding: 4px 10px 12px; }
       .fm-sync { border-radius: 10px; padding: 12px 14px; margin: 10px 0; font-size: 13.5px; line-height: 1.55; } .fm-sync.ok { background: #e8f7ee; border: 1px solid #9bd5b0; color: #14532d; } .fm-sync.warn { background: #fff6e5; border: 1px solid #f0cf8a; color: #6b4a06; }
       .fm-sync-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; align-items: center; } .fm-sync-row select { padding: 8px; border-radius: 8px; border: 1px solid #ccc; max-width: 100%; } .fm-sync button:disabled { opacity: .5; cursor: not-allowed; } .fm-sync small { display: block; color: inherit; opacity: .85; }
       .fm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-bottom: 14px; }
@@ -493,7 +502,7 @@
         document.getElementById('rf-wait').textContent = refundsData.filter(r => r.status === 'Chờ xử lý').length;
         document.getElementById('rf-done-sum').textContent = vnd(refundsData.filter(r => r.status === 'Đã hoàn').reduce((a, r) => a + Number(r.amount), 0));
         const maskAcc = (v) => /^\d{6,20}$/.test(v) ? '****' + v.slice(-4) : v;
-        document.getElementById('refunds-tbody').innerHTML = refundsData.map(r => `<tr><td>${esc(new Date(r.created_at).toLocaleDateString('vi-VN'))}</td><td>${esc(r.booking_code)}</td><td>${esc(vnd(r.amount))}</td><td>${esc(r.bank_name)}<br><small>${esc(r.account_name)} · ${esc(r.status === 'Chờ xử lý' ? r.account_no : maskAcc(r.account_no))}</small></td><td>${esc(r.reason || '')}</td><td>${esc(r.status)}</td><td>${r.status === 'Chờ xử lý' ? `<button class="btn-add" onclick="setRefund('${esc(r.id)}','Đã hoàn')">Đã hoàn</button> <button class="btn-export" onclick="setRefund('${esc(r.id)}','Từ chối')">Từ chối</button> <button class="btn-export" onclick="delRefund('${esc(r.id)}')">Xóa</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:#888">Chưa có yêu cầu hoàn trả</td></tr>';
+        document.getElementById('refunds-tbody').innerHTML = refundsData.map(r => `<tr><td>${esc(new Date(r.created_at).toLocaleDateString('vi-VN'))}</td><td>${esc(r.booking_code)}</td><td>${esc(vnd(r.amount))}</td><td>${esc(r.bank_name)}<br><small>${esc(r.account_name)} · ${esc(r.status === 'Chờ xử lý' ? r.account_no : maskAcc(r.account_no))}</small></td><td>${esc(r.reason || '')}</td><td>${esc(r.status)}<br><small>${esc(rfStepLabel(r))}</small></td><td><button class="btn-add" onclick="openRefundProgress('${esc(r.id)}')">Tiến độ</button> ${r.status === 'Chờ xử lý' ? `<button class="btn-export" onclick="setRefund('${esc(r.id)}','Đã hoàn')">Đã hoàn</button> <button class="btn-export" onclick="setRefund('${esc(r.id)}','Từ chối')">Từ chối</button> <button class="btn-export" onclick="delRefund('${esc(r.id)}')">Xóa</button>` : ''}</td></tr>`).join('') || '<tr><td colspan="7" style="text-align:center;color:#888">Chưa có yêu cầu hoàn trả</td></tr>';
       }
       function checkRefundCode() {
         const sel = (document.getElementById('rf-code').value || '').trim().toUpperCase(), v = document.getElementById('rf-check').value.trim().toUpperCase(), m = document.getElementById('rf-check-msg');
@@ -520,7 +529,61 @@
         if (!confirm('Chuyển yêu cầu sang "' + status + '"?')) return;
         const { error } = await supabaseClient.from('refunds').update({ status, done_at: new Date().toISOString() }).eq('id', id);
         if (error) { alert('Lỗi: ' + error.message); return; }
-        loadRefunds();
+        await loadRefunds();
+      }
+
+      /* ===== Thẻ tiến độ hoàn trả (chụp gửi khách) ===== */
+      const RF_STEPS = [
+        { t: 'Đã tiếp nhận yêu cầu', now: 'Nhà đã nhận yêu cầu hoàn tiền và ghi lại thông tin tài khoản nhận.', you: 'Kiểm tra tên chủ tài khoản và số tài khoản bên dưới có đúng không. Nếu đúng, bạn không cần làm gì thêm.' },
+        { t: 'Đang đối chiếu', now: 'Nhà đang đối chiếu mã booking trên Phiếu xác nhận của bạn với đơn và số tiền đã thu trong hệ thống.', you: 'Giữ lại Phiếu xác nhận và nhắn nhà nếu có thay đổi thông tin.' },
+        { t: 'Đã duyệt, chuẩn bị chuyển tiền', now: 'Nhà đã duyệt số tiền hoàn theo chính sách hoàn hủy và đang chuẩn bị chuyển khoản.', you: 'Bạn chưa cần làm gì, chỉ cần để ý tin nhắn của nhà.' },
+        { t: 'Đã chuyển khoản', now: 'Nhà đã chuyển tiền về tài khoản của bạn. Ngân hàng có thể mất một thời gian để tiền hiện trong tài khoản.', you: 'Kiểm tra tài khoản. Khi nhận được tiền, bạn nhắn nhà một câu để nhà đóng yêu cầu.' },
+        { t: 'Hoàn tất', now: 'Nhà đã hoàn tiền và đóng yêu cầu. Biên bản hoàn trả được lưu để hai bên đối chiếu khi cần.', you: 'Bạn không cần làm gì thêm. Cảm ơn bạn đã tin tưởng Nhà của An.' }
+      ];
+      const rfStepNo = (r) => (r.status === 'Đã hoàn' ? 5 : Math.min(4, Math.max(1, Number(r.step) || 1)));
+      const rfStepLabel = (r) => (r.status === 'Đã hoàn' ? 'Hoàn tất' : r.status === 'Từ chối' ? 'Không hoàn' : r.step === undefined ? '' : 'Bước ' + rfStepNo(r) + '/5');
+      const rfTime = (r, n) => {
+        const log = Array.isArray(r.step_log) ? r.step_log : [], hit = log.find(x => Number(x.s) === n);
+        const iso = hit ? hit.at : (n === 1 ? r.created_at : n === 5 && r.status === 'Đã hoàn' ? r.done_at : null);
+        if (!iso) return '';
+        const d = new Date(iso); return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN');
+      };
+      function openRefundProgress(id) {
+        const r = refundsData.find(x => x.id === id); if (!r) return;
+        let m = document.getElementById('rp-modal');
+        if (!m) { m = document.createElement('div'); m.id = 'rp-modal'; m.className = 'modal-overlay'; document.body.appendChild(m); m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-rp="close"]')) m.classList.remove('active'); }); }
+        const noStep = r.step === undefined, rejected = r.status === 'Từ chối', n = rfStepNo(r), note = (m.querySelector('#rp-note') || {}).value || '';
+        const acc = /^\d{6,20}$/.test(r.account_no) ? '****' + r.account_no.slice(-4) : r.account_no;
+        const stepsHtml = RF_STEPS.map((st, i) => {
+          const k = i + 1, cls = rejected ? (k === 1 ? 'done' : '') : k < n ? 'done' : k === n ? 'now' : '';
+          return `<div class="rp-step ${cls}"><div class="rp-dot">${cls === 'done' || (cls === 'now' && n === 5) ? '✓' : k}</div><div class="rp-st"><b>${esc(st.t)}</b><small>${esc(cls ? rfTime(r, k) : 'Chưa tới')}</small></div></div>`;
+        }).join('');
+        const cur = RF_STEPS[n - 1];
+        const body = rejected
+          ? `<div class="rp-now rp-bad"><b>Nhà chưa thể hoàn khoản này</b><p>${esc((r.reason || '').split(' | ')[0])}</p><p><u>Bạn cần làm:</u> nhắn nhà để được giải thích và hướng dẫn bước tiếp theo.</p></div>`
+          : `<div class="rp-now"><b>Bây giờ: ${esc(cur.t)}</b><p><u>Nhà đang làm:</u> ${esc(cur.now)}</p><p><u>Bạn cần làm:</u> ${esc(cur.you)}</p>${note ? `<p class="rp-msg">${esc(note)}</p>` : ''}</div>`;
+        const next = !rejected && r.status === 'Chờ xử lý' && !noStep && n < 4 ? RF_STEPS[n].t : '';
+        m.innerHTML = `<div class="modal-box" style="max-width:520px;padding:16px;background:#fff"><span class="modal-close" data-rp="close">&times;</span>
+          <p class="fin-note" style="margin:0 0 8px">Chụp màn hình phần thẻ bên dưới rồi gửi khách. Mỗi lần chuyển bước, mở lại thẻ để chụp bước mới.</p>
+          <div class="rp-card" id="rp-card"><div class="rp-head"><b>NHÀ CỦA AN</b><small>HOMESTAY &amp; COFFEE</small><h3>Tiến độ hoàn tiền</h3></div>
+          <div class="rp-info"><div><small>Mã booking</small><b>${esc(r.booking_code)}</b></div><div><small>Số tiền hoàn</small><b>${esc(vnd(r.amount))}</b></div><div class="rp-wide"><small>Nhận hoàn về</small><b>${esc(r.bank_name)} · ${esc(r.account_name)} · ${esc(acc)}</b></div></div>
+          <div class="rp-steps">${stepsHtml}</div>${body}<div class="rp-foot">Thắc mắc, nhắn nhà kèm mã booking ${esc(r.booking_code)}</div></div>
+          ${noStep ? '<p class="fin-note" style="color:#b91c1c">Chưa bật tiến độ: cần chạy file SQL 20261011040000_refund_progress.sql trong Supabase trước (xem hướng dẫn trong chat).</p>' : ''}
+          <input id="rp-note" type="text" maxlength="160" placeholder="Lời nhắn thêm cho khách (không lưu, hiện trên thẻ)" value="${esc(note)}" style="width:100%;margin:10px 0 8px;padding:9px;border:1px solid #ccc;border-radius:8px" oninput="openRefundProgress('${esc(r.id)}')">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            ${next ? `<button class="btn-add" onclick="advanceRefund('${esc(r.id)}')">Chuyển sang: ${esc(next)}</button>` : ''}
+            ${!rejected && r.status === 'Chờ xử lý' && !noStep && n === 4 ? `<button class="btn-add" onclick="setRefund('${esc(r.id)}','Đã hoàn').then(()=>openRefundProgress('${esc(r.id)}'))">Khách đã nhận tiền: Hoàn tất</button>` : ''}
+            <button class="btn-export" data-rp="close">Đóng</button></div></div>`;
+        m.classList.add('active');
+        const inp = m.querySelector('#rp-note'); if (note) { inp.focus(); inp.setSelectionRange(note.length, note.length); }
+      }
+      async function advanceRefund(id) {
+        const r = refundsData.find(x => x.id === id); if (!r) return;
+        const to = rfStepNo(r) + 1;
+        if (!confirm('Chuyển yêu cầu sang bước ' + to + ': "' + RF_STEPS[to - 1].t + '"? Giờ sẽ được ghi lại.')) return;
+        const { error } = await supabaseClient.from('refunds').update({ step: to }).eq('id', id);
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        await loadRefunds(); openRefundProgress(id);
       }
       async function delRefund(id) {
         if (!confirm('Xóa yêu cầu hoàn trả này?')) return;
