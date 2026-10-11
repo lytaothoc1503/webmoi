@@ -59,6 +59,7 @@ Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh d
 5. **Kiểm tra trước khi báo xong:** `node scripts/kiem-tra.js`, các bài test đặt phòng/tài khoản, xem cả điện thoại 390px và máy tính 1366px (không tràn ngang, không lỗi JS), chữ Việt mới đã có bản Anh trong `i18n.js`.
 6. **Đồng bộ 2 thiết bị:** `git pull --rebase`, commit tiếng Việt, `git push`, rồi xác nhận `git rev-parse HEAD origin/main` bằng nhau và tab Actions xanh.
 7. **Danh sách việc chờ:** giữ theo mức ưu tiên, làm việc quan trọng trước và nhắc lại phần chưa làm khi xong.
+9. **Rà soát chủ động (chủ dự án dặn 11/10):** lâu lâu, hoặc trước việc có thể ảnh hưởng hệ thống đang chạy, tự rà soát và sửa (kiểm tra CSDL thật, thử gọi API như người lạ, `disable_signup` phải True, `node scripts/kiem-tra.js`). Có thông tin mới hợp lý thì tự sáng tạo thêm trong khuôn quy tắc ở trên, lưu và đồng bộ. Việc có ảnh hưởng hoặc phân vân thì hỏi có/không.
 8. **Báo cáo:** kết luận trước, ngắn gọn, tối đa một câu hỏi có/không. Khi đổi cấu trúc hoặc quy trình thì cập nhật file này.
 
 ## Quản trị: Homestay & Tài chính
