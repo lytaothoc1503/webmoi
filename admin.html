@@ -463,7 +463,8 @@
         if (finMissing(error)) return;
         refundsData = data || [];
         const sel = document.getElementById('rf-code');
-        sel.innerHTML = '<option value="">Chọn đơn...</option>' + allBookings.map(b => `<option value="${esc(b.booking_code)}" data-amt="${Number(b.total_price || 0)}">${esc(b.booking_code)} - ${esc(b.fullname)} (${esc(normStatus(b.status))})</option>`).join('');
+        const refundable = allBookings.filter(b => b.confirmed_at || [ST.OK, ST.DONE].includes(normStatus(b.status)));
+        sel.innerHTML = '<option value="">' + (refundable.length ? 'Chọn đơn đã nhận tiền...' : 'Chưa có đơn nào đã xác nhận nhận tiền') + '</option>' + refundable.map(b => `<option value="${esc(b.booking_code)}" data-amt="${Number(b.total_price || 0)}">${esc(b.booking_code)} - ${esc(b.fullname)} (${esc(normStatus(b.status))})</option>`).join('');
         sel.onchange = () => { const o = sel.selectedOptions[0]; if (o && o.dataset.amt) document.getElementById('rf-amount').value = o.dataset.amt; checkRefundCode(); };
         document.getElementById('rf-wait').textContent = refundsData.filter(r => r.status === 'Chờ xử lý').length;
         document.getElementById('rf-done-sum').textContent = vnd(refundsData.filter(r => r.status === 'Đã hoàn').reduce((a, r) => a + Number(r.amount), 0));
