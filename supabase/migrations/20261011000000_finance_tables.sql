@@ -1,6 +1,18 @@
 -- Tài chính trong trang quản trị: khoản thu/chi, hoàn trả (có STK nhận hoàn) và nhật ký thay đổi.
 -- Chỉ admin (is_admin) đọc/ghi được. Quy tắc nghiệp vụ do CSDL ép, không phụ thuộc giao diện.
 
+-- Nâng cấp từ bản đầu (bảng refunds chưa có cột ngân hàng): chỉ tạo lại khi bảng đang TRỐNG, không bao giờ xóa dữ liệu thật.
+DO $$ BEGIN
+  IF to_regclass('public.refunds') IS NOT NULL
+     AND NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='refunds' AND column_name='bank_name') THEN
+    IF (SELECT count(*) FROM public.refunds) = 0 THEN
+      DROP TABLE public.refunds;
+    ELSE
+      RAISE EXCEPTION 'Bảng refunds cũ đang có dữ liệu, cần chuyển dữ liệu thủ công trước khi nâng cấp';
+    END IF;
+  END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS public.finance_entries (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   entry_date date NOT NULL DEFAULT current_date,
