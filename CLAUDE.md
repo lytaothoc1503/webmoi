@@ -66,6 +66,7 @@ Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh d
 STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa sổ đơn ở `app.js` khi trạng thái Chờ thanh toán; phiếu `phieu.js` chỉ khi `còn lại > 0` và tổng > 0, tắt được bằng `hideBank:true`). KHÔNG hiện ở trang chủ, đơn đã thanh toán đủ/đã hủy, phiếu thu, hoàn trả, biên bản, giấy ủy quyền. Thêm chỗ hiển thị STK mới phải theo đúng quy tắc này.
 
 ## Quy tắc khi sửa
+00. Trình duyệt khách lưu tạm file JS (GitHub Pages cache ~10 phút, có máy giữ lâu hơn). `index.html` và `phieu.html` gọi script kèm `?v=...`; khi sửa `config.js`, `data.js`, `app.js`, `phieu.js`, `account.js`, `i18n.js` thì ĐỔI số `v` trong 2 file này để khách nhận bản mới ngay.
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).
 1. `git pull --rebase` trước khi làm.
 2. Không để chữ "mẫu" hay dữ liệu thử hiển thị cho khách (cờ `catalogIsSample`, `storyIsSample`, `policyIsSample` trong `data.js` phải là `false`).
