@@ -12,13 +12,13 @@
 
     <style>
       :root {
-        --primary: #3d2314;
-        --accent: #d96b27;
+        --primary: #0b3b46;
+        --accent: #e8890c;
         --green: #10b981;
         --red: #ef4444;
-        --bg: #f5eee8;
+        --bg: #eef4f5;
         --surface: #ffffff;
-        --border: #e2d3c5;
+        --border: #d3e1e4;
         --text: #2f251e;
         --muted: #7a6e65;
       }
@@ -31,7 +31,7 @@
         position: sticky; top: 0; height: 100vh; overflow-y: auto;
       }
       .brand-title {
-        font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #ffdeb4;
+        font-size: 16px; font-weight: 700; letter-spacing: 1px; color: #ffe2a8;
         text-align: center; margin-bottom: 24px;
         border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 14px;
       }
@@ -137,11 +137,21 @@
         .menu-item { font-size: 10px; padding: 10px 8px; text-align: center; }
         main { padding: 16px; }
       }
+      .slip-ov { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; overflow: auto; }
+      .slip-ov.open { display: flex; }
+      .slip { background: #fff; width: 100%; max-width: 560px; border: 3px double var(--primary); border-radius: 6px; padding: 28px 30px; position: relative; }
+      .slip h3 { text-align: center; color: var(--primary); letter-spacing: .06em; font-size: 17px; margin-bottom: 4px; }
+      .slip .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+      .slip table { width: 100%; font-size: 13px; margin-bottom: 14px; } .slip td { padding: 6px 4px; border-bottom: 1px dashed var(--border); } .slip td:first-child { color: var(--muted); width: 42%; }
+      .slip .sign { display: flex; gap: 12px; margin-top: 18px; text-align: center; font-size: 12px; } .slip .sign div { flex: 1; } .slip .sign b { display: block; min-height: 54px; margin-top: 4px; }
+      .slip .sign input { width: 100%; border: 0; border-bottom: 1px solid #999; text-align: center; font: inherit; margin-top: 30px; padding: 4px; }
+      .slip .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+      @media print { body > *:not(.slip-ov) { display: none !important; } .slip-ov { position: static; background: none; display: block; padding: 0; } .slip .acts { display: none; } .slip { border-width: 3px; margin: 0 auto; } .slip .sign input { border-bottom: 1px solid #333; } }
     </style>
   </head>
   <body style="visibility:hidden">
     <aside>
-      <div class="brand-title">NHÀ CỦA AN MANAGER</div>
+      <div class="brand-title"><svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true" style="display:block;margin:0 auto 8px"><rect width="48" height="48" rx="12" fill="#e8890c"/><path d="M10 23 24 11l14 12v14H10z" fill="#fff"/><path d="m18 28 4 4 8-9" fill="none" stroke="#0b3b46" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>HỆ THỐNG ĐỐI SOÁT<br>&amp; XỬ LÝ HOÀN TRẢ</div>
       <div class="menu-group">🏡 Homestay & Coffee</div>
       <div class="menu-item active" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
       <div class="menu-item" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
@@ -221,7 +231,7 @@
 
       <!-- TÀI CHÍNH: ĐỐI SOÁT -->
       <div class="page-section" id="page-recon">
-        <div class="top-bar"><h2>Cổng Quản lý Đối soát & Xử lý Hoàn trả</h2></div>
+        <div class="top-bar"><h2>Hệ Thống Đối soát & Xử lý Hoàn trả</h2></div>
         <div class="fin-note" id="fin-setup-note" style="display:none">Chưa tạo bảng tài chính trong Supabase. Chạy file supabase/migrations/20261011000000_finance_tables.sql trong SQL Editor một lần.</div>
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">Chờ đối soát</div><div class="stat-num" id="rc-wait" style="color:#b45309">0</div></div>
@@ -406,9 +416,19 @@
         document.getElementById('recon-tbody').innerHTML = rows.map(b => {
           const st = normStatus(b.status);
           const act = st === ST.PAID ? `<button class="btn-add" onclick="reconOk('${esc(b.id)}')">Đã nhận tiền</button>` : st === ST.WAIT ? '<small>Chờ khách chuyển</small>' : '✓';
-          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}</td></tr>`;
+          const slipBtn = st === ST.PAID || st === ST.OK || st === ST.DONE ? ` <button class="btn-export" onclick="openSlip('${esc(b.id)}')">Phiếu</button>` : '';
+          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
         }).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có đơn</td></tr>';
       }
+      function openSlip(id) {
+        const b = allBookings.find(x => x.id === id); if (!b) return;
+        const S = window.SITE || {}, f = (d) => d ? new Date(d).toLocaleString('vi-VN') : '—';
+        const rows = [['Mã đơn', b.booking_code], ['Khách đặt', b.fullname + ' · ' + b.phone], ['Hạng phòng', b.room], ['Nhận phòng - Trả phòng', b.checkin + ' → ' + b.checkout], ['Số tiền', vnd(b.total_price)], ['Nội dung chuyển khoản', b.transfer_code || '—'], ['Ngày giờ đặt', f(b.created_at)], ['Ngày giờ báo thanh toán', f(b.paid_at)], ['Ngày giờ xác nhận', f(b.confirmed_at)], ['Trạng thái', normStatus(b.status)], ['Đơn vị nhận tiền', S.name || 'Nhà của An Homestay Tà Xùa']];
+        document.getElementById('slip-body').innerHTML = rows.map(r => `<tr><td>${esc(r[0])}</td><td><b>${esc(r[1] || '')}</b></td></tr>`).join('');
+        document.getElementById('slip-date').textContent = 'Lập ngày ' + new Date().toLocaleDateString('vi-VN');
+        document.getElementById('slip-ov').classList.add('open');
+      }
+      function closeSlip() { document.getElementById('slip-ov').classList.remove('open'); }
       async function reconOk(id) {
         if (!confirm('Xác nhận đã nhận đủ tiền của đơn này?')) return;
         await setStatus(id, ST.OK);
@@ -1015,5 +1035,12 @@
         supabaseClient.channel('bookings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => loadBookings()).subscribe();
       })();
     </script>
+  <div class="slip-ov" id="slip-ov"><div class="slip">
+      <h3>PHIẾU XÁC NHẬN ĐẶT PHÒNG &amp; THANH TOÁN</h3>
+      <div class="sub">Hệ Thống Đối soát &amp; Xử lý Hoàn trả · <span id="slip-date"></span></div>
+      <table><tbody id="slip-body"></tbody></table>
+      <div class="sign"><div>Người lập phiếu<input placeholder="Họ tên" maxlength="60" /></div><div>Kế toán / người xác nhận<input placeholder="Họ tên (nếu có)" maxlength="60" /></div></div>
+      <div class="acts"><button class="btn-export" onclick="closeSlip()">Đóng</button><button class="btn-add" onclick="window.print()">In / Lưu PDF</button></div>
+    </div></div>
   </body>
 </html>
