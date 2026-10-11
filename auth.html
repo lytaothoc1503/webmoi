@@ -18,6 +18,8 @@
         .btn-submit { width: 100%; padding: 13px; background-color: #d96b27; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; }
         .btn-submit:disabled { opacity: .6; cursor: wait; }
         .msg { margin-top: 14px; font-size: 13px; color: #fca5a5; min-height: 18px; }
+        [hidden] { display: none !important; }
+        .hint { margin-top: 12px; font-size: 11.5px; color: #8f7e70; line-height: 1.5; }
         .back { display: inline-block; margin-top: 16px; font-size: 12.5px; color: #b9a99a; }
     </style>
 </head>
@@ -25,46 +27,126 @@
 <div class="auth-container">
     <div class="logo">Nhà của An</div>
     <div class="sub">Khu vực quản trị</div>
-    <form id="admin-login-form" autocomplete="on" novalidate>
-        <div class="input-group">
-            <label for="adm-email">Email quản trị</label>
-            <input type="email" id="adm-email" name="username" required autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" placeholder="email quản trị">
+    <form id="admin-login-form" autocomplete="off" novalidate>
+        <div id="step-pass">
+            <div class="input-group">
+                <label for="adm-email">Email quản trị</label>
+                <input type="email" id="adm-email" name="nca-a1" required autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" inputmode="email" placeholder="email quản trị">
+            </div>
+            <div class="input-group">
+                <label for="adm-pass">Mật khẩu</label>
+                <input type="password" id="adm-pass" name="nca-a2" required autocomplete="new-password" placeholder="mật khẩu">
+            </div>
         </div>
-        <div class="input-group">
-            <label for="adm-pass">Mật khẩu</label>
-            <input type="password" id="adm-pass" name="password" required minlength="6" autocomplete="current-password" placeholder="mật khẩu">
+        <div id="step-totp" hidden>
+            <div class="input-group">
+                <label for="adm-totp">Mã 6 số trong ứng dụng xác thực (Google Authenticator...)</label>
+                <input type="text" id="adm-totp" name="nca-a3" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••">
+            </div>
+        </div>
+        <div id="step-pin" hidden>
+            <div class="input-group">
+                <label for="adm-pin" id="pin-label">Mã PIN quản trị (6-8 số)</label>
+                <input type="password" id="adm-pin" name="nca-a4" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="••••••">
+            </div>
+            <div class="input-group" id="pin-new-box" hidden>
+                <label for="adm-pin2">Nhập lại PIN mới</label>
+                <input type="password" id="adm-pin2" name="nca-a5" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="••••••">
+            </div>
         </div>
         <button type="submit" class="btn-submit" id="adm-btn">Đăng nhập</button>
         <div class="msg" id="adm-msg"></div>
+        <div class="hint">Phiên chỉ tồn tại trong tab này. Đóng tab hoặc rời trang quản trị là phải đăng nhập lại.</div>
     </form>
     <a class="back" href="./index.html">← Về trang chủ</a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
+<script src="admin-auth.js"></script>
 <script>
     const CFG = (window.SITE && window.SITE.supabase) || {};
-    const msg = document.getElementById('adm-msg');
+    const msg = document.getElementById('adm-msg'), btn = document.getElementById('adm-btn');
+    const $ = (id) => document.getElementById(id);
     if (!CFG.url || !CFG.anonKey) {
         msg.textContent = 'Cơ sở dữ liệu chưa được cấu hình. Hãy điền url và anonKey của Supabase trong file config.js.';
-        document.getElementById('adm-btn').disabled = true;
+        btn.disabled = true;
     } else {
-        const client = window.supabase.createClient(CFG.url, CFG.anonKey);
+        // Mỗi lần mở trang đăng nhập là bắt đầu lại từ đầu: xóa mọi phiên cũ còn sót trên máy này
+        NCA_adminWipe(false);
+        const client = NCA_adminClient();
+        let step = 'pass', needSetPin = false, factorId = null;
+        const show = (s) => {
+            step = s;
+            $('step-pass').hidden = s !== 'pass'; $('step-totp').hidden = s !== 'totp'; $('step-pin').hidden = s !== 'pin';
+            $('pin-new-box').hidden = !needSetPin;
+            $('pin-label').textContent = needSetPin ? 'Đặt mã PIN quản trị mới (6-8 số, không dùng số dễ đoán)' : 'Mã PIN quản trị (6-8 số)';
+            btn.textContent = s === 'pass' ? 'Đăng nhập' : (needSetPin ? 'Lưu PIN và vào' : 'Xác nhận');
+            const f = s === 'totp' ? $('adm-totp') : (s === 'pin' ? $('adm-pin') : null); if (f) f.focus();
+        };
+        const fail = async (t) => { msg.textContent = t; btn.disabled = false; };
         const goAdmin = () => window.location.replace('./admin.html');
-        async function isAdmin() { const { data } = await client.auth.getSession(); if (!data || !data.session) return false; const r = await client.rpc('is_admin'); return r.data === true; }
-        // Đã là admin thì vào thẳng; nếu đang là tài khoản khách thì vẫn cho đăng nhập admin (sẽ thay phiên đăng nhập)
-        isAdmin().then((ok) => { if (ok) goAdmin(); });
-        document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('adm-btn');
-            const email = document.getElementById('adm-email').value.trim(), password = document.getElementById('adm-pass').value;
-            if (!email || !password) { msg.textContent = 'Vui lòng nhập đủ email và mật khẩu.'; return; }
-            btn.disabled = true; msg.textContent = '';
-            const { error } = await client.auth.signInWithPassword({ email, password });
-            if (error) { msg.textContent = 'Đăng nhập không thành công: email hoặc mật khẩu chưa đúng.'; btn.disabled = false; return; }
-            if (await isAdmin()) { goAdmin(); return; }
-            await client.auth.signOut();
-            msg.textContent = 'Tài khoản này chưa được cấp quyền quản trị.'; btn.disabled = false;
+        const leave = async (t) => { await client.auth.signOut(); NCA_adminWipe(false); show('pass'); $('adm-pass').value = ''; fail(t); };
+        const mins = (iso) => Math.max(1, Math.ceil((new Date(iso) - Date.now()) / 60000));
+
+        async function afterPassword() {
+            const { data: st } = await client.rpc('admin_status');
+            if (!st || st.admin !== true) return leave('Tài khoản này chưa được cấp quyền quản trị.');
+            // Bước 2: mã xác thực nếu đã đăng ký ứng dụng
+            if (!st.mfa_ok) {
+                const { data: fs } = await client.auth.mfa.listFactors();
+                const f = fs && fs.totp && fs.totp.find((x) => x.status === 'verified');
+                if (f) { factorId = f.id; show('totp'); msg.textContent = ''; btn.disabled = false; return; }
+            }
+            return afterMfa();
+        }
+        async function afterMfa() {
+            const { data: st } = await client.rpc('admin_status');
+            if (!st || st.admin !== true) return leave('Tài khoản này chưa được cấp quyền quản trị.');
+            if (st.pin_ok && st.pin_set) return goAdmin();
+            needSetPin = !st.pin_set;
+            if (!st.pin_set) msg.textContent = 'Lần đầu: hãy đặt mã PIN riêng cho quản trị.';
+            else msg.textContent = '';
+            show('pin'); btn.disabled = false;
+        }
+        $('admin-login-form').addEventListener('submit', async (e) => {
+            e.preventDefault(); btn.disabled = true; msg.textContent = '';
+            try {
+                if (step === 'pass') {
+                    const email = $('adm-email').value.trim(), password = $('adm-pass').value;
+                    if (!email || !password) return fail('Vui lòng nhập đủ email và mật khẩu.');
+                    const { error } = await client.auth.signInWithPassword({ email, password });
+                    $('adm-pass').value = '';
+                    if (error) return fail('Đăng nhập không thành công: email hoặc mật khẩu chưa đúng.');
+                    return afterPassword();
+                }
+                if (step === 'totp') {
+                    const code = $('adm-totp').value.replace(/\D/g, '');
+                    if (code.length !== 6) return fail('Nhập đủ 6 số trong ứng dụng xác thực.');
+                    const ch = await client.auth.mfa.challenge({ factorId });
+                    if (ch.error) return fail('Không tạo được phép thử, hãy thử lại.');
+                    const v = await client.auth.mfa.verify({ factorId, challengeId: ch.data.id, code });
+                    $('adm-totp').value = '';
+                    if (v.error) return fail('Mã chưa đúng hoặc đã hết hạn (mã đổi mỗi 30 giây).');
+                    return afterMfa();
+                }
+                if (step === 'pin') {
+                    const pin = $('adm-pin').value.replace(/\D/g, '');
+                    if (!/^[0-9]{6,8}$/.test(pin)) return fail('PIN gồm 6 đến 8 chữ số.');
+                    if (needSetPin) {
+                        if (pin !== $('adm-pin2').value.replace(/\D/g, '')) return fail('Hai lần nhập PIN chưa giống nhau.');
+                        const { data } = await client.rpc('admin_set_pin', { p_old: null, p_new: pin });
+                        $('adm-pin').value = ''; $('adm-pin2').value = '';
+                        if (data && data.ok) return goAdmin();
+                        return fail(data && data.error === 'weak' ? 'PIN này quá dễ đoán, hãy chọn dãy số khác.' : 'Không đặt được PIN, hãy thử lại.');
+                    }
+                    const { data } = await client.rpc('admin_verify_pin', { p_pin: pin });
+                    $('adm-pin').value = '';
+                    if (data && data.ok) return goAdmin();
+                    if (data && data.locked_until) return leave('Nhập sai quá nhiều lần. Khóa khoảng ' + mins(data.locked_until) + ' phút.');
+                    return fail('PIN chưa đúng' + (data && data.left ? ' (còn ' + data.left + ' lần thử).' : '.'));
+                }
+            } catch (err) { fail('Có lỗi kết nối, hãy thử lại.'); }
         });
     }
 </script>

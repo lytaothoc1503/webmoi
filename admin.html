@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script src="admin-auth.js"></script>
     <script src="phieu.js" defer></script>
     <script src="bieu-mau.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -178,6 +179,7 @@
       <div class="menu-item" onclick="showPage('ledger', this)">📒 Thu Chi</div>
       <div class="menu-item" onclick="showPage('forms', this)">📄 Biểu Mẫu</div>
       <div class="menu-item" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
+      <div class="menu-item" onclick="showPage('security', this)">🔐 Bảo Mật</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
@@ -335,6 +337,24 @@
         </table></div>
       </div>
 
+      <div class="page-section" id="page-security">
+        <div class="top-bar"><h2>Bảo mật đăng nhập quản trị</h2></div>
+        <p class="fin-note">Phiên đăng nhập chỉ nằm trong tab này: đóng tab, tải lại trang, rời trang hoặc để 15 phút không thao tác là tự đăng xuất, máy không giữ lại gì. PIN và mã 2 bước do máy chủ kiểm, không nằm trong code.</p>
+        <div class="table-box" style="padding:18px;max-width:520px">
+          <h3 style="margin-top:0">Đổi mã PIN (6-8 số)</h3>
+          <input type="password" id="sc-old" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="PIN hiện tại" style="width:100%;margin-bottom:8px">
+          <input type="password" id="sc-new" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="PIN mới" style="width:100%;margin-bottom:8px">
+          <input type="password" id="sc-new2" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="Nhập lại PIN mới" style="width:100%;margin-bottom:8px">
+          <button class="btn-export" onclick="changePin()">Đổi PIN</button>
+          <div id="sc-pin-msg" class="fin-note"></div>
+        </div>
+        <div class="table-box" style="padding:18px;max-width:520px;margin-top:16px">
+          <h3 style="margin-top:0">Mã xác thực 2 bước (ứng dụng điện thoại)</h3>
+          <div id="sc-mfa-state" class="fin-note">Đang kiểm tra...</div>
+          <div id="sc-mfa-box"></div>
+        </div>
+      </div>
+
       <!-- ROOMS PAGE -->
       <div class="page-section" id="page-rooms">
         <div class="top-bar">
@@ -402,7 +422,7 @@
         window.location.replace('./index.html');
         throw new Error('Supabase chưa cấu hình');
       }
-      const supabaseClient = window.supabase.createClient(CFG.url, CFG.anonKey);
+      const supabaseClient = NCA_adminClient();
       const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn' };
       const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
@@ -427,6 +447,7 @@
         if (page === 'ledger') loadLedger();
         if (page === 'audit') loadAudit();
         if (page === 'forms') initForms();
+        if (page === 'security') loadSecurity();
       }
 
 
@@ -1053,10 +1074,68 @@
         currentCrudType = '';
       }
 
-      async function logoutAdmin() {
-        await supabaseClient.auth.signOut();
-        window.location.replace('./index.html');
+      // ===== Bảo mật đăng nhập =====
+      const PIN_ERR = { wrong_old: 'PIN hiện tại chưa đúng.', weak: 'PIN mới quá dễ đoán.', format: 'PIN gồm 6 đến 8 chữ số.', locked: 'Đang bị khóa tạm do nhập sai, hãy thử lại sau.' };
+      async function changePin() {
+        const m = document.getElementById('sc-pin-msg'), o = document.getElementById('sc-old').value, n = document.getElementById('sc-new').value;
+        if (n !== document.getElementById('sc-new2').value) { m.textContent = 'Hai lần nhập PIN mới chưa giống nhau.'; return; }
+        const { data } = await supabaseClient.rpc('admin_set_pin', { p_old: o, p_new: n });
+        ['sc-old', 'sc-new', 'sc-new2'].forEach((i) => document.getElementById(i).value = '');
+        m.textContent = data && data.ok ? 'Đã đổi PIN. Các phiên khác (nếu có) phải nhập lại PIN.' : (PIN_ERR[data && data.error] || 'Không đổi được PIN.');
       }
+      async function loadSecurity() {
+        const st = document.getElementById('sc-mfa-state'), box = document.getElementById('sc-mfa-box');
+        box.innerHTML = '';
+        const { data } = await supabaseClient.auth.mfa.listFactors();
+        const f = data && data.totp && data.totp.find((x) => x.status === 'verified');
+        if (f) {
+          st.textContent = '✅ Đã bật mã 2 bước. Mỗi lần đăng nhập cần mã 6 số từ ứng dụng.';
+          box.innerHTML = '<button class="btn-export" style="background:#b91c1c" onclick="mfaOff(\'' + esc(f.id) + '\')">Tắt mã 2 bước</button><p class="fin-note">Mất điện thoại: vào Supabase &gt; Authentication &gt; Users &gt; chọn tài khoản &gt; xóa yếu tố MFA.</p>';
+        } else {
+          st.textContent = '⚠️ Chưa bật. Nên bật để có lớp bảo vệ thứ hai (Google Authenticator, Microsoft Authenticator, Authy...).';
+          box.innerHTML = '<button class="btn-export" onclick="mfaStart()">Bật mã 2 bước</button>';
+        }
+      }
+      async function mfaStart() {
+        const box = document.getElementById('sc-mfa-box');
+        const old = await supabaseClient.auth.mfa.listFactors();
+        for (const x of ((old.data && old.data.all) || [])) if (x.status !== 'verified') await supabaseClient.auth.mfa.unenroll({ factorId: x.id });
+        const { data, error } = await supabaseClient.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Quan tri ' + Date.now() });
+        if (error) { box.innerHTML = '<p class="fin-note">Không bật được: ' + esc(error.message) + '</p>'; return; }
+        box.innerHTML = '<p class="fin-note">1) Mở ứng dụng xác thực, quét mã QR. 2) Nhập mã 6 số hiện ra để xác nhận.</p>'
+          + '<img alt="QR" style="width:180px;height:180px;background:#fff" src="' + esc(data.totp.qr_code) + '">'
+          + '<p class="fin-note">Không quét được? Nhập khóa: <b>' + esc(data.totp.secret) + '</b></p>'
+          + '<input id="sc-code" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="Mã 6 số" style="width:140px"> '
+          + '<button class="btn-export" onclick="mfaConfirm(\'' + esc(data.id) + '\')">Xác nhận</button><div id="sc-mfa-msg" class="fin-note"></div>';
+      }
+      async function mfaConfirm(id) {
+        const code = document.getElementById('sc-code').value.replace(/\D/g, ''), m = document.getElementById('sc-mfa-msg');
+        const ch = await supabaseClient.auth.mfa.challenge({ factorId: id });
+        if (ch.error) { m.textContent = 'Không tạo được phép thử.'; return; }
+        const v = await supabaseClient.auth.mfa.verify({ factorId: id, challengeId: ch.data.id, code });
+        if (v.error) { m.textContent = 'Mã chưa đúng, hãy thử lại.'; return; }
+        loadSecurity();
+      }
+      async function mfaOff(id) {
+        if (!confirm('Tắt mã 2 bước? Tài khoản sẽ kém an toàn hơn.')) return;
+        const { error } = await supabaseClient.auth.mfa.unenroll({ factorId: id });
+        if (error) alert('Không tắt được: ' + error.message);
+        loadSecurity();
+      }
+
+      // ===== Không giữ phiên: rời trang / tải lại / bỏ máy lâu là đăng xuất =====
+      let lastActive = Date.now(), leaving = false;
+      const IDLE_MS = 15 * 60 * 1000;
+      ['click', 'keydown', 'touchstart', 'mousemove'].forEach((e) => window.addEventListener(e, () => { lastActive = Date.now(); }, { passive: true }));
+      async function logoutAdmin(reason) {
+        leaving = true;
+        try { await supabaseClient.rpc('admin_end_session'); await supabaseClient.auth.signOut(); } catch (e) {}
+        NCA_adminWipe(false);
+        window.location.replace(reason === 'idle' ? './auth.html' : './index.html');
+      }
+      setInterval(() => { if (Date.now() - lastActive > IDLE_MS) logoutAdmin('idle'); }, 30000);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastActive > IDLE_MS) logoutAdmin('idle'); });
+      window.addEventListener('pagehide', () => { if (!leaving) NCA_adminWipe(true); });
 
       (async function initAdmin() {
         const { data } = await supabaseClient.auth.getSession();
