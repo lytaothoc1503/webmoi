@@ -96,6 +96,11 @@
     setOut(t);
   };
   window.aiCopy = () => copy(false);
+  window.aiOpen = function (url) {
+    if (!url) return;
+    window.open(url, '_blank', 'noopener');
+    const sel = $('ai-open'); if (sel) sel.value = '';
+  };
   window.aiInit = async function () {
     const bl = bks().slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))).slice(0, 60);
     $('ai-bk').innerHTML = bl.length ? bl.map((b) => `<option value="${esc(b.id)}">${esc((b.booking_code || '?') + ' - ' + clip(b.fullname, 24) + ' - ' + st(b))}</option>`).join('') : '<option value="">Chưa có đơn</option>';

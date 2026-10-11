@@ -11,7 +11,7 @@
     <script src="admin-auth.js"></script>
     <script src="phieu.js" defer></script>
     <script src="bieu-mau.js?v=20261011r" defer></script>
-    <script src="ai-tro-ly.js?v=20261011r" defer></script>
+    <script src="ai-tro-ly.js?v=20261011s" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
     <style>
@@ -346,7 +346,21 @@
         </div>
         <h3 style="font-size:14px;margin:16px 0 6px;color:var(--primary)">Lời nhờ AI (đã tự sao chép khi bạn bấm)</h3>
         <textarea id="ai-out" class="ai-out" rows="9" readonly placeholder="Chọn một việc ở trên..."></textarea>
-        <div class="ai-row"><button class="btn-export" onclick="aiCopy()">Sao chép lại</button><a href="https://gemini.google.com/app" target="_blank" rel="noopener">Mở Gemini</a><a href="https://claude.ai/new" target="_blank" rel="noopener">Mở Claude</a><a href="https://chatgpt.com/" target="_blank" rel="noopener">Mở ChatGPT</a><span class="ai-hint">Sider: bấm biểu tượng Sider trên trình duyệt rồi dán</span><span id="ai-msg" class="ai-hint" role="status"></span></div>
+        <div class="ai-row"><button class="btn-export" onclick="aiCopy()">Sao chép lại</button>
+          <select id="ai-open" onchange="aiOpen(this.value)">
+            <option value="">Mở AI...</option>
+            <option value="https://gemini.google.com/app">Gemini</option>
+            <option value="https://claude.ai/new">Claude</option>
+            <option value="https://chatgpt.com/">ChatGPT</option>
+            <option value="https://copilot.microsoft.com/">Copilot</option>
+            <option value="https://www.perplexity.ai/">Perplexity</option>
+            <option value="https://chat.deepseek.com/">DeepSeek</option>
+            <option value="https://grok.com/">Grok</option>
+          </select>
+          <span class="ai-hint">Sider (tiện ích có sẵn trên trình duyệt): bấm biểu tượng Sider rồi dán</span>
+          <span id="ai-msg" class="ai-hint" role="status"></span>
+        </div>
+        <p class="ai-hint" style="margin-top:4px">Mỗi AI ở trên là một trang web riêng, bạn tự dán và đọc kết quả — chưa thể cho các AI này tự chạy cùng lúc hay nhớ chung dữ liệu với nhau (muốn vậy phải nối bằng khóa API, tốn phí hằng tháng).</p>
       </div>
       <!-- TÀI CHÍNH: NHẬT KÝ -->
       <!-- TÀI CHÍNH: BIỂU MẪU -->
