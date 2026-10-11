@@ -10,6 +10,8 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 - Không ghi mật khẩu, khóa bí mật (`service_role`, Turnstile Secret...) vào code, tài liệu hay chat.
 - Chủ dự án sửa code trên điện thoại bằng github.dev và VS Code; lấy bản mới bằng `.\scripts\dong-bo.ps1` (tự bật pull.rebase + autoStash, giữ thay đổi chưa commit, báo khớp `origin/main`). Trợ lý luôn `git pull --rebase` trước khi sửa và trước khi push, và không để lại file chưa commit.
 
+- VS Code: mở thư mục `webmoi`, cài tiện ích **Claude Code** (gợi ý sẵn trong `.vscode/extensions.json`), dùng terminal PowerShell (không dùng terminal Kali của dev-container). Ctrl+Shift+P > Tasks: Run Task > "Đồng bộ GitHub" hoặc "Kiểm tra web".
+
 ## Kiến trúc
 - Web tĩnh (HTML/CSS/JS thuần, không framework) chạy trên **GitHub Pages**: https://lytaothoc1503.github.io/webmoi/ (đẩy lên `main` là web tự cập nhật sau 1-3 phút).
 - **Supabase** (project `hkfprewiprdztmdcoxzz`): Postgres + RLS (bật trên cả 7 bảng), Auth, Edge Function `customer-signup`.

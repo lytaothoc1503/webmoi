@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Đồng bộ GitHub",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File ./scripts/dong-bo.ps1",
+            "problemMatcher": []
+        },
+        {
+            "label": "Kiểm tra web",
+            "type": "shell",
+            "command": "node scripts/kiem-tra.js",
+            "problemMatcher": []
+        }
+    ]
+}
