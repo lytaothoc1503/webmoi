@@ -96,7 +96,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 - **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`. Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
 
 ## Việc còn lại (nhắc chủ dự án khi phù hợp)
-0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`); ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
+0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`): chủ dự án nói tên là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không, và đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại vào thứ Sáu 16/10; CHƯA điền, chờ chữ chính xác; ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
 1. Giá thật phòng/tour/dịch vụ (đang là giá tạm trong `data.js`).
 2. Ảnh thật phòng Gia Đình và Dorm (đang dùng ảnh thư viện làm ảnh tạm).
 3. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
