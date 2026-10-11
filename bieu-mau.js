@@ -185,13 +185,36 @@
     return m;
   };
   const newCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = 'NA'; for (let i = 0; i < 8; i++) c += a[Math.floor(Math.random() * a.length)]; return c; };
+  const payloadOf = () => { const f = state.f; return { fullname: String(f.b_ten || '').trim().slice(0, 80), phone: String(f.b_sdt || '').replace(/[^\d+]/g, '').slice(0, 20), room: String(f.phong || '').trim().slice(0, 120), checkin: f.nhan, checkout: f.tra, guests: String(f.khach || '').slice(0, 100) || null, total_price: Math.round(Number(f.tien)) }; };
+  const diffOf = (b) => {
+    const p = payloadOf(), L = { fullname: 'họ tên', phone: 'SĐT', room: 'hạng phòng', checkin: 'ngày nhận', checkout: 'ngày trả', guests: 'số khách', total_price: 'số tiền' };
+    return Object.keys(L).filter((k) => String(p[k] ?? '') !== String(b[k] ?? '') && !(k === 'guests' && !p[k] && !b[k])).map((k) => L[k]);
+  };
+  window.updateBookingFromForm = async function (id) {
+    const btn = $('fm-upd'), out = $('fm-sync-msg'); if (!btn || missing().length) return;
+    btn.disabled = true; out.textContent = 'Đang cập nhật...';
+    try {
+      const b = (typeof allBookings !== 'undefined' ? allBookings : []).find((x) => x.id === id); if (!b) { out.textContent = 'Không thấy đơn, hãy tải lại trang.'; return; }
+      const ses = await supabaseClient.auth.getSession(), who = (ses.data && ses.data.session && ses.data.session.user && ses.data.session.user.email) || 'quản trị';
+      const tag = '[Sửa từ Biểu Mẫu bởi ' + who + ' lúc ' + fmtT(new Date().toISOString()) + ']';
+      const keep = String(b.notes || '').slice(0, 500 - tag.length - 1);
+      const patch = Object.assign(payloadOf(), { notes: (keep ? keep + ' ' : '') + tag });
+      const r = await supabaseClient.from('bookings').update(patch).eq('id', id).select().single();
+      if (r.error) { out.textContent = 'Không cập nhật được: ' + (r.error.message || 'lỗi'); btn.disabled = false; return; }
+      Object.assign(b, r.data || patch);
+      if (typeof loadBookings === 'function') loadBookings();
+      render();
+    } catch (e) { out.textContent = 'Có lỗi kết nối, hãy thử lại.'; btn.disabled = false; }
+  };
   function renderSync() {
     const box = $('fm-sync'); if (!box) return;
     if (!state.tpl.fields.includes('phong')) { box.innerHTML = ''; return; }
     const b = findBooking(), base2 = location.origin + location.pathname.replace(/[^/]*$/, '');
     if (b) {
       const via = /^\[Tạo từ Biểu Mẫu/.test(b.notes || '') ? ' ' + esc2(String(b.notes).split(']')[0].replace('[', '')) + '.' : '';
-      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.</div>';
+      const diff = diffOf(b), miss2 = missing();
+      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.</div>'
+        + (diff.length ? '<div class="fm-sync warn"><b>⚠️ Phiếu đang khác hệ thống</b>: ' + esc2(diff.join(', ')) + '. Khách sẽ chỉ thấy dữ liệu trong hệ thống cho đến khi bạn cập nhật.<div class="fm-sync-row"><button class="btn-export" id="fm-upd"' + (miss2.length ? ' disabled' : '') + ' onclick="updateBookingFromForm(\'' + esc2(b.id) + '\')">Cập nhật đơn theo phiếu này</button></div>' + (miss2.length ? '<small>Còn thiếu: ' + esc2(miss2.join(', ')) + '.</small>' : '') + '<div id="fm-sync-msg"></div></div>' : '');
       return;
     }
     const miss = missing();
