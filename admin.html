@@ -438,6 +438,8 @@
       const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
       const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn' };
       const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
+      // Số tiền ĐÃ THU thật: admin nhập khi xác nhận (received_amount); đơn cũ chưa có thì dùng giá đơn.
+      const paidOf = (b) => Number(b.received_amount != null ? b.received_amount : b.total_price) || 0;
 
       let allBookings = [];
       let revenueChart = null;
@@ -476,18 +478,17 @@
         document.getElementById('rc-wait').textContent = waiting.length;
         document.getElementById('rc-wait-sum').textContent = vnd(waiting.reduce((a, b) => a + Number(b.total_price || 0), 0));
         document.getElementById('rc-ok').textContent = ok.length;
-        document.getElementById('rc-ok-sum').textContent = vnd(ok.reduce((a, b) => a + Number(b.total_price || 0), 0));
+        document.getElementById('rc-ok-sum').textContent = vnd(ok.reduce((a, b) => a + paidOf(b), 0));
         const order = { [ST.PAID]: 0, [ST.WAIT]: 1, [ST.OK]: 2, [ST.DONE]: 3 };
         rows.sort((a, b) => order[normStatus(a.status)] - order[normStatus(b.status)]);
         document.getElementById('recon-tbody').innerHTML = rows.map(b => {
           const st = normStatus(b.status);
           const act = st === ST.PAID ? `<button class="btn-add" onclick="reconOk('${esc(b.id)}')">Đã nhận tiền</button>` : st === ST.WAIT ? '<small>Chờ khách chuyển</small>' : '✓';
           const slipBtn = st === ST.PAID || st === ST.OK || st === ST.DONE ? ` <button class="btn-export" onclick="openFormsFor('${esc(b.id)}')">Phiếu / Gửi khách</button>` : '';
-          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
+          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}${b.received_amount != null && Number(b.received_amount) !== Number(b.total_price) ? `<br><small>Thực nhận: ${esc(vnd(b.received_amount))}</small>` : ''}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
         }).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có đơn</td></tr>';
       }
       async function reconOk(id) {
-        if (!confirm('Xác nhận đã nhận đủ tiền của đơn này?')) return;
         await setStatus(id, ST.OK);
       }
 
@@ -497,7 +498,7 @@
         refundsData = data || [];
         const sel = document.getElementById('rf-code');
         const refundable = allBookings.filter(b => b.confirmed_at || [ST.OK, ST.DONE].includes(normStatus(b.status)));
-        sel.innerHTML = '<option value="">' + (refundable.length ? 'Chọn đơn đã nhận tiền...' : 'Chưa có đơn nào đã xác nhận nhận tiền') + '</option>' + refundable.map(b => `<option value="${esc(b.booking_code)}" data-amt="${Number(b.total_price || 0)}">${esc(b.booking_code)} - ${esc(b.fullname)} (${esc(normStatus(b.status))})</option>`).join('');
+        sel.innerHTML = '<option value="">' + (refundable.length ? 'Chọn đơn đã nhận tiền...' : 'Chưa có đơn nào đã xác nhận nhận tiền') + '</option>' + refundable.map(b => `<option value="${esc(b.booking_code)}" data-amt="${paidOf(b)}">${esc(b.booking_code)} - ${esc(b.fullname)} (${esc(normStatus(b.status))})</option>`).join('');
         sel.onchange = () => { const o = sel.selectedOptions[0]; if (o && o.dataset.amt) document.getElementById('rf-amount').value = o.dataset.amt; checkRefundCode(); };
         document.getElementById('rf-wait').textContent = refundsData.filter(r => r.status === 'Chờ xử lý').length;
         document.getElementById('rf-done-sum').textContent = vnd(refundsData.filter(r => r.status === 'Đã hoàn').reduce((a, r) => a + Number(r.amount), 0));
@@ -518,7 +519,7 @@
         if (!code || !(amount > 0)) { alert('Chọn đơn và nhập số tiền hoàn.'); return; }
         if (!codeCheck) { alert('Nhập mã booking trên Phiếu xác nhận của khách để đối chiếu.'); return; }
         if (codeCheck !== String(code).toUpperCase()) { alert('Mã booking trên phiếu (' + codeCheck + ') KHÔNG trùng với đơn đang chọn (' + code + '). Chưa tạo yêu cầu hoàn. Hãy kiểm tra lại với khách.'); checkRefundCode(); return; }
-        if (b && amount > Number(b.total_price || 0)) { alert('Số tiền hoàn không được vượt số đã thu (' + vnd(b.total_price) + ').'); return; }
+        if (b && amount > paidOf(b)) { alert('Số tiền hoàn không được vượt số đã thu (' + vnd(paidOf(b)) + ').'); return; }
         if (bank.length < 2 || !/^\d{6,20}$/.test(acc) || name.length < 2 || !reason) { alert('Nhập đủ ngân hàng, số tài khoản (6-20 số), tên chủ tài khoản và lý do.'); return; }
         const { error } = await supabaseClient.from('refunds').insert({ booking_code: code, amount, reason: reason + ' | Đã đối chiếu mã booking trên phiếu: khớp', bank_name: bank, account_no: acc, account_name: name });
         if (error) { alert('Lỗi: ' + error.message); return; }
@@ -602,7 +603,7 @@
         entriesData = e.data || []; refundsData = r.data || [];
         const mk = new Date().toISOString().slice(0, 7);
         const inMonth = (d) => String(d).slice(0, 7) === mk;
-        const bookingIn = allBookings.filter(b => isRevenue(b) && inMonth(b.created_at)).reduce((a, b) => a + Number(b.total_price || 0), 0);
+        const bookingIn = allBookings.filter(b => isRevenue(b) && inMonth(b.created_at)).reduce((a, b) => a + paidOf(b), 0);
         const thu = bookingIn + entriesData.filter(x => x.kind === 'thu' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
         const chi = entriesData.filter(x => x.kind === 'chi' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
         const ref = refundsData.filter(x => x.status === 'Đã hoàn' && inMonth(x.done_at || x.created_at)).reduce((a, x) => a + Number(x.amount), 0);
@@ -613,7 +614,7 @@
         el.textContent = vnd(net); el.style.color = net >= 0 ? 'var(--green)' : '#b91c1c';
         const mm = {};
         const slot = (k) => (mm[k] = mm[k] || { t: 0, c: 0, h: 0 });
-        allBookings.filter(isRevenue).forEach(b => { slot(String(b.created_at).slice(0, 7)).t += Number(b.total_price || 0); });
+        allBookings.filter(isRevenue).forEach(b => { slot(String(b.created_at).slice(0, 7)).t += paidOf(b); });
         entriesData.forEach(x => { const m = slot(String(x.entry_date).slice(0, 7)); if (x.kind === 'thu') m.t += Number(x.amount); else m.c += Number(x.amount); });
         refundsData.filter(x => x.status === 'Đã hoàn').forEach(x => { slot(String(x.done_at || x.created_at).slice(0, 7)).h += Number(x.amount); });
         document.getElementById('month-tbody').innerHTML = Object.keys(mm).sort().reverse().slice(0, 12).map(k => `<tr><td>${esc(k)}</td><td>${esc(vnd(mm[k].t))}</td><td>${esc(vnd(mm[k].c))}</td><td>${esc(vnd(mm[k].h))}</td><td><strong>${esc(vnd(mm[k].t - mm[k].c - mm[k].h))}</strong></td></tr>`).join('') || '<tr><td colspan="5" style="text-align:center;color:#888">Chưa có số liệu</td></tr>';
@@ -688,7 +689,7 @@
           const st = normStatus(b.status);
           if (st === ST.WAIT) wait++;
           if (st === ST.PAID) paid++;
-          if (st === ST.OK || st === ST.DONE) { ok++; revenue += Number(b.total_price || 0); }
+          if (st === ST.OK || st === ST.DONE) { ok++; revenue += paidOf(b); }
         });
         document.getElementById('stat-total').textContent = allBookings.length;
         document.getElementById('stat-wait').textContent = wait;
@@ -733,7 +734,7 @@
             const d = new Date(b.created_at);
             const key = String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
             if (!months[key]) months[key] = { revenue: 0, count: 0 };
-            months[key].revenue += Number(b.total_price || 0);
+            months[key].revenue += paidOf(b);
             months[key].count += 1;
           }
         });
@@ -768,8 +769,20 @@
         if (status === ST.CANCEL && !confirm('Hủy đơn này?')) return;
         const patch = { status };
         if (status === ST.PAID) patch.paid_at = new Date().toISOString();
-        if (status === ST.OK) patch.confirmed_at = new Date().toISOString();
-        const { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
+        if (status === ST.OK) {
+          // Ghi SỐ TIỀN THỰC NHẬN (đối chiếu sao kê ngân hàng), không dùng giá khách gửi lên: hoàn trả bị giới hạn theo số này.
+          const bk = allBookings.find(x => x.id === id) || {};
+          const def = bk.received_amount != null ? bk.received_amount : (bk.total_price || 0);
+          const v = prompt('Số tiền THỰC NHẬN trong tài khoản (đ). Giá đơn: ' + vnd(bk.total_price || 0), String(def));
+          if (v === null) return;
+          const n = Math.round(Number(String(v).replace(/[^\d]/g, '')));
+          if (!Number.isFinite(n) || n < 0 || n > 100000000) { alert('Số tiền không hợp lệ.'); return; }
+          if (n !== Number(bk.total_price || 0) && !confirm('Số thực nhận (' + vnd(n) + ') KHÁC giá đơn (' + vnd(bk.total_price || 0) + '). Vẫn xác nhận?')) return;
+          patch.confirmed_at = new Date().toISOString();
+          patch.received_amount = n;
+        }
+        let { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
+        if (error && /received_amount/.test(error.message || '')) { delete patch.received_amount; ({ error } = await supabaseClient.from('bookings').update(patch).eq('id', id)); }   // CSDL chưa có cột (chưa chạy SQL) thì vẫn xác nhận được
         if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
         loadBookings();
       }
