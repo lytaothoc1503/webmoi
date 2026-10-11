@@ -781,6 +781,7 @@
           const def = bk.received_amount != null ? bk.received_amount : (bk.total_price || 0);
           const v = prompt('Số tiền THỰC NHẬN trong tài khoản (đ). Giá đơn: ' + vnd(bk.total_price || 0), String(def));
           if (v === null) return;
+          if (!/\d/.test(String(v))) { alert('Hãy nhập số tiền (chỉ chữ số).'); return; }
           const n = Math.round(Number(String(v).replace(/[^\d]/g, '')));
           if (!Number.isFinite(n) || n < 0 || n > 100000000) { alert('Số tiền không hợp lệ.'); return; }
           if (n !== Number(bk.total_price || 0) && !confirm('Số thực nhận (' + vnd(n) + ') KHÁC giá đơn (' + vnd(bk.total_price || 0) + '). Vẫn xác nhận?')) return;
