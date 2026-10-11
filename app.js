@@ -346,6 +346,13 @@ const STMSG = {
   [ST.DONE]: 'Cảm ơn bạn đã ở cùng Nhà của An. Hẹn gặp lại bạn!',
   [ST.CANCEL]: 'Đơn này đã được hủy. Cần hỗ trợ, bạn hãy liên hệ nhà qua Facebook.',
 };
+const NEXT = {
+  [ST.WAIT]: 'Chuyển khoản đúng số tiền và nội dung là mã đơn, rồi bấm "Tôi đã chuyển khoản". Chưa sẵn sàng, bạn cứ nhắn nhà, chưa mất phí gì.',
+  [ST.PAID]: 'Chờ nhà đối chiếu giao dịch. Gửi ảnh chụp giao dịch kèm mã đơn qua Facebook để nhà xác nhận nhanh hơn.',
+  [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, mang CCCD/hộ chiếu của các khách để nhà làm thủ tục lưu trú. Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
+  [ST.DONE]: 'Bạn có thể viết đánh giá để giúp khách sau chọn phòng dễ hơn.',
+  [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, xem chính sách hoàn hủy hoặc nhắn nhà kèm mã đơn. Tiền hoàn về đúng tài khoản bạn cung cấp và có biên bản xác nhận.',
+};
 const vdate = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s.split('-').reverse().join('/') : s || '');
 function newCode() {
   const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = new Uint32Array(8);
@@ -484,6 +491,7 @@ function orderCard(o, opt) {
   const act = [];
   if (st === ST.WAIT) act.push(`<button class="oc-btn primary" data-act="pay" data-code="${c}">Tiếp tục thanh toán</button>`);
   if (st === ST.WAIT || st === ST.PAID || st === ST.OK) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
+  if ((st === ST.OK || st === ST.DONE) && window.NCA_slip) act.unshift(`<button class="oc-btn primary" data-act="slip" data-code="${c}">Xem / in phiếu xác nhận</button>`);
   if (st === ST.OK || st === ST.DONE) {
     if (o.review === 'published') act.push('<span class="oc-chip ok">Đánh giá của bạn đã hiển thị ✓</span>');
     else if (o.review === 'pending') act.push('<span class="oc-chip">Đánh giá đang chờ nhà duyệt</span>');
@@ -494,6 +502,7 @@ function orderCard(o, opt) {
   return `<div class="oc ${cancel ? 'is-cancel' : ''}"><div class="oc-head"><div><strong class="oc-code">${c}</strong><small>${esc(vdate((o.created || '').slice(0, 10)))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
     <div class="oc-body"><strong>${esc(o.room)}</strong><br>${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))}${o.guests ? ' · ' + esc(o.guests) : ''} · ${Number(o.total) > 0 ? Number(o.total).toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}</div>
     ${cancel ? '' : `<ol class="oc-steps">${steps}</ol>`}
+    ${NEXT[st] ? `<p class="oc-note oc-next"><strong>Bước tiếp theo:</strong> ${esc(NEXT[st])}${st === ST.CANCEL ? ' <a href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">Chính sách hoàn hủy</a>' : ''}</p>` : ''}
     <p class="oc-note">${esc(note)}${o.note ? '<br><em>Nhà nhắn: ' + esc(o.note) + '</em>' : ''}</p>
     <div class="oc-actions">${act.join('')}</div></div>`;
 }
@@ -548,11 +557,22 @@ function onOrderAction(e) {
   if (act === 'pay') openOrderView(o);
   else if (act === 'fb') sendViaFacebook(o);
   else if (act === 'review') openReview(o);
+  else if (act === 'slip') openPhieu(o);
   else if (act === 'remove' && confirm('Xóa đơn này khỏi lịch sử trên thiết bị? (Đơn vẫn được lưu ở nhà)')) { setLocal(getLocal().filter((x) => x.code !== o.code)); renderHistory(); }
 }
 $('order-history').addEventListener('click', onOrderAction);
 $('track-result').addEventListener('click', onOrderAction);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshHistory(); });
+
+/* ===== PHIẾU XÁC NHẬN (khách xem, in, lưu PDF) ===== */
+function openPhieu(o) {
+  let m = document.getElementById('phieu-modal');
+  if (!m) { m = document.createElement('div'); m.id = 'phieu-modal'; m.className = 'modal-overlay'; document.body.appendChild(m); m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-p="close"]')) m.classList.remove('active'); if (e.target.closest('[data-p="print"]')) window.NCA_printLand('print-phieu');
+  }); }
+  const st = normStatus(o.status), paid = st === ST.OK || st === ST.DONE ? Number(o.total) || 0 : 0;
+  m.innerHTML = `<div class="modal-box" style="max-width:1100px;padding:14px;background:#fff"><span class="modal-close" data-p="close">&times;</span><div style="overflow:auto">${window.NCA_slip({ code: o.code, tcode: o.tcode, name: o.name, phone: o.phone || '', guests: o.guests, room: o.room, checkin: o.checkin, checkout: o.checkout, total: o.total, paid, nowStep: st === ST.DONE ? 3 : 2 })}</div><div style="text-align:center;margin-top:12px"><button type="button" class="oc-btn primary" data-p="print">In / Lưu PDF</button> <button type="button" class="oc-btn" data-p="close">Đóng</button></div></div>`;
+  m.classList.add('active');
+}
 
 /* ===== VIẾT ĐÁNH GIÁ (sau khi đặt phòng thành công; hiện lên web khi nhà duyệt) ===== */
 let reviewFor = null, reviewRating = 5;
@@ -584,4 +604,6 @@ async function submitReview() {
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
   syncLodgingPrice(); populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
+  const ma = (new URLSearchParams(location.search).get('ma') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (ma) { $('track-code').value = ma; await trackOrder(); $('tra-cuu-don').scrollIntoView(); }
 })();

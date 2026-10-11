@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script src="phieu.js" defer></script>
     <script src="bieu-mau.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
@@ -141,20 +142,8 @@
         .menu-item { flex-shrink: 0; white-space: nowrap; font-size: 12px; padding: 9px 12px; margin: 0; text-align: center; }
         main { padding: 14px; }
       }
-      .slip-ov { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: none; align-items: center; justify-content: center; z-index: 999; padding: 16px; overflow: auto; }
-      .slip-ov.open { display: flex; }
-      .slip { background: #fff; width: 100%; max-width: 560px; border: 3px double var(--primary); border-radius: 6px; padding: 28px 30px; position: relative; }
-      .slip h3 { text-align: center; color: var(--primary); letter-spacing: .06em; font-size: 17px; margin-bottom: 4px; }
-      .slip .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 16px; }
-      .slip .rows { margin-bottom: 14px; font-size: 13px; } .slip .r { display: flex; gap: 12px; justify-content: space-between; padding: 7px 2px; border-bottom: 1px dashed var(--border); } .slip .r span { color: var(--muted); flex: 0 0 42%; } .slip .r b { text-align: right; word-break: break-word; }
-      .slip .sign { display: flex; gap: 12px; margin-top: 18px; text-align: center; font-size: 12px; } .slip .sign div { flex: 1; } .slip .sign b { display: block; min-height: 54px; margin-top: 4px; }
-      .slip .sign input { width: 100%; border: 0; border-bottom: 1px solid #999; text-align: center; font: inherit; margin-top: 30px; padding: 4px; }
-      .slip .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
       @media print {
-        body.print-slip > *:not(.slip-ov) { display: none !important; }
-        body.print-slip .slip-ov { position: static; background: none; display: block; padding: 0; }
-        .slip .acts { display: none; } .slip { border-width: 3px; margin: 0 auto; } .slip .sign input { border-bottom: 1px solid #333; }
-        body.print-doc aside, body.print-doc .slip-ov, body.print-doc .no-print { display: none !important; }
+        body.print-doc aside, body.print-doc .no-print { display: none !important; }
         body.print-doc main { padding: 0; } body.print-doc .page-section { display: none !important; } body.print-doc #page-forms { display: block !important; }
         body.print-doc { background: #fff; display: block; } body.print-doc .dpaper { box-shadow: none; border: 0; padding: 0; max-width: none; }
       }
@@ -165,6 +154,11 @@
       .dpaper * { font-family: inherit; } .dpaper p { margin: 6px 0; text-align: justify; } .dpaper .dp-c { text-align: center; }
       .dp-qh { text-align: center; font-size: 14px; line-height: 1.5; margin-bottom: 14px; } .dp-title { text-align: center; font-size: 19px; margin: 10px 0 6px; }
       .dp-sign { display: flex; justify-content: space-between; text-align: center; margin: 22px 0 70px; gap: 20px; } .dp-sign > div { flex: 1; }
+      .dpaper.is-land { max-width: 1100px; padding: 0; background: none; box-shadow: none; } .dp-page + .dp-page { margin-top: 28px; padding-top: 28px; border-top: 2px dashed #bbb; }
+      .dp-page.dp-land { margin-left: -56px; margin-right: -56px; }
+      .fm-msgs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 18px; } .fm-msg { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px; } .fm-msg b { display: block; font-size: 12px; margin-bottom: 6px; color: var(--primary); } .fm-msg textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px; font: inherit; font-size: 12.5px; resize: vertical; margin-bottom: 6px; }
+      @media print { .dp-page { break-after: page; } .dp-page:last-child { break-after: auto; } .dp-page + .dp-page { border: 0; margin: 0; padding: 0; } .dp-page.dp-land { margin: 0; } body.print-doc .dpaper.is-land { max-width: none; } }
+      @media (max-width: 768px) { .dp-page.dp-land { margin-left: -16px; margin-right: -16px; } }
       @media (max-width: 768px) { .dpaper { padding: 22px 16px; font-size: 14px; } }
     </style>
   </head>
@@ -320,6 +314,8 @@
         <div class="fm-bar no-print"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
         <p class="fin-note no-print" id="fm-note"></p>
         <div class="fm-grid no-print" id="fm-fields"></div>
+        <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--primary)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
+        <div class="fm-msgs no-print" id="fm-msg"></div>
         <div class="dpaper" id="fm-preview"></div>
       </div>
 
@@ -446,24 +442,10 @@
         document.getElementById('recon-tbody').innerHTML = rows.map(b => {
           const st = normStatus(b.status);
           const act = st === ST.PAID ? `<button class="btn-add" onclick="reconOk('${esc(b.id)}')">Đã nhận tiền</button>` : st === ST.WAIT ? '<small>Chờ khách chuyển</small>' : '✓';
-          const slipBtn = st === ST.PAID || st === ST.OK || st === ST.DONE ? ` <button class="btn-export" onclick="openSlip('${esc(b.id)}')">Phiếu</button>` : '';
+          const slipBtn = st === ST.PAID || st === ST.OK || st === ST.DONE ? ` <button class="btn-export" onclick="openFormsFor('${esc(b.id)}')">Phiếu / Gửi khách</button>` : '';
           return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
         }).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có đơn</td></tr>';
       }
-      function openSlip(id) {
-        const b = allBookings.find(x => x.id === id); if (!b) return;
-        const S = window.SITE || {}, f = (d) => d ? new Date(d).toLocaleString('vi-VN') : '—';
-        const rows = [['Mã đơn', b.booking_code], ['Khách đặt', b.fullname + ' · ' + b.phone], ['Hạng phòng', b.room], ['Nhận phòng - Trả phòng', (b.checkin || '—') + ' → ' + (b.checkout || '—')], ['Số tiền', vnd(b.total_price)], ['Nội dung chuyển khoản', b.transfer_code || '—'], ['Ngày giờ đặt', f(b.created_at)], ['Ngày giờ báo thanh toán', f(b.paid_at)], ['Ngày giờ xác nhận', f(b.confirmed_at)], ['Trạng thái', normStatus(b.status)], ['Đơn vị nhận tiền', S.name || 'Nhà của An Homestay Tà Xùa']];
-        document.getElementById('slip-body').innerHTML = rows.map(r => `<div class="r"><span>${esc(r[0])}</span><b>${esc(r[1] || '—')}</b></div>`).join('');
-        document.getElementById('slip-date').textContent = 'Lập ngày ' + new Date().toLocaleDateString('vi-VN');
-        document.getElementById('slip-ov').classList.add('open');
-      }
-      function printSlip() {
-        document.body.classList.add('print-slip');
-        const done = () => { document.body.classList.remove('print-slip'); window.removeEventListener('afterprint', done); };
-        window.addEventListener('afterprint', done); window.print();
-      }
-      function closeSlip() { document.getElementById('slip-ov').classList.remove('open'); }
       async function reconOk(id) {
         if (!confirm('Xác nhận đã nhận đủ tiền của đơn này?')) return;
         await setStatus(id, ST.OK);
@@ -1070,12 +1052,5 @@
         supabaseClient.channel('bookings-changes').on('postgres_changes', { event: '*', schema: 'public', table: 'bookings' }, () => loadBookings()).subscribe();
       })();
     </script>
-  <div class="slip-ov" id="slip-ov"><div class="slip">
-      <h3>PHIẾU XÁC NHẬN ĐẶT PHÒNG &amp; THANH TOÁN</h3>
-      <div class="sub">Hệ Thống Đối soát &amp; Xử lý Hoàn trả · <span id="slip-date"></span></div>
-      <div class="rows" id="slip-body"></div>
-      <div class="sign"><div>Người lập phiếu<input placeholder="Họ tên" maxlength="60" /></div><div>Kế toán / người xác nhận<input placeholder="Họ tên (nếu có)" maxlength="60" /></div></div>
-      <div class="acts"><button class="btn-export" onclick="closeSlip()">Đóng</button><button class="btn-add" onclick="printSlip()">In / Lưu PDF</button></div>
-    </div></div>
   </body>
 </html>
