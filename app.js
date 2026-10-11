@@ -1,5 +1,8 @@
 /* Nhà của An Homestay Tà Xùa — logic trang chủ */
 const S = window.SITE, D = window.SITE_DATA, C = S.contacts;
+
+// Đo lượt xem bằng Cloudflare Web Analytics (không cookie). Chỉ chạy khi config.js có analyticsToken.
+(function () { const t = S.analyticsToken; if (!t || !/^[a-f0-9]{32}$/i.test(t)) return; const s = document.createElement('script'); s.defer = true; s.src = 'https://static.cloudflareinsights.com/beacon.min.js'; s.setAttribute('data-cf-beacon', JSON.stringify({ token: t })); document.head.appendChild(s); })();
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const safeUrl = (u) => (/^(https?:\/\/|images\/|\.\/)/.test(u || '') ? u : '');
