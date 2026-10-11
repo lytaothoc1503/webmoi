@@ -38,7 +38,7 @@
     ma: ['Mã đơn', 'text'], phong: ['Hạng phòng', 'text'], nhan: ['Ngày nhận phòng', 'text'], tra: ['Ngày trả phòng', 'text'],
     tien: ['Số tiền (đ)', 'number'], lydo: ['Lý do', 'text'], hinhthuc: ['Hình thức giao nhận', 'text'],
     nh: ['Ngân hàng nhận', 'text'], stk: ['Số tài khoản nhận', 'text'], ctk: ['Tên chủ tài khoản', 'text'],
-    khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Đã thanh toán / đã cọc (đ)', 'number'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
+    ma_phieu: ['Mã booking trên phiếu khách xuất trình (đối chiếu)', 'text'], khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Đã thanh toán / đã cọc (đ)', 'number'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
     c_ten: ['Người được ủy quyền: họ tên', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text']
   };
 
@@ -53,6 +53,11 @@
     <p>Địa chỉ: ${dots(f.b_dc, 36)}; điện thoại: ${dots(f.b_sdt, 12)}</p>`;
   const sign2 = (l, r) => `<div class="dp-sign"><div><b>${l}</b><br><i>(Ký, ghi rõ họ tên)</i></div><div><b>${r}</b><br><i>(Ký, ghi rõ họ tên)</i></div></div>`;
   const sign1 = (l) => `<div class="dp-sign"><div></div><div><b>${l}</b><br><i>(Ký, ghi rõ họ tên)</i></div></div>`;
+  const chk = (f) => {
+    const a = String(f.ma_phieu || '').trim().toUpperCase(), m = String(f.ma || '').trim().toUpperCase();
+    if (!a) return '<p>Đối chiếu mã booking: mã trên Phiếu xác nhận do khách xuất trình ' + dots('', 12) + ' ☐ trùng khớp ☐ không trùng khớp với mã trên hệ thống.</p>';
+    return a === m ? '<p>Đối chiếu mã booking: mã trên Phiếu xác nhận do khách xuất trình là <b>' + esc2(a) + '</b>, <b>trùng khớp</b> với mã trên hệ thống.</p>' : '<p style="color:#b91c1c"><b>CẢNH BÁO: mã trên phiếu khách xuất trình (' + esc2(a) + ') KHÔNG trùng với mã đơn (' + esc2(m || '—') + '). Chưa được hoàn tiền, cần kiểm tra lại.</b></p>';
+  };
   const booking = (f) => `đơn đặt phòng mã ${dots(f.ma, 10)}, hạng phòng ${dots(f.phong, 12)}, từ ngày ${dots(f.nhan, 10)} đến ngày ${dots(f.tra, 10)}`;
   const bank = (f) => `Chuyển khoản vào tài khoản số ${dots(f.stk, 16)} tại ngân hàng ${dots(f.nh, 14)}, chủ tài khoản ${dots(f.ctk, 18)}`;
 
@@ -61,24 +66,25 @@
       fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'coc', 'b_cccd', 'ghichu'],
       body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2 }) },
     { id: 'bb-hoan-coc', group: 'Hoàn trả', name: 'Biên bản hoàn trả tiền đặt cọc (đầy đủ)', note: 'Hai bên ký, dùng khi hoàn cọc/hoàn tiền cho khách.',
-      fields: ['ngay', 'diadiem', 'so', 'a_ten', 'a_cccd', 'a_dc', 'a_sdt', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc', 'nh', 'stk', 'ctk'],
+      fields: ['ma_phieu', 'ngay', 'diadiem', 'so', 'a_ten', 'a_cccd', 'a_dc', 'a_sdt', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc', 'nh', 'stk', 'ctk'],
       body: (f) => `${head(f, 'BIÊN BẢN HOÀN TRẢ TIỀN ĐẶT CỌC')}
         <p><i>${when(f)}, chúng tôi gồm:</i></p>${partyA(f, 'BÊN NHẬN TIỀN ĐẶT CỌC')}${partyB(f, 'BÊN GIAO TIỀN ĐẶT CỌC')}
         <p>Hai bên đã thống nhất lập Biên bản hoàn trả tiền đặt cọc đối với ${booking(f)}, với nội dung như sau:</p>
         <p>1. Bên A hoàn trả lại cho Bên B số tiền đặt cọc là: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 30)}).</p>
+        ${chk(f)}
         <p>2. Lý do hoàn trả: ${dots(f.lydo, 40)}.</p>
         <p>3. Hình thức giao nhận: ${dots(f.hinhthuc, 20)}. ${f.stk ? bank(f) + '.' : ''}</p>
         <p>4. Bên B xác nhận đã nhận đủ số tiền nêu trên. Kể từ thời điểm này, hai bên không còn quyền và nghĩa vụ nào liên quan đến khoản tiền đặt cọc này và không khiếu nại gì thêm.</p>
         <p>5. Biên bản được lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản.</p>${sign2('BÊN A (Bên nhận tiền đặt cọc)', 'BÊN B (Bên giao tiền đặt cọc)')}` },
 
     { id: 'bb-hoan-coc-gon', group: 'Hoàn trả', name: 'Biên bản hoàn trả tiền (bản gọn)', note: 'Một trang ngắn, dùng cho đơn nhỏ.',
-      fields: ['ngay', 'diadiem', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'tien', 'lydo', 'hinhthuc'],
+      fields: ['ma_phieu', 'ngay', 'diadiem', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'tien', 'lydo', 'hinhthuc'],
       body: (f) => `${head(f, 'BIÊN BẢN HOÀN TRẢ TIỀN')}
         <p><i>${when(f)}.</i></p>
         <p>Bên hoàn trả: <b>Nhà của An Homestay Tà Xùa</b>, đại diện ${dots(f.a_ten, 20)}.</p>
         <p>Bên nhận hoàn: Ông/Bà ${dots(f.b_ten, 22)}; điện thoại ${dots(f.b_sdt, 12)}.</p>
         <p>Nội dung: hoàn trả tiền đơn đặt phòng mã ${dots(f.ma, 10)}. Số tiền: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}). Lý do: ${dots(f.lydo, 30)}. Hình thức: ${dots(f.hinhthuc, 18)}.</p>
-        <p>Bên nhận hoàn xác nhận đã nhận đủ tiền và không khiếu nại gì thêm.</p>${sign2('BÊN HOÀN TRẢ', 'BÊN NHẬN HOÀN')}` },
+        ${chk(f)}<p>Bên nhận hoàn xác nhận đã nhận đủ tiền và không khiếu nại gì thêm.</p>${sign2('BÊN HOÀN TRẢ', 'BÊN NHẬN HOÀN')}` },
 
     { id: 'uq-nhan-hoan', group: 'Ủy quyền', name: 'Giấy ủy quyền nhận tiền hoàn trả', note: 'Khách ủy quyền cho người khác nhận tiền hoàn thay.',
       fields: ['ngay', 'diadiem', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'c_ten', 'c_cccd', 'c_dc', 'c_sdt', 'ma', 'tien', 'nh', 'stk', 'ctk'],
@@ -101,14 +107,14 @@
         <p>Tôi cam đoan chịu trách nhiệm trước pháp luật về nội dung ủy quyền này.</p>${sign2('NGƯỜI ĐƯỢC ỦY QUYỀN', 'NGƯỜI ỦY QUYỀN')}` },
 
     { id: 'de-nghi-hoan', group: 'Hoàn trả', name: 'Giấy đề nghị hoàn tiền (khách làm)', note: 'Khách ký đề nghị, nhà xem xét rồi xử lý hoàn.',
-      fields: ['ngay', 'diadiem', 'b_ten', 'b_cccd', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'nh', 'stk', 'ctk'],
+      fields: ['ma_phieu', 'ngay', 'diadiem', 'b_ten', 'b_cccd', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'nh', 'stk', 'ctk'],
       body: (f) => `${head(f, 'GIẤY ĐỀ NGHỊ HOÀN TIỀN')}
         <p class="dp-c"><b>Kính gửi: Nhà của An Homestay Tà Xùa</b></p>
         <p><i>${when(f)}</i></p>
         <p>Tôi tên: ${dots(f.b_ten, 24)}; CCCD số ${dots(f.b_cccd, 16)}; điện thoại ${dots(f.b_sdt, 12)}.</p>
         <p>Tôi đã đặt và thanh toán ${booking(f)}, số tiền <b>${money(f.tien)}</b>.</p>
         <p>Nay tôi đề nghị Quý đơn vị hoàn lại số tiền: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}). Lý do: ${dots(f.lydo, 40)}.</p>
-        <p>Thông tin nhận hoàn: ${bank(f)}.</p>
+        ${chk(f)}<p>Thông tin nhận hoàn: ${bank(f)}.</p>
         <p>Tôi cam đoan thông tin trên là đúng và chịu trách nhiệm về thông tin đã cung cấp. Việc hoàn tiền thực hiện theo chính sách hoàn hủy của Nhà của An.</p>${sign1('NGƯỜI ĐỀ NGHỊ')}` },
 
     { id: 'phieu-thu', group: 'Khách đặt phòng', name: 'Phiếu thu tiền đặt cọc / thanh toán', note: 'Xác nhận nhà đã nhận tiền của khách.',
