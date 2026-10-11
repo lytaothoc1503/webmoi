@@ -27,7 +27,8 @@
   window.vnWords = vnWords;
 
   const esc2 = (x) => String(x ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const dots = (v, n) => (v && String(v).trim() ? '<b>' + esc2(v) + '</b>' : '.'.repeat(n || 24));
+  const dmy = (v) => (/^\d{4}-\d{2}-\d{2}$/.test(v || '') ? String(v).split('-').reverse().join('/') : (v || ''));
+  const dots = (v, n) => (v && String(v).trim() ? '<b>' + esc2(dmy(v)) + '</b>' : '.'.repeat(n || 24));
   const fdate = (iso) => { const d = iso ? new Date(iso) : new Date(); return { d: d.getDate(), m: d.getMonth() + 1, y: d.getFullYear() }; };
   const money = (n) => (Number(n) > 0 ? new Intl.NumberFormat('vi-VN').format(Number(n)) + ' đồng' : dots('', 14));
 
@@ -35,7 +36,7 @@
     ngay: ['Ngày lập', 'date'], diadiem: ['Địa điểm', 'text'], so: ['Số văn bản (nếu có)', 'text'],
     a_ten: ['Chủ homestay: họ tên', 'text'], a_cccd: ['Chủ homestay: CCCD', 'text'], a_dc: ['Địa chỉ homestay', 'text'], a_sdt: ['Chủ homestay: SĐT', 'text'],
     b_ten: ['Khách: họ tên', 'text'], b_cccd: ['Khách: CCCD', 'text'], b_dc: ['Khách: địa chỉ', 'text'], b_sdt: ['Khách: SĐT', 'text'],
-    ma: ['Mã đơn', 'text'], phong: ['Hạng phòng', 'text'], nhan: ['Ngày nhận phòng', 'text'], tra: ['Ngày trả phòng', 'text'],
+    ma: ['Mã đơn', 'text'], phong: ['Hạng phòng', 'text'], nhan: ['Ngày nhận phòng', 'date'], tra: ['Ngày trả phòng', 'date'],
     tien: ['Số tiền (đ)', 'number'], lydo: ['Lý do', 'text'], hinhthuc: ['Hình thức giao nhận', 'text'],
     nh: ['Ngân hàng nhận', 'text'], stk: ['Số tài khoản nhận', 'text'], ctk: ['Tên chủ tài khoản', 'text'],
     ma_phieu: ['Mã booking trên phiếu khách xuất trình (đối chiếu)', 'text'], khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Đã thanh toán / đã cọc (đ)', 'number'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
@@ -153,7 +154,7 @@
     }
   }
   function render() {
-    $('fm-preview').innerHTML = state.tpl.body(state.f); $('fm-preview').classList.toggle('is-land', !!state.tpl.land); renderMsg();
+    $('fm-preview').innerHTML = state.tpl.body(state.f); $('fm-preview').classList.toggle('is-land', !!state.tpl.land); renderMsg(); renderSync();
     $('fm-note').textContent = state.tpl.note + ' Thông tin điền ở đây chỉ nằm trong trình duyệt, không lưu lại.';
   }
   function drawFields() {
@@ -163,6 +164,62 @@
     }).join('');
     $('fm-fields').querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { state.f[i.dataset.k] = i.value.trim(); render(); }));
   }
+
+  /* ===== Xác nhận tạo đơn: lưu phiếu thành đơn thật trong hệ thống (khách mới mở được link phiếu) ===== */
+  const fmtT = (iso) => { try { const d = new Date(iso); return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN'); } catch (e) { return ''; } };
+  const findBooking = () => {
+    const list = (typeof allBookings !== 'undefined' ? allBookings : []), code = String(state.f.ma || '').trim().toUpperCase();
+    const id = $('fm-booking') && $('fm-booking').value;
+    return list.find((x) => (id && x.id === id) || (code && x.booking_code === code));
+  };
+  const missing = () => {
+    const f = state.f, m = [];
+    if (!String(f.b_ten || '').trim()) m.push('họ tên khách');
+    if (String(f.b_sdt || '').replace(/\D/g, '').length < 9) m.push('SĐT (từ 9 số)');
+    if (!String(f.phong || '').trim()) m.push('hạng phòng');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(f.nhan || '')) m.push('ngày nhận phòng');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(f.tra || '')) m.push('ngày trả phòng');
+    else if (/^\d{4}-\d{2}-\d{2}$/.test(f.nhan || '') && f.tra <= f.nhan) m.push('ngày trả phải sau ngày nhận');
+    const t = Number(f.tien); if (!(t > 0 && t <= 100000000)) m.push('số tiền (1 đến 100.000.000 đ)');
+    if (f.ma && !/^[A-Za-z0-9]{6,20}$/.test(f.ma)) m.push('mã đơn (6-20 chữ/số, không dấu)');
+    return m;
+  };
+  const newCode = () => { const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = 'NA'; for (let i = 0; i < 8; i++) c += a[Math.floor(Math.random() * a.length)]; return c; };
+  function renderSync() {
+    const box = $('fm-sync'); if (!box) return;
+    if (!state.tpl.fields.includes('phong')) { box.innerHTML = ''; return; }
+    const b = findBooking(), base2 = location.origin + location.pathname.replace(/[^/]*$/, '');
+    if (b) {
+      const via = /^\[Tạo từ Biểu Mẫu/.test(b.notes || '') ? ' ' + esc2(String(b.notes).split(']')[0].replace('[', '')) + '.' : '';
+      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.</div>';
+      return;
+    }
+    const miss = missing();
+    box.innerHTML = '<div class="fm-sync warn"><b>⚪ Chưa đồng bộ</b>: phiếu này mới chỉ ở trên màn hình, <u>khách chưa mở được link</u> cho đến khi bạn xác nhận tạo đơn.'
+      + '<div class="fm-sync-row"><select id="fm-st"><option value="Đặt phòng thành công">Đã chốt, đã nhận tiền (Đặt phòng thành công)</option><option value="Chờ thanh toán">Chưa nhận tiền (Chờ thanh toán)</option></select>'
+      + '<button class="btn-export" id="fm-create"' + (miss.length ? ' disabled' : '') + ' onclick="createBookingFromForm()">Xác nhận tạo đơn</button></div>'
+      + (miss.length ? '<small>Còn thiếu: ' + esc2(miss.join(', ')) + '.</small>' : '<small>Bấm xác nhận để lưu đơn vào hệ thống. Mã đơn trống thì tự tạo.</small>') + '<div id="fm-sync-msg"></div></div>';
+  }
+  window.createBookingFromForm = async function () {
+    const f = state.f, btn = $('fm-create'), out = $('fm-sync-msg'); if (!btn) return;
+    if (missing().length) return;
+    btn.disabled = true; out.textContent = 'Đang lưu...';
+    try {
+      if (!f.ma) { f.ma = newCode(); drawFields(); }
+      const code = String(f.ma).toUpperCase(); f.ma = code;
+      const ex = await supabaseClient.from('bookings').select('id').eq('booking_code', code).maybeSingle();
+      if (ex.data) { out.textContent = 'Mã ' + code + ' đã có trong hệ thống. Hãy chọn đơn đó ở ô "Chọn đơn" hoặc đổi mã.'; btn.disabled = false; return; }
+      const ses = await supabaseClient.auth.getSession(), who = (ses.data && ses.data.session && ses.data.session.user && ses.data.session.user.email) || 'quản trị';
+      const status = $('fm-st').value, now = new Date().toISOString();
+      const row = { booking_code: code, transfer_code: code, fullname: String(f.b_ten).trim().slice(0, 80), phone: String(f.b_sdt).replace(/[^\d+]/g, '').slice(0, 20), room: String(f.phong).trim().slice(0, 120), checkin: f.nhan, checkout: f.tra, guests: String(f.khach || '').slice(0, 100) || null, total_price: Math.round(Number(f.tien)), status, confirmed_at: status === 'Đặt phòng thành công' ? now : null, notes: ('[Tạo từ Biểu Mẫu bởi ' + who + ' lúc ' + fmtT(now) + ']').slice(0, 500) };
+      const r = await supabaseClient.from('bookings').insert(row).select().single();
+      if (r.error) { out.textContent = 'Không lưu được: ' + (r.error.message || 'lỗi'); btn.disabled = false; return; }
+      if (typeof allBookings !== 'undefined') allBookings.unshift(r.data);
+      if (typeof loadBookings === 'function') loadBookings();
+      const bk = $('fm-booking'); if (bk) { bk.innerHTML = '<option value="">Không chọn đơn (điền tay)</option>' + allBookings.map((b) => '<option value="' + esc2(b.id) + '">' + esc2(b.booking_code) + ' - ' + esc2(b.fullname) + '</option>').join(''); bk.value = r.data.id; }
+      render();
+    } catch (e) { out.textContent = 'Có lỗi kết nối, hãy thử lại.'; btn.disabled = false; }
+  };
   window.initForms = function () {
     const sel = $('fm-tpl'), bk = $('fm-booking');
     if (!sel.options.length) {
@@ -179,12 +236,12 @@
   const base = () => location.origin + location.pathname.replace(/[^/]*$/, '');
   function renderMsg() {
     const f = state.f, box = $('fm-msg'); if (!box) return;
-    const link = base() + '?ma=' + encodeURIComponent(f.ma || '') + '#tra-cuu-don';
+    const link = base() + 'phieu.html?ma=' + encodeURIComponent(String(f.ma || '').toUpperCase());
     const code = f.ma ? f.ma : '(mã đơn)';
     const M = {
-      xn: `Chào ${f.b_ten || 'bạn'}, Nhà của An xác nhận đơn đặt phòng mã ${code} (${f.phong || 'phòng'}, ${f.nhan || '...'} → ${f.tra || '...'}).\nBạn xem tình trạng đơn và tải/in Phiếu xác nhận tại: ${link}\nNgày đến, bạn mang CCCD/hộ chiếu của các khách để nhà làm thủ tục lưu trú nhé. Cần hỏi đường đi hoặc đổi lịch, bạn nhắn nhà kèm mã ${code}.`,
+      xn: `Chào ${f.b_ten || 'bạn'}, Nhà của An xác nhận đơn đặt phòng mã ${code} (${f.phong || 'phòng'}, ${dmy(f.nhan) || '...'} → ${dmy(f.tra) || '...'}).\nBạn mở Phiếu xác nhận (xem, in hoặc lưu PDF, không cần đăng nhập) tại: ${link}\nNgày đến, người đặt phòng chỉ cần mang CCCD hoặc VNeID; khách đi cùng bạn gửi nhà họ tên và số CCCD để nhà khai báo lưu trú nhé. Cần hỏi đường đi hoặc đổi lịch, bạn nhắn nhà kèm mã ${code}.`,
       hoan: `Chào ${f.b_ten || 'bạn'}, Nhà của An đã ghi nhận yêu cầu hoàn tiền đơn ${code}${f.tien ? ' (' + new Intl.NumberFormat('vi-VN').format(Number(f.tien)) + ' đ)' : ''}.\nNhà sẽ chuyển về đúng tài khoản bạn cung cấp và gửi Biên bản hoàn trả để hai bên lưu. Bạn xem đơn tại: ${link}`,
-      nhac: `Chào ${f.b_ten || 'bạn'}, nhắc lịch nhận phòng ${f.nhan || '...'} tại Nhà của An (đơn ${code}). Nhận phòng từ ${(window.SITE && window.SITE.checkin) || '14:00'}. Bạn mang CCCD/hộ chiếu; đường đi và gửi xe nhà sẽ hướng dẫn khi bạn nhắn. Xem đơn: ${link}`
+      nhac: `Chào ${f.b_ten || 'bạn'}, nhắc lịch nhận phòng ${dmy(f.nhan) || '...'} tại Nhà của An (đơn ${code}). Nhận phòng từ ${(window.SITE && window.SITE.checkin) || '14:00'}. Người đặt phòng mang CCCD hoặc VNeID (khách đi cùng gửi nhà họ tên và số CCCD trước); đường đi và gửi xe nhà sẽ hướng dẫn khi bạn nhắn. Xem đơn: ${link}`
     };
     box.innerHTML = [['xn', 'Tin xác nhận đặt phòng'], ['hoan', 'Tin báo hoàn tiền'], ['nhac', 'Tin nhắc lịch nhận phòng']].map(([k, l]) => `<div class="fm-msg"><b>${l}</b><textarea readonly rows="6" id="fm-m-${k}">${esc2(M[k]).replace(/\\n/g, '&#10;')}</textarea><button class="btn-export" data-copy="fm-m-${k}">Sao chép</button></div>`).join('');
     box.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => { const t = $(b.dataset.copy); try { await navigator.clipboard.writeText(t.value); b.textContent = 'Đã chép ✓'; } catch (e) { t.select(); document.execCommand('copy'); } setTimeout(() => (b.textContent = 'Sao chép'), 1500); }));

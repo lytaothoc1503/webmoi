@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Phiếu xác nhận đặt phòng | Nhà của An Homestay Tà Xùa</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    :root { color-scheme: light; }
+    body { margin: 0; background: #f3ede4; font-family: 'Be Vietnam Pro', 'Segoe UI', Arial, sans-serif; color: #1d2b2e; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0; }
+    .bar a, .bar button { background: #0b3b46; color: #fff; border: 0; border-radius: 10px; padding: 11px 18px; font-size: 14px; font-weight: 700; cursor: pointer; text-decoration: none; font-family: inherit; }
+    .bar .alt { background: #fff; color: #0b3b46; border: 1.5px solid #0b3b46; }
+    .slipbox { overflow-x: auto; }
+    .msg { text-align: center; padding: 40px 16px; font-size: 16px; line-height: 1.6; }
+    .msg small { display: block; color: #5d6b6e; margin-top: 8px; font-size: 13px; }
+    .hint { text-align: center; color: #5d6b6e; font-size: 13px; margin-top: 10px; }
+    @media print { body { background: #fff; } .bar, .hint { display: none !important; } .wrap { padding: 0; max-width: none; } .slipbox { overflow: visible; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div id="out"><div class="msg">Đang mở phiếu...</div></div>
+  <div class="bar" id="bar" hidden>
+    <button type="button" id="b-print">In / Lưu PDF</button>
+    <a class="alt" id="b-fb" href="#" target="_blank" rel="noopener">Nhắn Messenger cho nhà</a>
+    <a class="alt" id="b-call" href="#">Gọi nhà</a>
+    <a class="alt" href="./index.html">Về trang chủ</a>
+  </div>
+  <p class="hint" id="hint" hidden>Trên điện thoại: bấm "In / Lưu PDF" rồi chọn "Lưu dưới dạng PDF" để giữ phiếu trong máy.</p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="phieu.js"></script>
+<script>
+  (function () {
+    const out = document.getElementById('out'), S = window.SITE || {}, CFG = S.supabase || {}, C = S.contacts || {};
+    const msg = (t, s) => { out.innerHTML = '<div class="msg">' + t + (s ? '<small>' + s + '</small>' : '') + '</div>'; };
+    const code = String(new URLSearchParams(location.search).get('ma') || '').trim().toUpperCase();
+    if (C.facebook) document.getElementById('b-fb').href = C.facebook; else document.getElementById('b-fb').hidden = true;
+    if (C.phone) document.getElementById('b-call').href = 'tel:' + C.phone; else document.getElementById('b-call').hidden = true;
+    if (!/^[A-Z0-9]{6,20}$/.test(code)) { msg('Đường dẫn chưa có mã đơn hợp lệ.', 'Bạn hãy mở lại đúng link nhà đã gửi, hoặc nhắn nhà kèm mã đơn.'); return; }
+    if (!CFG.url || !CFG.anonKey || !window.supabase) { msg('Chưa mở được phiếu lúc này.', 'Bạn nhắn nhà kèm mã đơn ' + code + ' để được hỗ trợ.'); return; }
+    const db = window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+    const norm = (s) => ({ 'Chờ duyệt tiền cọc': 'Chờ thanh toán', 'Đã duyệt phòng': 'Đặt phòng thành công' }[s] || s || 'Chờ thanh toán');
+    db.rpc('track_booking', { p_code: code, p_phone: null }).then(({ data, error }) => {
+      if (error) { msg('Chưa mở được phiếu lúc này.', 'Bạn thử lại sau ít phút hoặc nhắn nhà kèm mã đơn ' + code + '.'); return; }
+      const r = data && data[0];
+      if (!r) { msg('Không tìm thấy đơn mã ' + code + '.', 'Nhà có thể chưa tạo đơn trên hệ thống. Bạn nhắn nhà kèm mã đơn để được kiểm tra.'); return; }
+      const st = norm(r.status), done = st === 'Đặt phòng thành công' || st === 'Hoàn thành';
+      if (st === 'Hủy đơn') { msg('Đơn ' + code + ' đã được hủy.', 'Cần hỗ trợ thêm, bạn nhắn nhà kèm mã đơn.'); return; }
+      const total = Number(r.total_price) || 0;
+      out.innerHTML = '<div class="slipbox">' + window.NCA_slip({ code: r.booking_code, tcode: r.transfer_code || r.booking_code, name: r.fullname, guests: r.guests || '', room: r.room, checkin: r.checkin, checkout: r.checkout, total: total, paid: done ? total : 0, nowStep: st === 'Hoàn thành' ? 3 : (done ? 2 : 1) }) + '</div>';
+      document.getElementById('bar').hidden = false; document.getElementById('hint').hidden = false;
+      document.title = 'Phiếu xác nhận ' + r.booking_code + ' | Nhà của An';
+    }).catch(() => msg('Chưa mở được phiếu lúc này.', 'Bạn thử lại sau ít phút.'));
+    document.getElementById('b-print').addEventListener('click', () => {
+      const s = document.createElement('style'); s.textContent = '@page{size:A4 landscape;margin:8mm}'; document.head.appendChild(s);
+      const fin = () => { s.remove(); window.removeEventListener('afterprint', fin); }; window.addEventListener('afterprint', fin); window.print();
+    });
+  })();
+</script>
+</body>
+</html>

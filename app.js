@@ -353,7 +353,7 @@ const STMSG = {
 const NEXT = {
   [ST.WAIT]: 'Chuyển khoản đúng số tiền và nội dung là mã đơn, rồi bấm "Tôi đã chuyển khoản". Chưa sẵn sàng, bạn cứ nhắn nhà, chưa mất phí gì.',
   [ST.PAID]: 'Chờ nhà đối chiếu giao dịch. Gửi ảnh chụp giao dịch kèm mã đơn qua Facebook để nhà xác nhận nhanh hơn.',
-  [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, mang CCCD/hộ chiếu của các khách để nhà làm thủ tục lưu trú. Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
+  [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, người đại diện đặt phòng mang CCCD hoặc VNeID để nhà làm thủ tục lưu trú (khách nước ngoài mang hộ chiếu). Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
   [ST.DONE]: 'Bạn có thể viết đánh giá để giúp khách sau chọn phòng dễ hơn.',
   [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, xem chính sách hoàn hủy hoặc nhắn nhà kèm mã đơn. Tiền hoàn về đúng tài khoản bạn cung cấp và có biên bản xác nhận.',
 };

@@ -80,7 +80,7 @@
         <tr><td>Số đêm</td><td>${dots(n, 4)}</td></tr></table></div></div>
       <div class="ns-pay">${pay}${bankBox}</div>
       <div class="ns-flow">${steps.map((s, i) => `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
-      <div class="ns-note"><b>Lưu ý khi đến:</b> mang CCCD/hộ chiếu của tất cả khách để nhà thực hiện thông báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
+      <div class="ns-note"><b>Khi nhận phòng:</b> người đại diện đặt phòng chỉ cần mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Với khách đi cùng, bạn gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
       <div class="ns-foot"><span>${esc(S.name || '')}</span><span>Địa chỉ: ${esc(S.address || '')}</span>${C.phone ? `<span>Hotline: ${esc(C.phone)}</span>` : ''}<span>Web: ${esc(location.origin + location.pathname.replace(/[^/]*$/, ''))}</span></div>
       </div></div>`;
   };
