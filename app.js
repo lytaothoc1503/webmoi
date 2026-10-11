@@ -202,7 +202,7 @@ function openPlace(i) {
       <p style="font-size:14px;margin:8px 0">${esc(x.text)}</p>
       ${(x.more || []).map((p) => `<p style="font-size:14px;margin:8px 0">${esc(p)}</p>`).join('')}
       ${x.tip ? `<p class="info-meta">💡 <strong>Lưu ý:</strong> ${esc(x.tip)}</p>` : ''}
-      <div class="info-actions">${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn nhà để hỏi đường và tình hình mây</a>` : ''}<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="closeInfo()">Đóng</a></div>
+      <div class="info-actions">${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn nhà để hỏi thêm</a>` : ''}<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="closeInfo()">Đóng</a></div>
     </div>`;
   $('info-modal').classList.add('active');
 }

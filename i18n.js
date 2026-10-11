@@ -742,7 +742,7 @@
   "Ban ngày mang nước và đồ chống nắng, khi trời chuyển lạnh nhớ có áo ấm.": "Bring water and sun protection by day, and warm clothes when it turns cold.",
   "Vào những đêm trời quang, ít ánh sáng, núi Tà Xùa có rất nhiều sao, nếu may mắn còn thấy cả dải Ngân Hà. Thời gian hợp nhất là từ khoảng tháng 3 đến tháng 10.": "On clear nights with little light, the Tà Xùa mountains are full of stars, and with luck you may even see the Milky Way. The best time is roughly from March to October.",
   "Mùa hè mây ít hơn nên dễ gặp những đêm quang hơn.": "There are fewer clouds in summer, so clear nights are easier to find.",
-  "Mang áo ấm và đèn pin, nhắn nhà để biết đêm nào trời đẹp. Không nên di chuyển trên đường đèo vào buổi tối, hãy ngắm sao gần nhà.": "Bring warm clothes and a flashlight, and message us to find out which night is clear. Avoid travelling on the mountain pass at night; stargaze close to the house instead.",
+  "Mang áo ấm, chân máy và đèn pin, dùng chế độ phơi sáng hoặc máy ảnh để chụp. Tắt đèn xung quanh khoảng 15 phút để mắt quen bóng tối. Khung giờ đẹp thường từ khoảng 21 giờ, tùy từng đêm; nhắn nhà để biết đêm nào trời quang. Không nên di chuyển trên đường đèo vào buổi tối, hãy ngắm sao gần nhà.": "Bring warm clothes, a tripod and a flashlight, and use long-exposure mode or a camera. Switch off the lights around you for about 15 minutes so your eyes adjust to the dark. The best hours usually start around 9 p.m. and vary from night to night; message us to find out which night is clear. Avoid travelling on the mountain pass at night; stargaze close to the house instead.",
   "Ngay tại nhà có chỗ ngồi nhìn ra thung lũng, nơi bạn có thể vừa uống cà phê vừa chờ mây. Không cần đi xa vẫn có thể thấy biển mây vào những sáng đẹp trời.": "Right at the house there is a seat looking out over the valley where you can sip coffee while waiting for the clouds. You do not need to go far to see the sea of clouds on a good morning.",
   "Thực đơn cà phê, trà và bữa sáng xem ở mục Coffee.": "See the coffee, tea and breakfast menu in the Coffee section.",
   "Nhắn nhà vào chiều tối để biết sáng mai có mây hay không.": "Message us in the evening to find out whether there will be clouds tomorrow morning.",
@@ -757,7 +757,7 @@
   "Hỏi nhà tình hình lúa trước khi đi để chọn đúng thời điểm đẹp.": "Ask us about the rice before you go so you can pick the best time.",
   "Xem thêm ›": "Read more ›",
   "Lưu ý:": "Note:",
-  "Nhắn nhà để hỏi đường và tình hình mây": "Message us about directions and cloud conditions",
+  "Nhắn nhà để hỏi thêm": "Message us to ask more",
 }/*END*/;
   const KEY = 'na_lang';
   let lang = 'vi';
