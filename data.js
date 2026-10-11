@@ -6,9 +6,12 @@
 const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 window.SITE_DATA = {
   rooms: [
-    { name: 'Phòng Đôi Gỗ View Thung Lũng', price: 850000, image_url: 'images/phong-view-may.jpg', guests: '2 khách', bed: '1 giường đôi', view: 'View thung lũng, biển mây', perks: ['Không gian gỗ ấm cúng', 'Ngắm mây từ khung cửa', 'Chăn đệm ấm cho đêm núi'] },
-    { name: 'Phòng Gia Đình', price: 1600000, image_url: 'images/hay-lay-toi-di-cabin.jpg', guests: '4 khách', bed: '2 giường đôi', view: 'View núi rừng', perks: ['Phù hợp nhóm nhỏ, gia đình', 'Không gian rộng rãi', 'Gần khu ngắm mây'] },
-    { name: 'Giường Tập Thể (Dorm)', price: 250000, image_url: 'images/bap-treo-cua-so.jpg', guests: '1 khách / giường', bed: 'Giường tầng', view: 'Không gian chung', perks: ['Phù hợp nhóm bạn', 'Tiết kiệm chi phí', 'Không gian chung vui vẻ'] },
+    { name: 'Phòng Gỗ Ngắm Biển Mây', price: 700000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
+      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp
+      image_url: 'images/phong-an-1.jpg', images: ['images/phong-an-2.jpg', 'images/phong-an-3.jpg', 'images/phong-an-4.jpg', 'images/phong-an-5.jpg', 'images/phong-an-6.jpg', 'images/phong-an-7.jpg', 'images/phong-an-8.jpg', 'images/phong-an-9.jpg'],
+      description: 'Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.',
+      guests: '2 khách (tối đa 3)', bed: '1 giường đôi', view: 'Biển mây, thung lũng',
+      perks: ['Cửa kính lớn nhìn ra biển mây', 'Khép kín, có nóng lạnh', 'Miễn phí nước lọc, snack'] },
   ],
   // Trải nghiệm & gợi ý lịch trình. KHÔNG bán như tour có hướng dẫn viên (hộ kinh doanh cá thể không đủ điều kiện kinh doanh lữ hành).
   // Muốn bán tour đặt online: ký hợp đồng đại lý với công ty lữ hành có giấy phép, rồi đổi toursBookable thành true và điền giá.
@@ -141,7 +144,14 @@ window.SITE_DATA = {
     { icon: '🎒', name: 'Hỗ trợ hành lý & đưa đón', price: 0, unit: '', time: 'Báo trước khi đến', description: 'Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.', includes: ['Mang hành lý lên xuống', 'Tư vấn xe khứ hồi'], note: 'Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.' },
     { icon: '🧭', name: 'Tư vấn lịch trình', price: 0, unit: '', time: 'Miễn phí', description: 'Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.', includes: ['Gợi ý theo mùa và thời tiết', 'Combo phòng, ăn sáng, xe khứ hồi (nhắn nhà để biết giá)'], note: 'Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.' },
   ],
+  // Combo (chủ nhà đồng ý): chọn phòng rồi thêm bữa sáng + trà chiều + nước. KHÔNG kèm xe/vận chuyển (web không bán vận chuyển).
+  // Giá combo = tổng giá các dịch vụ trong `items` (lấy từ services) x số khách x số đêm; nước uống tặng kèm.
+  combo: { name: 'Combo Săn Mây', items: ['Bữa sáng trên mây', 'Trà chiều ngắm hoàng hôn'], waterNote: 'tặng kèm nước uống' },
   gallery: [
+    { image_url: 'images/phong-an-1.jpg', caption: 'Giường nhìn thẳng ra biển mây' },
+    { image_url: 'images/phong-an-5.jpg', caption: 'Mây bồng bềnh ngay cửa sổ' },
+    { image_url: 'images/phong-an-6.jpg', caption: 'Hoàng hôn qua khung cửa phòng' },
+    { image_url: 'images/phong-an-4.jpg', caption: 'Cửa kính lớn mở ra biển mây' },
     { image_url: 'images/hero-san-may.jpg', caption: 'Biển mây Tà Xùa' },
     { image_url: 'images/hoang-hon-fisheye.jpg', caption: 'Hoàng hôn rực lửa' },
     { image_url: 'images/tram-mam-xoi.jpg', caption: 'Trạm Mầm Xôi cà phê' },

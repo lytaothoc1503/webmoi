@@ -38,6 +38,9 @@ Khách đã đăng nhập thấy khung "Nhà nên gọi bạn là gì?" ở mụ
 
 Bấm vào thẻ phòng mở trang chi tiết (hàm `openRoom` trong `app.js`): ảnh lớn, ô giá và thông tin bên phải, nút Đặt phòng, Gọi, Messenger. Phòng có thể thêm `images: [...]` và `description` trong `data.js` để hiện thêm ảnh nhỏ và mô tả.
 
+## Phòng và giá (chủ nhà cung cấp)
+Chỉ có **1 hạng phòng** ("Phòng Gỗ Ngắm Biển Mây", các căn giống nhau), khai báo ở `rooms` trong `data.js` với `rates` (T2-T5 700k, T6+CN 900k, T7 1,1 triệu cho 2 khách/đêm), `extraGuestFee` (khách thứ 3: 200k), `maxGuests` (3). Web tự tính giá từng đêm theo thứ trong `calculateTotal` (`app.js`). Chưa đưa giá ngày lễ lên web (chủ dự án quyết định không thêm). Trẻ dưới 6 tuổi miễn phí, giá chưa gồm ăn sáng. **Combo Săn Mây** (`combo` trong `data.js`): tùy chọn khi đặt phòng, = bữa sáng + trà chiều (giá lấy từ `services`) x khách x đêm, nước uống tặng kèm; KHÔNG kèm xe giường nằm/vận chuyển (rủi ro lữ hành). Khuyến mãi "giảm 100-150k" chưa ghi rõ điều kiện nên chưa đưa lên web.
+
 ## Mục Coffee (ngang hàng Homestay)
 `#coffee` lấy dữ liệu từ `coffee` trong `data.js` (giới thiệu, 4 điểm nhấn Mây/Trải nghiệm/Chill/Khách, bảng thông tin quán, menu lấy từ `services`, ảnh quán, ảnh khách hàng, đánh giá có nhắc quán). Ô nào để trống thì web tự ẩn; chủ nhà bổ sung giờ mở cửa, menu, ảnh khách thật tại đây. Menu và đầu trang có thẻ đôi Homestay | Coffee. Ba dịch vụ chính (cà phê, trà chiều, bữa sáng trên mây) nằm ở mục Coffee (khai báo ở `coffee.menuFrom`); dịch vụ không còn là một mục dài trên trang: toàn bộ `services` nằm trong menu "Dịch Vụ" (bấm vào mở cửa sổ chi tiết, gọn như trang mẫu); `#dich-vu` luôn ẩn. Chỉ phần nổi bật, quan trọng mới đặt thành mục riêng trên trang.
 
@@ -79,7 +82,7 @@ STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa
 ## Trạng thái hiện tại
 **Đã có:** đặt phòng + QR, tra cứu đơn, đăng ký SĐT, tiếng Anh, thư viện ảnh thật, tour/dịch vụ công khai, SEO cơ bản (canonical, sitemap, schema), RLS.
 
-**Chờ chủ dự án cung cấp:** tài khoản ngân hàng thật, Gmail nhận đơn, giá thật từng phòng/tour/dịch vụ, ảnh thật phòng Gia Đình và Dorm, câu chuyện chủ nhà thật, chính sách hoàn hủy thật, video giới thiệu, link Messenger.
+**Chờ chủ dự án cung cấp:** tài khoản ngân hàng thật, Gmail nhận đơn, giá thật tour/dịch vụ, câu chuyện chủ nhà thật, chính sách hoàn hủy thật, video giới thiệu, link Messenger.
 
 **Chờ tiền/điều kiện:** mua tên miền (dự kiến `nhacuaantaxua.com`, giá .com khoảng 309-429 nghìn đồng/năm ở Tenten, chưa mua), Cloudflare (DNS, HTTPS, chống DDoS, email theo tên miền), đăng nhập Facebook/Google.
 
@@ -97,8 +100,8 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 
 ## Việc còn lại (nhắc chủ dự án khi phù hợp)
 0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`): chủ dự án nói tên là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không, và đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại vào thứ Sáu 16/10; CHƯA điền, chờ chữ chính xác; ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
-1. Giá thật phòng/tour/dịch vụ (đang là giá tạm trong `data.js`).
-2. Ảnh thật phòng Gia Đình và Dorm (đang dùng ảnh thư viện làm ảnh tạm).
+1. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật của chủ nhà).
+2. (Xong) Phòng: chủ nhà xác nhận chỉ có 1 hạng phòng; ảnh lấy từ Drive của chủ nhà.
 3. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
 4. Ngân hàng thật, Gmail nhận đơn, câu chuyện chủ nhà, chính sách hoàn hủy thật, video, link Messenger.
 5. Đổi mật khẩu admin + bật 2FA; Turnstile Site Key; mua tên miền rồi bật Facebook/Google.

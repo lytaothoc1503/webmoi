@@ -118,7 +118,7 @@ async function loadRooms() {
   $('rooms-grid').innerHTML = roomsData.map((r) => `
     <div class="room-card" onclick="openRoom(${roomsData.indexOf(r)})" style="cursor:pointer">${img(r.image_url, r.name, 'room-thumb')}
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
-        <div class="room-price">${priceHtml(r.price, '/ đêm')}</div>
+        <div class="room-price">${r.rates ? 'Từ ' : ''}${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
@@ -153,6 +153,7 @@ function openRoom(i) {
   const r = roomsData[i]; if (!r) return;
   const imgs = [r.image_url].concat(r.images || []).filter(Boolean);
   const rows = [['👥', 'Sức chứa', r.guests], ['🛏️', 'Giường', r.bed], ['🏔️', 'View', r.view], ['⏰', 'Nhận phòng', S.checkin], ['🚪', 'Trả phòng', S.checkout]].filter((x) => x[2]);
+  if (r.rates) rows.push(['📅', 'Thứ 2 - Thứ 5', money(r.rates.weekday)], ['📅', 'Thứ 6 và Chủ nhật', money(r.rates.friSun)], ['📅', 'Thứ 7', money(r.rates.sat)], ['👤', 'Khách thứ 3', '+' + money(r.extraGuestFee) + ' / đêm'], ['🧒', 'Trẻ dưới 6 tuổi', 'Miễn phí'], ['🍳', 'Giá phòng', 'Chưa gồm bữa sáng']);
   const fb = messengerHref(), tel = C.phone;
   $('info-box').style.maxWidth = '900px';
   $('info-body').innerHTML = `<div class="rd-wrap"><div class="rd-grid">
@@ -290,15 +291,18 @@ function closeLightbox() { $('lightbox').classList.remove('active'); }
 /* ===== ĐẶT PHÒNG ===== */
 function populateRoomSelect() {
   let o = '<option value="">-- Chọn hạng phòng hoặc tour --</option>';
-  if (roomsData.length) o += '<optgroup label="Hạng Phòng">' + roomsData.map((r, i) => `<option value="r:${i}">${esc(r.name)} - ${Number(r.price) > 0 ? money(r.price) + '/đêm' : 'Liên hệ báo giá'}</option>`).join('') + '</optgroup>';
+  if (roomsData.length) o += '<optgroup label="Hạng Phòng">' + roomsData.map((r, i) => `<option value="r:${i}">${esc(r.name)} - ${Number(r.price) > 0 ? (r.rates ? 'từ ' : '') + money(r.price) + '/đêm' : 'Liên hệ báo giá'}</option>`).join('') + '</optgroup>';
   if (toursData.length && D.toursBookable) o += '<optgroup label="Tour Trải Nghiệm">' + toursData.map((t, i) => `<option value="t:${i}">${esc(t.name)} - ${money(t.price)}</option>`).join('') + '</optgroup>';
   $('bk-room-select').innerHTML = o;
 }
 function onRoomSelectChange() {
   const v = $('bk-room-select').value, [k, i] = v.split(':');
   const it = v ? (k === 'r' ? roomsData : toursData)[Number(i)] : null;
-  currentItem = it ? { name: it.name, price: Number(it.price) || 0, perPerson: k === 't' } : { name: '', price: 0, perPerson: false };
+  currentItem = it ? { name: it.name, price: Number(it.price) || 0, perPerson: k === 't', rates: k === 'r' && it.rates ? it.rates : null, extraGuestFee: Number(it.extraGuestFee) || 0, maxGuests: Number(it.maxGuests) || 0 } : { name: '', price: 0, perPerson: false };
   const pr = $('bk-people-row'); if (pr) pr.style.display = currentItem.perPerson ? 'block' : 'none';
+  const cr = $('bk-combo-row'), cb = $('bk-combo');
+  if (cb) cb.checked = false;
+  if (cr) { cr.style.display = comboPerPerson() > 0 && k === 'r' && it ? 'block' : 'none'; const m = $('bk-combo-money'); if (m) m.textContent = money(comboPerPerson()); }
   calculateTotal();
 }
 // Ngày theo giờ máy khách (không dùng toISOString vì nó tính theo giờ quốc tế UTC, lệch ngày với Việt Nam lúc 0h-7h sáng)
@@ -319,9 +323,31 @@ function validateDates() {
   if (a && b && (new Date(b) - new Date(a)) / 864e5 < 1) { err.textContent = 'Ngày trả phòng phải sau ngày nhận phòng ít nhất 1 ngày.'; err.classList.add('show'); return false; }
   err.classList.remove('show'); calculateTotal(); return true;
 }
+// Combo = tổng giá các dịch vụ trong D.combo.items (mỗi khách, mỗi đêm); nước uống tặng kèm
+function comboPerPerson() {
+  const c = D.combo; if (!c || !(c.items || []).length) return 0;
+  let sum = 0;
+  for (const nm of c.items) { const s = (D.services || []).find((x) => x.name === nm); if (!s || !(Number(s.price) > 0)) return 0; sum += Number(s.price); }
+  return sum;
+}
+const guestCount = () => { const m = String(($('bk-guests') || {}).value || '').match(/\d+/); return m ? Math.max(1, Math.min(99, parseInt(m[0], 10))) : 2; };
 function calculateTotal() {
   let n = Math.ceil((new Date($('bk-checkout').value) - new Date($('bk-checkin').value)) / 864e5);
   if (isNaN(n) || n < 1) n = 1;
+  if (currentItem.rates) {
+    // Giá theo từng đêm: T2-T5, T6 và CN, T7 (tính từ ngày nhận phòng); khách thứ 3 phụ thu; combo tính theo đầu người
+    const a = new Date($('bk-checkin').value + 'T00:00:00'), R = currentItem.rates, valid = !isNaN(a.getTime());
+    let base = 0;
+    for (let i = 0; i < n; i++) { const d = valid ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + i).getDay() : 1; base += d === 6 ? R.sat : (d === 5 || d === 0) ? R.friSun : R.weekday; }
+    const g = Math.min(guestCount(), currentItem.maxGuests || 99);
+    const extra = Math.max(0, g - 2) * currentItem.extraGuestFee * n;
+    const cb = $('bk-combo'), combo = cb && cb.checked ? comboPerPerson() * g * n : 0;
+    const total = base + extra + combo, parts = [n + ' đêm'];
+    if (extra) parts.push('phụ thu khách thứ 3: ' + extra.toLocaleString('vi-VN') + ' đ');
+    if (combo) parts.push('combo: ' + combo.toLocaleString('vi-VN') + ' đ');
+    $('bk-total-display').textContent = total.toLocaleString('vi-VN') + ' đ (' + parts.join(', ') + ')';
+    return total;
+  }
   // Tour tính theo đầu người (giá x số người); phòng tính theo đêm (giá x số đêm)
   const people = Math.max(1, Math.min(99, parseInt(($('bk-people') || {}).value, 10) || 1));
   const total = currentItem.perPerson ? people * currentItem.price : n * currentItem.price;
@@ -413,11 +439,13 @@ $('booking-form-step1').addEventListener('submit', async (e) => {
   if (!validateDates()) return;
   if (db && !currentUser) { pendingBooking = true; openAuthModal('Vui lòng đăng nhập hoặc đăng ký để đặt dịch vụ. Thông tin bạn vừa điền được giữ nguyên.'); return; }
   if (!currentItem.name) { alert('Vui lòng chọn hạng phòng hoặc tour.'); return; }
+  if (currentItem.rates && currentItem.maxGuests && guestCount() > currentItem.maxGuests) { alert('Mỗi phòng ở tối đa ' + currentItem.maxGuests + ' khách. Bạn đặt thêm phòng hoặc nhắn nhà để được hỗ trợ nhé.'); return; }
   const phone = $('bk-phone').value.trim();
   if (phone.replace(/\D/g, '').length < 9) { alert('Số điện thoại chưa hợp lệ.'); return; }
   const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true; const label = btn.textContent; btn.textContent = 'ĐANG TẠO ĐƠN...';
   const code = newCode();
-  const o = { code, phone, room: currentItem.name, name: $('bk-name').value.trim(), checkin: $('bk-checkin').value, checkout: $('bk-checkout').value, guests: $('bk-guests').value.trim(), notes: $('bk-notes').value.trim() || 'Không có', total: calculateTotal(), tcode: code, status: ST.WAIT, created: new Date().toISOString() };
+  const withCombo = currentItem.rates && $('bk-combo') && $('bk-combo').checked;
+  const o = { code, phone, room: currentItem.name + (withCombo ? ' + ' + ((D.combo && D.combo.name) || 'Combo') : ''), name: $('bk-name').value.trim(), checkin: $('bk-checkin').value, checkout: $('bk-checkout').value, guests: $('bk-guests').value.trim(), notes: $('bk-notes').value.trim() || 'Không có', total: calculateTotal(), tcode: code, status: ST.WAIT, created: new Date().toISOString() };
   const r = await createOrder(o);
   btn.disabled = false; btn.textContent = label;
   if (!r.ok) { alert('Chưa gửi được đơn: ' + r.msg + '\nBạn thử lại hoặc nhắn Facebook của nhà nhé.'); return; }

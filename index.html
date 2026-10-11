@@ -1445,7 +1445,11 @@
           </div>
           <div class="form-group">
             <label>Số lượng khách (Người lớn + Trẻ em):</label>
-            <input type="text" id="bk-guests" placeholder="Ví dụ: 2 người lớn" required />
+            <input type="text" id="bk-guests" placeholder="Ví dụ: 2 người lớn" required oninput="calculateTotal()" />
+          </div>
+          <div class="form-group" id="bk-combo-row" style="display:none">
+            <label style="display:flex;gap:8px;align-items:flex-start;font-weight:600"><input type="checkbox" id="bk-combo" onchange="calculateTotal()" style="margin-top:3px" /> <span>Thêm Combo Săn Mây: bữa sáng trên mây + set trà chiều + nước uống</span></label>
+            <small style="color:var(--text-muted)">Cộng thêm <b id="bk-combo-money"></b> mỗi khách, mỗi đêm. Trẻ dưới 6 tuổi miễn phí phòng, không tính vào số khách.</small>
           </div>
           <div class="form-group">
             <label>Ghi chú thêm (Đưa đón, tiệc BBQ...):</label>
