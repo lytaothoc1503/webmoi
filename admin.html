@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
+    <script src="bieu-mau.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
     <style>
@@ -149,7 +150,22 @@
       .slip .sign { display: flex; gap: 12px; margin-top: 18px; text-align: center; font-size: 12px; } .slip .sign div { flex: 1; } .slip .sign b { display: block; min-height: 54px; margin-top: 4px; }
       .slip .sign input { width: 100%; border: 0; border-bottom: 1px solid #999; text-align: center; font: inherit; margin-top: 30px; padding: 4px; }
       .slip .acts { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-      @media print { body > *:not(.slip-ov) { display: none !important; } .slip-ov { position: static; background: none; display: block; padding: 0; } .slip .acts { display: none; } .slip { border-width: 3px; margin: 0 auto; } .slip .sign input { border-bottom: 1px solid #333; } }
+      @media print {
+        body.print-slip > *:not(.slip-ov) { display: none !important; }
+        body.print-slip .slip-ov { position: static; background: none; display: block; padding: 0; }
+        .slip .acts { display: none; } .slip { border-width: 3px; margin: 0 auto; } .slip .sign input { border-bottom: 1px solid #333; }
+        body.print-doc aside, body.print-doc .slip-ov, body.print-doc .no-print { display: none !important; }
+        body.print-doc main { padding: 0; } body.print-doc .page-section { display: none !important; } body.print-doc #page-forms { display: block !important; }
+        body.print-doc { background: #fff; display: block; } body.print-doc .dpaper { box-shadow: none; border: 0; padding: 0; max-width: none; }
+      }
+      .fm-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; } .fm-bar select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; min-width: 240px; flex: 1; }
+      .fm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-bottom: 14px; }
+      .fm-f span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; } .fm-f input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 13px; }
+      .dpaper { background: #fff; max-width: 794px; margin: 0 auto 24px; padding: 48px 56px; box-shadow: 0 6px 26px rgba(0,0,0,.12); font-family: 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.6; color: #000; }
+      .dpaper * { font-family: inherit; } .dpaper p { margin: 6px 0; text-align: justify; } .dpaper .dp-c { text-align: center; }
+      .dp-qh { text-align: center; font-size: 14px; line-height: 1.5; margin-bottom: 14px; } .dp-title { text-align: center; font-size: 19px; margin: 10px 0 6px; }
+      .dp-sign { display: flex; justify-content: space-between; text-align: center; margin: 22px 0 70px; gap: 20px; } .dp-sign > div { flex: 1; }
+      @media (max-width: 768px) { .dpaper { padding: 22px 16px; font-size: 14px; } }
     </style>
   </head>
   <body style="visibility:hidden">
@@ -166,6 +182,7 @@
       <div class="menu-item" onclick="showPage('recon', this)">🧾 Đối Soát</div>
       <div class="menu-item" onclick="showPage('refunds', this)">↩️ Hoàn Trả</div>
       <div class="menu-item" onclick="showPage('ledger', this)">📒 Thu Chi</div>
+      <div class="menu-item" onclick="showPage('forms', this)">📄 Biểu Mẫu</div>
       <div class="menu-item" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
@@ -297,6 +314,15 @@
       </div>
 
       <!-- TÀI CHÍNH: NHẬT KÝ -->
+      <!-- TÀI CHÍNH: BIỂU MẪU -->
+      <div class="page-section" id="page-forms">
+        <div class="top-bar no-print"><h2>Biểu Mẫu In</h2><button class="btn-add" onclick="printForm()">In / Lưu PDF</button></div>
+        <div class="fm-bar no-print"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
+        <p class="fin-note no-print" id="fm-note"></p>
+        <div class="fm-grid no-print" id="fm-fields"></div>
+        <div class="dpaper" id="fm-preview"></div>
+      </div>
+
       <div class="page-section" id="page-audit">
         <div class="top-bar"><h2>Nhật ký thay đổi tài chính</h2></div>
         <p class="fin-note">Hệ thống tự ghi mọi thay đổi ở Thu chi và Hoàn trả (không lưu số tài khoản đầy đủ). 100 dòng gần nhất.</p>
@@ -397,6 +423,7 @@
         if (page === 'refunds') loadRefunds();
         if (page === 'ledger') loadLedger();
         if (page === 'audit') loadAudit();
+        if (page === 'forms') initForms();
       }
 
 
@@ -430,6 +457,11 @@
         document.getElementById('slip-body').innerHTML = rows.map(r => `<div class="r"><span>${esc(r[0])}</span><b>${esc(r[1] || '—')}</b></div>`).join('');
         document.getElementById('slip-date').textContent = 'Lập ngày ' + new Date().toLocaleDateString('vi-VN');
         document.getElementById('slip-ov').classList.add('open');
+      }
+      function printSlip() {
+        document.body.classList.add('print-slip');
+        const done = () => { document.body.classList.remove('print-slip'); window.removeEventListener('afterprint', done); };
+        window.addEventListener('afterprint', done); window.print();
       }
       function closeSlip() { document.getElementById('slip-ov').classList.remove('open'); }
       async function reconOk(id) {
@@ -1043,7 +1075,7 @@
       <div class="sub">Hệ Thống Đối soát &amp; Xử lý Hoàn trả · <span id="slip-date"></span></div>
       <div class="rows" id="slip-body"></div>
       <div class="sign"><div>Người lập phiếu<input placeholder="Họ tên" maxlength="60" /></div><div>Kế toán / người xác nhận<input placeholder="Họ tên (nếu có)" maxlength="60" /></div></div>
-      <div class="acts"><button class="btn-export" onclick="closeSlip()">Đóng</button><button class="btn-add" onclick="window.print()">In / Lưu PDF</button></div>
+      <div class="acts"><button class="btn-export" onclick="closeSlip()">Đóng</button><button class="btn-add" onclick="printSlip()">In / Lưu PDF</button></div>
     </div></div>
   </body>
 </html>
