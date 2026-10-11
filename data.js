@@ -136,13 +136,16 @@ window.SITE_DATA = {
       { image_url: 'images/den-long-hoang-hon.jpg', caption: 'Đèn lồng lên đèn trên biển mây' },
     ],
   },
+  // Tạm ẩn (chờ chủ nhà xác nhận đã đăng ký ngành thuê xe / đưa đón): chuyển lại vào `services` để bật.
+  servicesPaused: [
+    { icon: '🛵', name: 'Thuê xe máy', price: 150000, unit: '/ ngày', time: 'Theo nhu cầu', description: 'Có xe máy cho thuê để di chuyển quanh Tà Xùa và khu trung tâm.', includes: ['Xe máy số/tay ga', 'Mũ bảo hiểm'], note: 'Cần giấy tờ tùy thân khi nhận xe. Nhắn nhà để giữ xe trước.' },
+    { icon: '🎒', name: 'Hỗ trợ hành lý & đưa đón', price: 0, unit: '', time: 'Báo trước khi đến', description: 'Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.', includes: ['Mang hành lý lên xuống', 'Tư vấn xe khứ hồi'], note: 'Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.' },
+  ],
   catalogIsSample: false,
   services: [
     { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 100000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
     { icon: '🍜', name: 'Bữa sáng trên mây', price: 70000, unit: '/ người', image_url: 'images/bua-sang-tren-may.jpg', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
     { icon: '☕', name: 'Cà phê & đồ uống', price: 30000, unit: 'từ / ly', image_url: 'images/ban-ghe-ngam-may.jpg', time: '7:00 - 21:00', description: 'Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.', includes: ['Cà phê, trà, nước ép', 'Chỗ ngồi ngoài trời ngắm mây'], note: 'Khách ở nhà được giảm khi gọi đồ uống tại quán.' },
-    { icon: '🛵', name: 'Thuê xe máy', price: 150000, unit: '/ ngày', time: 'Theo nhu cầu', description: 'Có xe máy cho thuê để di chuyển quanh Tà Xùa và khu trung tâm.', includes: ['Xe máy số/tay ga', 'Mũ bảo hiểm'], note: 'Cần giấy tờ tùy thân khi nhận xe. Nhắn nhà để giữ xe trước.' },
-    { icon: '🎒', name: 'Hỗ trợ hành lý & đưa đón', price: 0, unit: '', time: 'Báo trước khi đến', description: 'Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.', includes: ['Mang hành lý lên xuống', 'Tư vấn xe khứ hồi'], note: 'Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.' },
     { icon: '🧭', name: 'Tư vấn lịch trình', price: 0, unit: '', time: 'Miễn phí', description: 'Gợi ý thời điểm, điểm săn mây và lịch trình 2 ngày 1 đêm, 3 ngày 2 đêm.', includes: ['Gợi ý theo mùa và thời tiết', 'Combo phòng, ăn sáng, xe khứ hồi (nhắn nhà để biết giá)'], note: 'Nhắn Messenger bất cứ lúc nào, nhà hỗ trợ 24/7.' },
   ],
   // Combo (chủ nhà đồng ý): chọn phòng rồi thêm bữa sáng + trà chiều + nước. KHÔNG kèm xe/vận chuyển (web không bán vận chuyển).
