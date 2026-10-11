@@ -17,6 +17,7 @@ window.SITE = {
   introPoster: 'images/video-poster.jpg',
   contacts: {
     facebook: 'https://www.facebook.com/share/1dCcJYWvU1/',
+    messenger: 'https://m.me/104705621935809', // m.me + mã Trang Facebook của nhà
     phone: '0352554863',
     email: '', // ví dụ: 'ten@gmail.com'
   },

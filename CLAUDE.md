@@ -100,6 +100,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 - **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`. Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
 
 ## Việc còn lại (nhắc chủ dự án khi phù hợp)
+-1. (Xong 11/10) Link Messenger: `contacts.messenger` = m.me/mã Trang (lấy từ link Meta Business của chủ nhà); chính sách hoàn hủy thật: chủ dự án đã đồng ý bản hiện có trên web. Dịch vụ "Thuê xe máy" và "Hỗ trợ hành lý & đưa đón" tạm ẩn trong `servicesPaused` (data.js) chờ xác nhận đăng ký ngành.
 0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`): chủ dự án nói tên là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không, và đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại vào thứ Sáu 16/10; CHƯA điền, chờ chữ chính xác; ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
 1. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật của chủ nhà).
 2. (Xong) Phòng: chủ nhà xác nhận chỉ có 1 hạng phòng; ảnh lấy từ Drive của chủ nhà.

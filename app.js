@@ -407,7 +407,7 @@ function newCode() {
 
 /* ===== LIÊN HỆ QUA FACEBOOK ===== */
 function fbSlug() { const m = (C.facebook || '').match(/facebook\.com\/(?:profile\.php\?id=)?([^/?#]+)/); return m && !['share', 'profile.php', 'people', 'groups'].includes(m[1]) ? m[1] : ''; } // link dạng /share/... không có tên trang nên dùng thẳng link Facebook
-function messengerHref() { return fbSlug() ? 'https://m.me/' + fbSlug() : chref('facebook'); }
+function messengerHref() { return C.messenger || (fbSlug() ? 'https://m.me/' + fbSlug() : chref('facebook')); }
 function orderText(o) {
   return [`ĐƠN ĐẶT PHÒNG - ${S.name}`, `Mã đơn: ${o.code}`, `Dịch vụ: ${o.room}`, `Khách: ${o.name} - ${o.phone}`, `Nhận phòng: ${vdate(o.checkin)} | Trả phòng: ${vdate(o.checkout)}`, `Số khách: ${o.guests || ''}`, `Tổng tiền: ${o.total > 0 ? o.total.toLocaleString('vi-VN') + ' đ' : 'Chờ nhà báo giá'}`, `Nội dung chuyển khoản: ${o.tcode || o.code}`, `Ghi chú: ${o.notes || 'Không có'}`].join('\n');
 }
