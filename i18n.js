@@ -4,6 +4,9 @@
    Muốn dịch câu mới: thêm dòng  "câu tiếng Việt": "English text"  vào DICT. Câu chưa có trong DICT sẽ giữ nguyên tiếng Việt. */
 (function () {
   const DICT = /*DICT*/{
+"Hủy trước ngày nhận phòng từ 3 ngày trở lên: hoàn 100% tiền đã chuyển.": "Cancel 3 or more days before check-in: 100% refund of the amount paid.",
+"Hủy trước ngày nhận phòng từ 3 ngày trở lên hoàn 100%, dưới 3 ngày không hoàn; tiền hoàn chuyển lại trong vòng 3 ngày. Xem chi tiết ở trang Chính sách. Nếu thời tiết xấu khiến bạn không lên được, hãy nhắn nhà để được hỗ trợ.": "Cancel 3 or more days before check-in for a 100% refund; under 3 days, no refund; refunds are returned within 3 days. See the Policy page for details. If bad weather stops you from coming up, message us for help.",
+"Để hủy hoặc đổi ngày, bạn nhắn homestay qua Messenger kèm mã đơn. Tiền hoàn (nếu có) được chuyển lại về tài khoản bạn đã dùng để thanh toán trong vòng 3 ngày.": "To cancel or change dates, message the homestay on Messenger with your booking code. Refunds (if any) are returned to the account you paid from within 3 days.",
 "Hỏi nhà về điểm này": "Ask us about this place",
 "-- Chọn hạng phòng --": "-- Choose a room --",
 "Vui lòng chọn hạng phòng.": "Please choose a room.",

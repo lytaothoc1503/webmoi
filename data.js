@@ -188,8 +188,7 @@ window.SITE_DATA = {
   // Chính sách hoàn/hủy (chờ chủ nhà xác nhận bản thật). Hiện ở trang chính sách, FAQ và trang đơn.
   policyIsSample: false,
   cancelPolicy: [
-    'Hủy trước ngày nhận phòng từ 7 ngày: hoàn 100% tiền đã chuyển.',
-    'Hủy từ 3 đến 6 ngày trước ngày nhận phòng: hoàn 50%.',
+    'Hủy trước ngày nhận phòng từ 3 ngày trở lên: hoàn 100% tiền đã chuyển.',
     'Hủy dưới 3 ngày hoặc không đến: không hoàn tiền.',
     'Đổi ngày: báo trước ít nhất 3 ngày, tùy tình trạng phòng.',
     'Thời tiết xấu, đường bị chặn khiến không thể lên Tà Xùa: nhà hỗ trợ đổi ngày hoặc hoàn tiền, báo cho nhà qua Messenger.',
@@ -197,7 +196,7 @@ window.SITE_DATA = {
   faq: [
     { question: 'Nhận phòng cần giấy tờ gì?', answer: 'Người đại diện đặt phòng mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Khách đi cùng gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định.' },
     { question: 'Giá phòng có gồm bữa sáng không?', answer: 'Giá phòng chưa gồm bữa sáng. Bạn có thể thêm Combo Săn Mây (bữa sáng trên mây + trà chiều, tặng kèm nước uống) khi đặt phòng.' },
-    { question: 'Chính sách hoàn / hủy phòng thế nào?', answer: 'Hủy trước 7 ngày hoàn 100%, từ 3 đến 6 ngày hoàn 50%, dưới 3 ngày không hoàn. Xem chi tiết ở trang Chính sách. Nếu thời tiết xấu khiến bạn không lên được, hãy nhắn nhà để được hỗ trợ.' },
+    { question: 'Chính sách hoàn / hủy phòng thế nào?', answer: 'Hủy trước ngày nhận phòng từ 3 ngày trở lên hoàn 100%, dưới 3 ngày không hoàn; tiền hoàn chuyển lại trong vòng 3 ngày. Xem chi tiết ở trang Chính sách. Nếu thời tiết xấu khiến bạn không lên được, hãy nhắn nhà để được hỗ trợ.' },
     { question: 'Làm sao để đặt phòng?', answer: 'Bạn bấm "Đặt Phòng" và điền thông tin, hoặc nhắn trực tiếp qua Facebook của nhà. Nhà sẽ liên hệ xác nhận với bạn.' },
     { question: 'Giờ nhận và trả phòng như thế nào?', answer: 'Nhận phòng từ 14:00 và trả phòng trước 12:00. Nếu cần đến sớm hoặc gửi hành lý, hãy báo trước cho nhà.' },
     { question: 'Thời điểm nào săn mây đẹp nhất?', answer: 'Mùa săn mây ở Tà Xùa thường từ khoảng tháng 10 đến tháng 4 năm sau. Thời tiết thay đổi theo ngày nên nhà sẽ tư vấn thêm khi bạn liên hệ.' },
