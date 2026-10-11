@@ -31,6 +31,7 @@ window.SITE_DATA = {
     { title: 'Mùa đẹp nhất', text: 'Từ khoảng tháng 10 đến tháng 4 năm sau, là mùa mây dày và dễ gặp biển mây nhất.' },
     { title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà gợi ý lịch săn mây bình minh, nên xuất phát khoảng 4:30.' },
     { title: 'Chuẩn bị gì', text: 'Trời khoảng 15-22°C, sáng và tối khá lạnh. Mang áo ấm, áo mưa và giày chống trơn.' },
+    { title: 'Đi lại an toàn', text: 'Nên lên Tà Xùa vào ban ngày, tránh chạy đường đèo buổi tối. Dịp lễ Tết phòng thường kín, nên đặt sớm.' },
     { title: 'Hỏi nhà trước', text: 'Mây phụ thuộc thời tiết từng ngày. Nhắn nhà để biết sáng mai có săn mây được không.' },
   ],
   attractions: [

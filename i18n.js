@@ -184,6 +184,8 @@
 "Nơi ngắm bình minh và săn mây, nhìn thấy nhiều lớp núi nối nhau. Có quán cà phê để ngồi ngắm.": "A spot for sunrise and cloud hunting with layers of mountains in view. There is a cafe to sit and watch.",
 "Check-in": "Photo spot",
 "Cây táo mèo cô đơn": "The Lonely Apple Tree",
+"Đi lại an toàn": "Travel safely",
+"Nên lên Tà Xùa vào ban ngày, tránh chạy đường đèo buổi tối. Dịp lễ Tết phòng thường kín, nên đặt sớm.": "Try to head up to Tà Xùa in daylight and avoid the mountain pass at night. Rooms often fill up over public holidays and Tết, so book early.",
 "Một cây táo mèo đứng lẻ loi giữa đồi, trở thành biểu tượng được nhiều người tìm đến chụp ảnh. Nên đến khoảng 5 giờ sáng để đón bình minh dưới gốc cây; nhà sẽ chỉ đường cụ thể khi bạn nhận phòng.": "A single apple tree standing alone on the hill, now a symbol that many visitors come to photograph. Come around 5 a.m. to catch the sunrise under the tree; we will show you the way when you check in.",
 "Ngắm cảnh": "Sightseeing",
 "Mỏm đá Đầu Rùa": "Turtle Head Rock",
