@@ -47,16 +47,17 @@ const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu']
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
 const NAV_MORE = ['gioi-thieu', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
-function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
-document.addEventListener('click', () => document.querySelectorAll('.nav-more.open').forEach((li) => li.classList.remove('open')));
+function closeNavMore(except) { document.querySelectorAll('.nav-more.open').forEach((li) => { if (li === except) return; li.classList.remove('open'); li.querySelector('.nav-more-btn').setAttribute('aria-expanded', 'false'); }); }
+function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; closeNavMore(li); const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
+document.addEventListener('click', () => closeNavMore());
 function visibleSections() { return SECTIONS.filter(([id]) => $(id) && !$(id).hidden).sort((x, y) => ($(x[0]).compareDocumentPosition($(y[0])) & 4 ? -1 : 1)); } // luôn theo thứ tự trên trang
 function buildNav() {
   const vs = visibleSections();
   const main = vs.filter(([id]) => id !== 'trang-chu' && !NAV_MORE.includes(id)), more = vs.filter(([id]) => NAV_MORE.includes(id));
   const svc = D.services || [];
-  const svcMenu = svc.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Dịch Vụ <span class="caret">▾</span></a><ul class="nav-dropdown">${svc.map((s, i) => `<li><a href="javascript:void(0)" onclick="openInfo('s', ${i})">${esc(s.icon || '')} ${esc(s.name)}</a></li>`).join('')}</ul></li>` : '';
+  const svcMenu = svc.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Dịch Vụ <span class="caret">▾</span></a><ul class="nav-dropdown">${svc.map((s, i) => `<li><a href="javascript:void(0)" onclick="openInfo('s', ${i})">${esc(s.icon || '')} ${esc(s.name)}</a></li>`).join('')}</ul></li>` : '';
   const links = main.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('') + svcMenu
-    + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
+    + (more.length ? `<li class="nav-more"><a href="javascript:void(0)" class="nav-more-btn" role="button" aria-haspopup="true" aria-expanded="false" onclick="toggleNavMore(event)">Thêm <span class="caret">▾</span></a><ul class="nav-dropdown">${more.map(([id, l]) => `<li><a href="#${id}" data-sec="${id}">${l}</a></li>`).join('')}</ul></li>` : '');
   $('nav-links').innerHTML = links + accountNavHtml() + (C.phone ? `<li><a href="tel:${esc(C.phone)}" class="btn-nav-call">📞 Gọi</a></li>` : '') + `<li><a href="javascript:void(0)" onclick="openBookingModal('', 0)" class="btn-nav-book">Đặt Phòng</a></li>`;
   $('mobile-nav').innerHTML = visibleSections().map(([id, l]) => `<a href="#${id}" data-sec="${id}" onclick="closeMobileNav()">${l}</a>`).join('')
     + (svc.length ? `<span class="mn-h">Dịch Vụ</span>` + svc.map((s, i) => `<a href="javascript:void(0)" class="mn-sub" onclick="closeMobileNav(); openInfo('s', ${i})">${esc(s.icon || '')} ${esc(s.name)}</a>`).join('') : '')
@@ -91,9 +92,19 @@ let userMoved = false;
 
 /* ===== MENU DI ĐỘNG ===== */
 const hamburgerBtn = $('hamburger-btn'), mobileNav = $('mobile-nav'), mobileOverlay = $('mobile-overlay');
-hamburgerBtn.addEventListener('click', () => { mobileNav.classList.add('open'); mobileOverlay.classList.add('active'); hamburgerBtn.classList.add('active'); });
-mobileOverlay.addEventListener('click', closeMobileNav);
-function closeMobileNav() { mobileNav.classList.remove('open'); mobileOverlay.classList.remove('active'); hamburgerBtn.classList.remove('active'); }
+mobileNav.inert = true; // ngăn kéo đóng thì không cho Tab vào các liên kết nằm ngoài màn hình
+hamburgerBtn.addEventListener('click', () => {
+  mobileNav.classList.add('open'); mobileOverlay.classList.add('active'); hamburgerBtn.classList.add('active'); mobileNav.inert = false;
+  hamburgerBtn.setAttribute('aria-expanded', 'true'); hamburgerBtn.setAttribute('aria-label', 'Đóng menu');
+  const first = mobileNav.querySelector('a'); if (first) first.focus({ preventScroll: true });
+});
+mobileOverlay.addEventListener('click', () => closeMobileNav());
+function closeMobileNav(restoreFocus) {
+  const had = mobileNav.classList.contains('open');
+  mobileNav.classList.remove('open'); mobileOverlay.classList.remove('active'); hamburgerBtn.classList.remove('active'); mobileNav.inert = true;
+  hamburgerBtn.setAttribute('aria-expanded', 'false'); hamburgerBtn.setAttribute('aria-label', 'Mở menu');
+  if (restoreFocus === true && had) hamburgerBtn.focus({ preventScroll: true });
+}
 
 /* ===== LỐI VÀO QUẢN TRỊ (nhấp 3 lần vào logo). Đăng nhập thật nằm ở auth.html ===== */
 let secretClicks = 0, secretTimer = null;
@@ -216,7 +227,98 @@ function openInfo(kind, i) {
     </div>`;
   $('info-modal').classList.add('active');
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeInfo(); closeLightbox(); } });
+/* ===== BÀN PHÍM + TRÌNH ĐỌC MÀN HÌNH: hộp thoại, tab, Esc, phần tử role="button" ===== */
+const DIALOG_CLOSERS = { 'booking-modal': () => closeBookingModal(), 'auth-modal': () => closeAuthModal(), 'review-modal': () => closeReview(), 'info-modal': () => closeInfo(), 'phieu-modal': () => $('phieu-modal').classList.remove('active') };
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const isShown = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+let lastFocus = null;
+document.addEventListener('focusin', (e) => { if (!e.target.closest('.modal-overlay.active, #lightbox.active')) lastFocus = e.target; });
+function topDialog() {
+  const lb = $('lightbox'); if (lb && lb.classList.contains('active')) return lb;
+  const act = document.querySelectorAll('.modal-overlay.active'); return act.length ? act[act.length - 1] : null;
+}
+const dialogBox = (d) => (d.id === 'lightbox' ? d : d.querySelector('.modal-box'));
+function decorateDialog(d) {
+  const box = dialogBox(d); if (!box) return;
+  if (d.id !== 'lightbox') {
+    box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); if (!box.hasAttribute('tabindex')) box.tabIndex = -1;
+    if (d.id === 'info-modal') { // nội dung đổi mỗi lần mở: gắn tên hộp thoại theo tiêu đề hiện tại
+      const h = box.querySelector('#info-body h3');
+      if (h) { if (!h.id) h.id = 'info-title'; box.setAttribute('aria-labelledby', h.id); box.removeAttribute('aria-label'); } else box.setAttribute('aria-label', 'Chi tiết');
+    } else if (!box.getAttribute('aria-labelledby') || !document.getElementById(box.getAttribute('aria-labelledby'))) {
+      const h = box.querySelector('h3, h2');
+      if (h) { if (!h.id) h.id = d.id + '-title'; box.setAttribute('aria-labelledby', h.id); } else box.setAttribute('aria-label', 'Phiếu đặt phòng');
+    }
+  }
+  d.querySelectorAll('.modal-close, .gallery-lightbox-close').forEach((c) => { c.setAttribute('role', 'button'); c.tabIndex = 0; c.setAttribute('aria-label', 'Đóng'); });
+}
+function restoreFocusTo(el) {
+  let t = el;
+  if (t && t.isConnected && t.closest('[inert]')) t = null;
+  if (t && t.isConnected && !isShown(t)) { const li = t.closest('.nav-more'); t = li ? li.querySelector('.nav-more-btn') : null; }
+  if ((!t || !t.isConnected) && isShown(hamburgerBtn)) t = hamburgerBtn;
+  if (t && t.isConnected && isShown(t)) t.focus({ preventScroll: true });
+}
+const dialogState = new WeakMap(); // hộp thoại -> phần tử đã mở nó
+new MutationObserver((muts) => {
+  for (const m of muts) {
+    const d = m.target; if (!(d.classList && (d.classList.contains('modal-overlay') || d.id === 'lightbox'))) continue;
+    const on = d.classList.contains('active'), was = dialogState.has(d);
+    if (on && !was) {
+      const ae = document.activeElement;
+      dialogState.set(d, ae && ae !== document.body ? ae : lastFocus);
+      decorateDialog(d);
+      const box = dialogBox(d); // hộp thoại đang hiện dần (visibility chuyển cảnh) nên thử lại vài lần cho tới khi nhận được focus
+      let tries = 0;
+      const tryFocus = () => {
+        if (!d.classList.contains('active') || !box || box.contains(document.activeElement)) return;
+        box.focus({ preventScroll: true });
+        if (document.activeElement !== box && ++tries < 6) setTimeout(tryFocus, 40);
+      };
+      tryFocus();
+    } else if (!on && was) {
+      const opener = dialogState.get(d); dialogState.delete(d);
+      if (!topDialog()) restoreFocusTo(opener);
+    }
+  }
+}).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['class'] });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    const d = topDialog();
+    if (d) { e.preventDefault(); if (d.id === 'lightbox') closeLightbox(); else if (DIALOG_CLOSERS[d.id]) DIALOG_CLOSERS[d.id](); return; }
+    if (mobileNav.classList.contains('open')) { e.preventDefault(); closeMobileNav(true); return; }
+    const open = document.querySelector('.nav-more.open');
+    if (open) { e.preventDefault(); closeNavMore(); open.querySelector('.nav-more-btn').focus({ preventScroll: true }); }
+    return;
+  }
+  if (e.key === 'Tab') {
+    const d = topDialog(); if (!d) return;
+    const box = dialogBox(d), items = [...box.querySelectorAll(FOCUSABLE)].filter(isShown);
+    if (!items.length) { e.preventDefault(); box.focus(); return; }
+    const i = items.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); items[items.length - 1].focus(); }
+    else if (!e.shiftKey && (i === -1 || i === items.length - 1)) { e.preventDefault(); items[0].focus(); }
+    return;
+  }
+  if (e.key === 'Enter' || e.key === ' ') { // phần tử role="button" không phải nút thật: Enter / Space = bấm
+    const el = e.target.closest && e.target.closest('[role="button"]'); if (!el || el !== e.target) return;
+    const tag = el.tagName;
+    if (tag === 'BUTTON' || (e.key === 'Enter' && tag === 'A' && el.hasAttribute('href'))) return;
+    e.preventDefault(); el.click();
+  }
+});
+/* thẻ bấm được dựng bằng div / figure: thêm role + tabindex để dùng được bằng bàn phím (không đổi giao diện) */
+function enhanceClickables() {
+  document.querySelectorAll('.room-card, .tour-arch-card, .svc-card, .cf-item, #cf-photos figure, #cf-guest figure, .tool-btn.is-empty').forEach((el) => {
+    if (el.hasAttribute('role')) return;
+    el.setAttribute('role', 'button'); el.tabIndex = 0;
+  });
+  document.querySelectorAll('.tool-btn:not([aria-label])').forEach((a) => { if (a.title) a.setAttribute('aria-label', a.title); });
+}
+let enhanceQueued = false;
+new MutationObserver(() => { if (enhanceQueued) return; enhanceQueued = true; requestAnimationFrame(() => { enhanceQueued = false; enhanceClickables(); }); }).observe(document.body, { childList: true, subtree: true });
+enhanceClickables();
+function toggleFaq(q) { const o = q.parentElement.classList.toggle('open'); q.setAttribute('aria-expanded', String(o)); }
 let placesList = [];
 function openPlace(i) {
   const x = placesList[i]; if (!x) return;
@@ -291,7 +393,7 @@ function loadExplore() {
   if (!tips.length && !at.length) { $('kham-pha').hidden = true; return; }
   $('kp-tips').innerHTML = tips.map((t) => `<div class="kp-tip">${t.icon ? `<span class="ic">${esc(t.icon)}</span>` : ''}<strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div>`).join('');
   placesList = at.filter((x) => x.image_url).concat(at.filter((x) => !x.image_url));
-  $('kp-grid').innerHTML = placesList.map((x, i) => `<div class="kp-card${x.image_url ? '' : ' kp-noimg'}" role="button" tabindex="0" onclick="openPlace(${i})" onkeydown="if(event.key==='Enter')openPlace(${i})">${x.image_url ? img(x.image_url, x.name) : '<div class="kp-band"></div>'}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p>${(x.more || []).length ? '<span class="kp-more">Xem thêm ›</span>' : ''}</div></div>`).join('');
+  $('kp-grid').innerHTML = placesList.map((x, i) => `<div class="kp-card${x.image_url ? '' : ' kp-noimg'}" role="button" tabindex="0" onclick="openPlace(${i})">${x.image_url ? img(x.image_url, x.name) : '<div class="kp-band"></div>'}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p>${(x.more || []).length ? '<span class="kp-more">Xem thêm ›</span>' : ''}</div></div>`).join('');
   $('kp-seasons').innerHTML = (D.seasons || []).map((x) => `<div class="kp-season">${x.image_url ? img(x.image_url, x.title) : ''}<div><small>${esc(x.months)}</small><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
   $('kp-seasons-box').hidden = !(D.seasons || []).length;
   $('kp-plan').innerHTML = (D.itinerary || []).map((d) => `<div class="kp-day"><h4>${esc(d.day)}</h4>${d.steps.map((st) => `<div class="kp-step">${st.image_url ? img(st.image_url, st.title) : ''}<div><small>${esc(st.time)}</small><strong>${esc(st.title)}</strong><p>${esc(st.text)}</p></div></div>`).join('')}</div>`).join('');
@@ -300,8 +402,8 @@ function loadExplore() {
 }
 async function loadGallery() {
   const list = await getList('gallery', D.gallery, 'is_active');
-  $('gallery-grid').innerHTML = list.map((g) => `<div class="gallery-item" data-full="${esc(safeUrl(g.image_url))}">${img(g.image_url, g.caption || 'Ảnh')}<div class="gallery-caption">${esc(g.caption || '')}</div></div>`).join('');
-  $('gallery-grid').querySelectorAll('.gallery-item').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full)));
+  $('gallery-grid').innerHTML = list.map((g) => `<div class="gallery-item" role="button" tabindex="0" aria-label="${esc('Xem ảnh lớn: ' + (g.caption || 'Ảnh'))}" data-full="${esc(safeUrl(g.image_url))}" data-alt="${esc(g.caption || '')}">${img(g.image_url, g.caption || 'Ảnh')}<div class="gallery-caption">${esc(g.caption || '')}</div></div>`).join('');
+  $('gallery-grid').querySelectorAll('.gallery-item').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full, el.dataset.alt)));
 }
 async function loadReviews() {
   const list = await getList('reviews', D.reviews, 'is_published');
@@ -315,7 +417,7 @@ async function loadReviews() {
 }
 async function loadFAQ() {
   const list = await getList('faq', D.faq, 'is_active');
-  $('faq-list').innerHTML = list.map((f) => `<div class="faq-item"><div class="faq-question" onclick="this.parentElement.classList.toggle('open')">${esc(f.question)}<span class="faq-icon">+</span></div><div class="faq-answer">${esc(f.answer)}</div></div>`).join('');
+  $('faq-list').innerHTML = list.map((f, i) => `<div class="faq-item"><div class="faq-question" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a-${i}" onclick="toggleFaq(this)">${esc(f.question)}<span class="faq-icon" aria-hidden="true">+</span></div><div class="faq-answer" id="faq-a-${i}">${esc(f.answer)}</div></div>`).join('');
   // Dữ liệu có cấu trúc FAQPage, tự đồng bộ với nội dung FAQ đang hiển thị
   const old = document.getElementById('faq-jsonld'); if (old) old.remove();
   if (list.length) {
@@ -325,7 +427,7 @@ async function loadFAQ() {
     document.head.appendChild(s);
   }
 }
-function openLightbox(url) { $('lightbox-img').src = url; $('lightbox').classList.add('active'); }
+function openLightbox(url, alt) { $('lightbox-img').src = url; $('lightbox-img').alt = alt || ''; $('lightbox').classList.add('active'); }
 function closeLightbox() { $('lightbox').classList.remove('active'); }
 
 /* ===== ĐẶT PHÒNG ===== */

@@ -148,6 +148,17 @@
         background: var(--accent-hover);
       }
 
+      /* BÀN PHÍM: viền cam rõ khi tab tới phần tử bấm được */
+      a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+      [role="button"]:focus-visible, [tabindex]:focus-visible {
+        outline: 3px solid var(--accent-orange);
+        outline-offset: 2px;
+      }
+      .faq-question:focus-visible, .gallery-item:focus-visible { outline-offset: -3px; }
+      .modal-box:focus-visible, .gallery-lightbox:focus-visible { outline: none; }
+      header a:focus-visible, header button:focus-visible, header [role="button"]:focus-visible, .mobile-nav a:focus-visible, .gallery-lightbox-close:focus-visible { outline-color: #ffb27a; }
+      .form-group input:focus-visible { outline: 3px solid var(--accent-orange); outline-offset: 1px; }
+
       /* MOBILE HAMBURGER */
       .hamburger {
         display: none;
@@ -944,7 +955,7 @@
       .nav-dropdown::before { content: ''; position: absolute; left: 0; right: 0; top: -16px; height: 16px; }
       .nav-dropdown a { display: block; padding: 10px 14px; border-radius: 8px; }
       .nav-dropdown a:hover { background: rgba(255,255,255,.08); }
-      .nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown, .nav-more:focus-within .nav-dropdown { display: block; }
+      .nav-more:hover .nav-dropdown, .nav-more.open .nav-dropdown { display: block; }
       .nav-links a { white-space: nowrap; font-size: 12.5px; }
       .nav-links a.active, .mobile-nav a.active { color: var(--accent-orange); }
       @media (max-width: 1240px) { .nav-links { display: none; } .hamburger { display: flex; } }
@@ -1036,7 +1047,7 @@
       .kp-card img, .kp-ph { width: 100%; height: 130px; object-fit: cover; display: block; }
       .kp-ph { display: flex; align-items: center; justify-content: center; font-size: 44px; background: linear-gradient(135deg,#f5ebe0,#e8d5c0); }
       .kp-band { height: 54px; background: radial-gradient(120px 40px at 18% 100%, rgba(255,255,255,.75), transparent 70%), radial-gradient(160px 46px at 62% 105%, rgba(255,255,255,.6), transparent 70%), radial-gradient(90px 30px at 92% 100%, rgba(255,255,255,.7), transparent 70%), linear-gradient(135deg, #e9b98a, #d9a06b 55%, #b9794a); }
-      .kp-card { cursor: pointer; transition: transform .15s; } .kp-card:hover, .kp-card:focus-visible { transform: translateY(-3px); } .kp-more { display: inline-block; margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--accent-orange); } .kp-tag { display: inline-block; font-size: 11px; color: var(--accent-orange); font-weight: 700; }
+      .kp-card { cursor: pointer; transition: transform .15s; } .kp-card:hover, .kp-card:focus-visible { transform: translateY(-3px); } .kp-more { display: inline-block; margin-top: 8px; font-size: 12.5px; font-weight: 700; color: var(--accent-hover); } .kp-tag { display: inline-block; font-size: 11px; color: var(--accent-hover); font-weight: 700; }
       .kp-noimg { border-top: 0; } .kp-noimg .kp-body { padding: 16px 16px 18px; }
       .kp-body { padding: 12px 14px 14px; } .kp-body h4 { font-size: 15px; color: var(--nav-brown); margin: 0 0 4px; }
       .kp-body small { display: inline-block; font-size: 11px; color: var(--accent-orange); font-weight: 700; margin-bottom: 4px; }
@@ -1190,7 +1201,7 @@
         </div>
         <ul class="nav-links" id="nav-links"></ul>
         <button type="button" class="lang-switch" id="lang-switch" title="Ngôn ngữ / Language"><span data-l="vi">VI</span><span data-l="en">EN</span></button>
-        <div class="hamburger" id="hamburger-btn">
+        <div class="hamburger" id="hamburger-btn" role="button" tabindex="0" aria-label="Mở menu" aria-expanded="false" aria-controls="mobile-nav">
           <span></span><span></span><span></span>
         </div>
       </div>
@@ -1198,7 +1209,7 @@
 
     <!-- MOBILE NAV DRAWER -->
     <div class="mobile-nav-overlay" id="mobile-overlay"></div>
-    <nav class="mobile-nav" id="mobile-nav"></nav>
+    <nav class="mobile-nav" id="mobile-nav" aria-label="Menu di động"></nav>
 
     <!-- HERO -->
     <section class="hero" id="trang-chu">
@@ -1420,8 +1431,8 @@
 
     <!-- BOOKING MODAL -->
     <div id="booking-modal" class="modal-overlay">
-      <div class="modal-box">
-        <span class="modal-close" onclick="closeBookingModal()">&times;</span>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-heading" tabindex="-1">
+        <span class="modal-close" role="button" tabindex="0" aria-label="Đóng" onclick="closeBookingModal()">&times;</span>
         <h3 class="modal-title" id="modal-heading">Phiếu Đặt Phòng Trực Tuyến</h3>
 
         <form id="booking-form-step1">
@@ -1481,8 +1492,8 @@
 
     <!-- REVIEW MODAL -->
     <div id="auth-modal" class="modal-overlay">
-      <div class="modal-box" style="max-width:420px">
-        <span class="modal-close" onclick="closeAuthModal()">&times;</span>
+      <div class="modal-box" style="max-width:420px" role="dialog" aria-modal="true" aria-labelledby="auth-title" tabindex="-1">
+        <span class="modal-close" role="button" tabindex="0" aria-label="Đóng" onclick="closeAuthModal()">&times;</span>
         <h3 class="modal-title" id="auth-title" style="margin-bottom:12px">Tài khoản của bạn</h3>
         <div class="auth-tabs" id="auth-tabs"><button type="button" id="auth-tab-login" class="on" onclick="setAuthMode('login')">ĐĂNG NHẬP</button><button type="button" id="auth-tab-signup" onclick="setAuthMode('signup')">ĐĂNG KÝ</button></div>
         <p class="ov-sub" id="auth-info" style="margin:10px 0"></p>
@@ -1509,9 +1520,9 @@
       </div>
     </div>
     <div id="review-modal" class="modal-overlay">
-      <div class="modal-box">
-        <span class="modal-close" onclick="closeReview()">&times;</span>
-        <h3 class="modal-title">Viết Đánh Giá</h3>
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="review-title" tabindex="-1">
+        <span class="modal-close" role="button" tabindex="0" aria-label="Đóng" onclick="closeReview()">&times;</span>
+        <h3 class="modal-title" id="review-title">Viết Đánh Giá</h3>
         <p id="rv-for" style="font-size:12.5px;color:var(--text-muted);margin-bottom:10px"></p>
         <div id="rv-stars" class="rv-stars"><button type="button" data-n="1">★</button><button type="button" data-n="2">★</button><button type="button" data-n="3">★</button><button type="button" data-n="4">★</button><button type="button" data-n="5">★</button></div>
         <div class="form-group"><label>Cảm nhận của bạn:</label><textarea id="rv-text" rows="5" maxlength="1000" placeholder="Bạn thấy chuyến nghỉ tại Nhà của An thế nào?" style="width:100%;padding:10px;border:1px solid #d5c8be;border-radius:8px;font-size:14px"></textarea></div>
@@ -1522,15 +1533,15 @@
 
     <!-- INFO MODAL (chi tiết tour / dịch vụ, ai cũng xem được) -->
     <div id="info-modal" class="modal-overlay" onclick="if(event.target===this)closeInfo()">
-      <div class="modal-box" id="info-box" style="max-width:560px;padding:0;overflow:hidden">
-        <span class="modal-close" onclick="closeInfo()" style="z-index:2;background:rgba(255,255,255,.9);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;top:10px;right:10px">&times;</span>
+      <div class="modal-box" id="info-box" style="max-width:560px;padding:0;overflow:hidden" role="dialog" aria-modal="true" tabindex="-1">
+        <span class="modal-close" role="button" tabindex="0" aria-label="Đóng" onclick="closeInfo()" style="z-index:2;background:rgba(255,255,255,.9);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;top:10px;right:10px">&times;</span>
         <div id="info-body"></div>
       </div>
     </div>
 
     <!-- GALLERY LIGHTBOX -->
-    <div class="gallery-lightbox" id="lightbox" onclick="closeLightbox()">
-      <span class="gallery-lightbox-close">&times;</span>
+    <div class="gallery-lightbox" id="lightbox" onclick="closeLightbox()" role="dialog" aria-modal="true" aria-label="Xem ảnh lớn" tabindex="-1">
+      <span class="gallery-lightbox-close" role="button" tabindex="0" aria-label="Đóng">&times;</span>
       <img id="lightbox-img" src="" alt="" />
     </div>
 
