@@ -39,7 +39,8 @@
     tien: ['Số tiền (đ)', 'number'], lydo: ['Lý do', 'text'], hinhthuc: ['Hình thức giao nhận', 'text'],
     nh: ['Ngân hàng nhận', 'text'], stk: ['Số tài khoản nhận', 'text'], ctk: ['Tên chủ tài khoản', 'text'],
     ma_phieu: ['Mã booking trên phiếu khách xuất trình (đối chiếu)', 'text'], khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Đã thanh toán / đã cọc (đ)', 'number'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
-    c_ten: ['Người được ủy quyền: họ tên', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text']
+    b_ns: ['Khách: ngày sinh', 'text'], b_cap: ['Khách: CCCD cấp ngày', 'text'], b_noicap: ['Khách: CCCD cấp tại', 'text'], songay: ['Dự kiến hoàn tiền trong (số ngày)', 'text'],
+    c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text']
   };
 
   const head = (f, title, sub) => `<div class="dp-qh"><b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b>Độc lập - Tự do - Hạnh phúc</b><br>-----------***-----------</div>
@@ -87,13 +88,13 @@
         ${chk(f)}<p>Bên nhận hoàn xác nhận đã nhận đủ tiền và không khiếu nại gì thêm.</p>${sign2('BÊN HOÀN TRẢ', 'BÊN NHẬN HOÀN')}` },
 
     { id: 'uq-nhan-hoan', group: 'Ủy quyền', name: 'Giấy ủy quyền nhận tiền hoàn trả', note: 'Khách ủy quyền cho người khác nhận tiền hoàn thay.',
-      fields: ['ngay', 'diadiem', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'c_ten', 'c_cccd', 'c_dc', 'c_sdt', 'ma', 'tien', 'nh', 'stk', 'ctk'],
-      body: (f) => `${head(f, 'GIẤY ỦY QUYỀN')}
+      fields: ['ngay', 'diadiem', 'b_ten', 'b_ns', 'b_cccd', 'b_cap', 'b_noicap', 'b_dc', 'b_sdt', 'c_ten', 'c_cccd', 'c_dc', 'c_sdt', 'ma', 'tien', 'nh', 'stk', 'ctk', 'songay'],
+      body: (f) => `${head(f, 'GIẤY ỦY QUYỀN NHẬN TIỀN CÓ THỜI HẠN')}
         <p><i>${when(f)}</i></p>
-        <p><b>Bên ủy quyền:</b> Ông/Bà ${dots(f.b_ten, 22)}; CCCD số ${dots(f.b_cccd, 16)}; địa chỉ ${dots(f.b_dc, 30)}; điện thoại ${dots(f.b_sdt, 12)}.</p>
-        <p><b>Bên được ủy quyền:</b> Ông/Bà ${dots(f.c_ten, 22)}; CCCD số ${dots(f.c_cccd, 16)}; địa chỉ ${dots(f.c_dc, 30)}; điện thoại ${dots(f.c_sdt, 12)}.</p>
+        <p><b>Bên ủy quyền:</b> Ông/Bà ${dots(f.b_ten, 22)}; sinh ngày ${dots(f.b_ns, 10)}; CCCD số ${dots(f.b_cccd, 16)}, cấp ngày ${dots(f.b_cap, 10)} tại ${dots(f.b_noicap, 18)}; địa chỉ ${dots(f.b_dc, 30)}; điện thoại ${dots(f.b_sdt, 12)}; là người đặt phòng (hoặc đại diện hợp pháp của người đặt phòng) theo mã đơn ${dots(f.ma, 10)}.</p>
+        <p><b>Bên được ủy quyền (đơn vị hoặc cá nhân nhận thay):</b> ${dots(f.c_ten, 22)}; CCCD số ${dots(f.c_cccd, 16)}; địa chỉ ${dots(f.c_dc, 30)}; điện thoại ${dots(f.c_sdt, 12)}.</p>
         <p><b>Nội dung ủy quyền:</b> Bằng giấy này, tôi ủy quyền cho người có tên trên thay mặt tôi nhận lại số tiền <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}) mà Nhà của An Homestay Tà Xùa hoàn trả cho đơn đặt phòng mã ${dots(f.ma, 10)}${f.stk ? '; ' + bank(f) : ''}, và ký xác nhận đã nhận tiền.</p>
-        <p>Phạm vi: chỉ trong nội dung nêu trên. Thời hạn ủy quyền: ${dots('', 14)}. Ủy quyền không có thù lao.</p>
+        <p>Phạm vi: chỉ trong nội dung nêu trên. Thời hạn ủy quyền: có hiệu lực kể từ ngày ký và tự chấm dứt khi tiền hoàn trả về thành công tài khoản nhận nêu trên (dự kiến trong vòng ${dots(f.songay, 4)} ngày theo quy trình của ngân hàng). Ủy quyền không có thù lao.</p>
         <p>Tôi cam đoan chịu trách nhiệm trước pháp luật về nội dung ủy quyền này và các thông tin đã nêu.</p>${sign2('NGƯỜI ĐƯỢC ỦY QUYỀN', 'NGƯỜI ỦY QUYỀN')}` },
 
     { id: 'uq-nhan-phong', group: 'Ủy quyền', name: 'Giấy ủy quyền làm thủ tục nhận/trả phòng', note: 'Khách nhờ người khác nhận phòng, trả phòng thay.',
