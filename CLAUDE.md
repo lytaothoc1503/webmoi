@@ -30,7 +30,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 | `supabase/migrations/` | SQL tạo bảng và quyền |
 
 ## Mục Khám phá Tà Xùa
-Mục `#kham-pha` (mẹo săn mây + 9 địa điểm) lấy dữ liệu từ `cloudTips`, `attractions`, `attractionsNote` trong `data.js`; thêm/sửa điểm ở đó (chữ Việt mới cần thêm bản Anh vào `i18n.js`). Quy ước: KHÔNG ghi nguồn/credit bên ngoài lên web, chỉ dùng nội dung cần thiết viết lại bằng lời của nhà. Chủ nhà nên rà lại và thay ảnh thật cho các điểm đang dùng biểu tượng.
+Mục `#kham-pha` (mẹo săn mây + 9 địa điểm) lấy dữ liệu từ `cloudTips`, `attractions`, `attractionsNote` trong `data.js`; thêm/sửa điểm ở đó (chữ Việt mới cần thêm bản Anh vào `i18n.js`). Mục còn có `seasons` (Tà Xùa theo mùa) và `itinerary` (gợi ý 2 ngày 1 đêm, chỉ là gợi ý, không bán tour). Thẻ địa điểm chưa có ảnh THẬT thì hiện dạng chữ, KHÔNG dùng emoji và KHÔNG gán ảnh của chỗ khác (chỉ dùng ảnh Nhà của An hoặc ảnh đã được phép bằng văn bản; web báo/công ty du lịch đều có bản quyền). Quy ước: KHÔNG ghi nguồn/credit bên ngoài lên web, chỉ dùng nội dung cần thiết viết lại bằng lời của nhà. Chủ nhà nên rà lại và thay ảnh thật cho các điểm đang dùng biểu tượng.
 
 Đầu trang có hàng nút "Bạn đến để:" (Săn mây, Ngắm sao, Cà phê, Nghỉ dưỡng) và nút "Hỏi nhà: sáng mai có mây không?" (sao chép câu hỏi + mở Messenger). Đồng bộ 2 thiết bị: mọi thay đổi phải nằm trên `main` của GitHub (máy tính và điện thoại đều `git pull --rebase` từ đó); kiểm tra `git rev-parse HEAD origin/main` bằng nhau sau khi đẩy.
 

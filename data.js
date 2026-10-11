@@ -16,22 +16,22 @@ window.SITE_DATA = {
   tours: [
     { name: 'Săn Mây Bình Minh', price: 0, image_url: 'images/vay-tay-bien-may.jpg', description: 'Dậy sớm đón biển mây và ánh bình minh trên đỉnh núi Tà Xùa.',
       duration: 'Khoảng 3 giờ (nên xuất phát khoảng 4:30 sáng)', level: 'Nhẹ nhàng, hợp mọi lứa tuổi', best: 'Tháng 10 đến tháng 4, sáng sớm', meet: '', includes: ['Gợi ý lộ trình và điểm ngắm đẹp trong ngày', 'Cho mượn đèn pin / áo ấm tại nhà', 'Bữa sáng nóng khi bạn quay về (đặt trước)'], note: 'Mang áo khoác ấm và giày bám tốt. Nếu trời mưa lớn nên dời sang hôm sau, nhà sẽ báo tình hình trước.', details: 'Nên xuất phát khi trời còn tối để kịp đón biển mây và mặt trời mọc. Nhà chỉ cho bạn lộ trình và điểm ngắm đẹp trong ngày, có thể giúp bạn kết nối xe ôm hoặc người địa phương quen đường, rồi chuẩn bị bữa sáng nóng khi bạn quay về.' },
-    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 0, image_url: 'images/ta-xua-wta-2026.jpg', description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
+    { name: 'Chinh Phục Sống Lưng Khủng Long', price: 0, image_url: 'images/nha-go-den-long.jpg', description: 'Cung đường nổi tiếng với những dốc núi uốn lượn giữa biển mây.',
       duration: 'Nửa ngày (khoảng 5 giờ)', level: 'Vừa đến khó, cần sức khỏe tốt', best: 'Ngày khô ráo, sáng sớm', meet: '', includes: ['Gợi ý lộ trình và lưu ý an toàn', 'Nước và đồ ăn nhẹ (đặt trước)'], note: 'Cần sức khỏe tốt, đi giày thể thao, tránh đi khi mưa trơn.', details: 'Cung đường trekking quen thuộc của Tà Xùa với những đoạn sống núi uốn lượn giữa mây. Phù hợp nhóm bạn thích vận động. Cung đường còn hoang sơ, nhà sẽ tư vấn lộ trình và cách đi an toàn.' },
-    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 0, image_url: 'images/ruong-bac-thang.jpg', description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
+    { name: 'Rừng Chè Shan Tuyết Cổ Thụ', price: 0, image_url: 'images/bang-hay-lay-toi-di.jpg', description: 'Dạo bước giữa những gốc chè cổ thụ trong không khí se lạnh của núi rừng.',
       duration: 'Khoảng 3 giờ', level: 'Nhẹ nhàng, đi bộ chậm', best: 'Buổi sáng hoặc chiều mát', meet: '', includes: ['Gợi ý điểm đến và cách đi', 'Thưởng thức trà tại vườn'], note: 'Nên mang áo ấm, đi giày kín.', details: 'Dạo giữa những gốc chè Shan tuyết cổ thụ và nhâm nhi ly trà nóng ngay giữa rừng.' },
   ],
 
   // Dịch vụ & tiện ích. Giá tạm, chủ nhà sửa theo thực tế (price: 0 = Liên hệ báo giá). 
   // Khám phá Tà Xùa: mẹo săn mây + điểm tham quan (chủ nhà sửa/bổ sung theo thực tế).
   cloudTips: [
-    { icon: '📅', title: 'Mùa đẹp nhất', text: 'Từ khoảng tháng 10 đến tháng 4 năm sau, là mùa mây dày và dễ gặp biển mây nhất.' },
-    { icon: '🌅', title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà gợi ý lịch săn mây bình minh, nên xuất phát khoảng 4:30.' },
-    { icon: '🧥', title: 'Chuẩn bị gì', text: 'Trời khoảng 15-22°C, sáng và tối khá lạnh. Mang áo ấm, áo mưa và giày chống trơn.' },
-    { icon: '🌤️', title: 'Hỏi nhà trước', text: 'Mây phụ thuộc thời tiết từng ngày. Nhắn nhà để biết sáng mai có săn mây được không.' },
+    { title: 'Mùa đẹp nhất', text: 'Từ khoảng tháng 10 đến tháng 4 năm sau, là mùa mây dày và dễ gặp biển mây nhất.' },
+    { title: 'Giờ nên dậy', text: 'Sáng sớm trước và quanh lúc mặt trời mọc. Nhà gợi ý lịch săn mây bình minh, nên xuất phát khoảng 4:30.' },
+    { title: 'Chuẩn bị gì', text: 'Trời khoảng 15-22°C, sáng và tối khá lạnh. Mang áo ấm, áo mưa và giày chống trơn.' },
+    { title: 'Hỏi nhà trước', text: 'Mây phụ thuộc thời tiết từng ngày. Nhắn nhà để biết sáng mai có săn mây được không.' },
   ],
   attractions: [
-    { name: 'Sống lưng khủng long Háng Đồng', tag: 'Săn mây · Trekking', image_url: 'images/ta-xua-wta-2026.jpg', text: 'Sống núi uốn lượn dài, nhìn ra các dãy núi, thung lũng và biển mây. Điểm nổi tiếng nhất Tà Xùa.' },
+    { name: 'Sống lưng khủng long Háng Đồng', tag: 'Săn mây · Trekking', image_url: 'images/hero-san-may.jpg', text: 'Sống núi uốn lượn dài, nhìn ra các dãy núi, thung lũng và biển mây. Điểm nổi tiếng nhất Tà Xùa.' },
     { name: 'Đỉnh Gió', tag: 'Bình minh', image_url: 'images/vay-tay-bien-may.jpg', text: 'Nơi ngắm bình minh và săn mây, nhìn thấy nhiều lớp núi nối nhau. Có quán cà phê để ngồi ngắm.' },
     { name: 'Cây táo mèo cô đơn', tag: 'Check-in', text: 'Một cây táo mèo đứng lẻ loi giữa đồi, trở thành biểu tượng được nhiều người tìm đến chụp ảnh.' },
     { name: 'Mỏm đá Đầu Rùa', tag: 'Ngắm cảnh', text: 'Tảng đá nhô ra khỏi vách núi, hình dáng giống đầu rùa, đứng đó nhìn xuống biển mây.' },
@@ -42,6 +42,26 @@ window.SITE_DATA = {
     { name: 'Đồi chè cổ thụ', tag: 'Trải nghiệm', text: 'Những gốc chè hàng trăm năm tuổi giữa rừng, không khí se lạnh và yên tĩnh.' },
     { name: 'Rừng rêu', tag: 'Thiên nhiên', text: 'Khu rừng thân cây phủ đầy rêu xanh, mát và yên, hợp để đi dạo chậm.' },
     { name: 'Ruộng bậc thang Xím Vàng', tag: 'Theo mùa', image_url: 'images/ruong-bac-thang.jpg', text: 'Được nhắc đến là một trong những nơi có ruộng bậc thang đẹp nhất khu vực. Đẹp nhất vào mùa lúa.' },
+  ],
+  // Mùa trong năm (tham khảo, viết lại bằng lời của nhà; chủ nhà rà lại theo thực tế)
+  seasons: [
+    { months: 'Tháng 10 - tháng 4', title: 'Mùa săn mây', text: 'Mây dày, dễ gặp biển mây nhất, đẹp nhất khoảng 5:30 đến 8:00 sáng. Trời lạnh, buổi tối có thể xuống dưới 10°C.', image_url: 'images/hero-san-may.jpg' },
+    { months: 'Tháng 3 - tháng 5', title: 'Mùa hoa núi', text: 'Hoa mận, hoa đào, hoa ban nở trên các triền đồi. Trời thường quang hơn nên dễ chụp ảnh phong cảnh.' },
+    { months: 'Tháng 9', title: 'Mùa lúa chín', text: 'Ruộng bậc thang chuyển vàng, đường khô ráo, hợp để đi dạo và chụp ảnh.', image_url: 'images/ruong-bac-thang.jpg' },
+    { months: 'Tháng 6 - tháng 8', title: 'Mùa mưa', text: 'Mưa lớn, sương mù dày và có thể sạt lở. Nếu đi mùa này hãy nhắn nhà hỏi tình hình đường trước.' },
+  ],
+  // Gợi ý lịch trình 2 ngày 1 đêm (chỉ là gợi ý của nhà, không phải tour bán trọn gói)
+  itinerary: [
+    { day: 'Ngày 1', steps: [
+      { time: 'Chiều', title: 'Đến Tà Xùa, nhận phòng', text: 'Nhân viên hỗ trợ mang hành lý lên nhà. Nghỉ ngơi, làm quen với khung cảnh núi rừng.', image_url: 'images/bac-da-nha-go.jpg' },
+      { time: '16:00 - 18:00', title: 'Trà chiều ngắm hoàng hôn', text: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây tại quán cà phê của nhà.', image_url: 'images/hoang-hon-quan-cafe.jpg' },
+      { time: 'Tối', title: 'Ăn tối, nghỉ sớm', text: 'Đêm trời quang có thể ngắm sao. Ngủ sớm để sáng mai dậy đón bình minh.', image_url: 'images/den-long-hoang-hon.jpg' }
+    ] },
+    { day: 'Ngày 2', steps: [
+      { time: 'Khoảng 4:30', title: 'Săn mây bình minh', text: 'Xuất phát sớm đến điểm ngắm. Nhà gợi ý điểm đẹp theo thời tiết hôm đó và cho mượn đèn pin, áo ấm.', image_url: 'images/vay-tay-bien-may.jpg' },
+      { time: '7:00 - 9:30', title: 'Bữa sáng trên mây', text: 'Tô mì nóng cùng đồ uống, ăn giữa trời mây.', image_url: 'images/bua-sang-tren-may.jpg' },
+      { time: 'Trước khi trả phòng', title: 'Cà phê ngắm núi', text: 'Nếu còn thời gian, đi bộ nhẹ quanh khu vực hoặc ngồi cà phê. Muốn đi Sống Lưng Khủng Long hay rừng chè, hãy báo nhà để được gợi ý lộ trình.', image_url: 'images/ban-ghe-ngam-may.jpg' }
+    ] },
   ],
   attractionsNote: 'Thông tin mang tính tham khảo. Đường đi, thời tiết và tình trạng cung đường có thể thay đổi, hãy hỏi nhà trước khi đi.',
   // Mục Coffee (ngang hàng Homestay). Thiếu gì chủ nhà bổ sung ở đây; ô nào để trống thì web tự ẩn.

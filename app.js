@@ -249,8 +249,12 @@ async function loadCoffee() {
 function loadExplore() {
   const tips = D.cloudTips || [], at = D.attractions || [];
   if (!tips.length && !at.length) { $('kham-pha').hidden = true; return; }
-  $('kp-tips').innerHTML = tips.map((t) => `<div class="kp-tip"><span class="ic">${esc(t.icon || '')}</span><strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div>`).join('');
+  $('kp-tips').innerHTML = tips.map((t) => `<div class="kp-tip">${t.icon ? `<span class="ic">${esc(t.icon)}</span>` : ''}<strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div>`).join('');
   $('kp-grid').innerHTML = at.filter((x) => x.image_url).concat(at.filter((x) => !x.image_url)).map((x) => `<div class="kp-card${x.image_url ? '' : ' kp-noimg'}">${x.image_url ? img(x.image_url, x.name) : ''}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
+  $('kp-seasons').innerHTML = (D.seasons || []).map((x) => `<div class="kp-season">${x.image_url ? img(x.image_url, x.title) : ''}<div><small>${esc(x.months)}</small><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
+  $('kp-seasons-box').hidden = !(D.seasons || []).length;
+  $('kp-plan').innerHTML = (D.itinerary || []).map((d) => `<div class="kp-day"><h4>${esc(d.day)}</h4>${d.steps.map((st) => `<div class="kp-step">${st.image_url ? img(st.image_url, st.title) : ''}<div><small>${esc(st.time)}</small><strong>${esc(st.title)}</strong><p>${esc(st.text)}</p></div></div>`).join('')}</div>`).join('');
+  $('kp-plan-box').hidden = !(D.itinerary || []).length;
   $('kp-note').textContent = D.attractionsNote || '';
 }
 async function loadGallery() {
