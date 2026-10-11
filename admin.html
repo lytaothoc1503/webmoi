@@ -290,7 +290,7 @@
           <b>Vì sao phải đối chiếu mã booking trước khi hoàn tiền?</b><br>
           Mã booking là mã định danh duy nhất của mỗi đơn. Mã này gắn với Phiếu xác nhận đặt phòng, hạng phòng, thông tin khách và số tiền đã thu trên hệ thống.<br>
           Khi hoàn trả, mã in trên Phiếu xác nhận mà khách xuất trình phải trùng với mã của đơn đang chọn. Nếu không trùng, nhiều khả năng khách nhập nhầm mã, phiếu thuộc đơn khác hoặc phiếu không do nhà phát hành.<br>
-          Trường hợp này hệ thống không cho tạo yêu cầu hoàn. Hãy kiểm tra lại với khách rồi mới xử lý, để tránh hoàn nhầm người hoặc hoàn sai số tiền.
+          Nếu không trùng, hệ thống chỉ nhắc và hỏi bạn Tiếp tục hay Hủy; quyết định cuối cùng là của admin. Nếu tiếp tục, lý do hoàn sẽ ghi rõ mã không khớp để sau này đối chiếu.
         </div>
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">Chờ xử lý</div><div class="stat-num" id="rf-wait" style="color:#b45309">0</div></div>
@@ -509,7 +509,7 @@
         const sel = (document.getElementById('rf-code').value || '').trim().toUpperCase(), v = document.getElementById('rf-check').value.trim().toUpperCase(), m = document.getElementById('rf-check-msg');
         if (!v) { m.textContent = ''; return null; }
         const ok = !!sel && v === sel;
-        m.textContent = !sel ? 'Chọn đơn trước' : ok ? '✓ Khớp mã' : '✗ Không trùng khớp'; m.style.color = ok ? '#047857' : '#b91c1c';
+        m.textContent = !sel ? 'Chọn đơn trước' : ok ? '✓ Khớp mã' : '⚠ Không trùng (vẫn có thể tiếp tục)'; m.style.color = ok ? '#047857' : '#b91c1c';
         return ok;
       }
       async function addRefund() {
@@ -517,11 +517,17 @@
         const code = g('rf-code'), codeCheck = g('rf-check').toUpperCase(), amount = Number(g('rf-amount')), bank = g('rf-bank'), acc = g('rf-acc').replace(/\s/g, ''), name = g('rf-accname'), reason = g('rf-reason');
         const b = allBookings.find(x => x.booking_code === code);
         if (!code || !(amount > 0)) { alert('Chọn đơn và nhập số tiền hoàn.'); return; }
-        if (!codeCheck) { alert('Nhập mã booking trên Phiếu xác nhận của khách để đối chiếu.'); return; }
-        if (codeCheck !== String(code).toUpperCase()) { alert('Mã booking trên phiếu (' + codeCheck + ') KHÔNG trùng với đơn đang chọn (' + code + '). Chưa tạo yêu cầu hoàn. Hãy kiểm tra lại với khách.'); checkRefundCode(); return; }
+        let doiChieu = 'khớp';
+        if (!codeCheck) {
+          if (!confirm('Bạn chưa nhập mã booking trên Phiếu của khách để đối chiếu.\n\nBấm OK để tiếp tục tạo yêu cầu hoàn, hoặc Hủy để quay lại nhập.')) return;
+          doiChieu = 'chưa đối chiếu (admin chọn tiếp tục)';
+        } else if (codeCheck !== String(code).toUpperCase()) {
+          if (!confirm('Lưu ý: mã booking trên phiếu (' + codeCheck + ') không trùng với đơn đang chọn (' + code + ').\n\nBấm OK để vẫn tiếp tục tạo yêu cầu hoàn, hoặc Hủy để kiểm tra lại.')) { checkRefundCode(); return; }
+          doiChieu = 'KHÔNG khớp (' + codeCheck + ' so với ' + code + '), admin chọn tiếp tục';
+        }
         if (b && amount > paidOf(b)) { alert('Số tiền hoàn không được vượt số đã thu (' + vnd(paidOf(b)) + ').'); return; }
         if (bank.length < 2 || !/^\d{6,20}$/.test(acc) || name.length < 2 || !reason) { alert('Nhập đủ ngân hàng, số tài khoản (6-20 số), tên chủ tài khoản và lý do.'); return; }
-        const { error } = await supabaseClient.from('refunds').insert({ booking_code: code, amount, reason: reason + ' | Đã đối chiếu mã booking trên phiếu: khớp', bank_name: bank, account_no: acc, account_name: name });
+        const { error } = await supabaseClient.from('refunds').insert({ booking_code: code, amount, reason: reason + ' | Đối chiếu mã booking trên phiếu: ' + doiChieu, bank_name: bank, account_no: acc, account_name: name });
         if (error) { alert('Lỗi: ' + error.message); return; }
         ['rf-amount', 'rf-bank', 'rf-acc', 'rf-accname', 'rf-reason', 'rf-check'].forEach(i => document.getElementById(i).value = '');
         loadRefunds();
