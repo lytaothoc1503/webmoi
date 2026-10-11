@@ -55,6 +55,9 @@ Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh d
 7. **Danh sách việc chờ:** giữ theo mức ưu tiên, làm việc quan trọng trước và nhắc lại phần chưa làm khi xong.
 8. **Báo cáo:** kết luận trước, ngắn gọn, tối đa một câu hỏi có/không. Khi đổi cấu trúc hoặc quy trình thì cập nhật file này.
 
+## Quản trị: Homestay & Tài chính
+`admin.html` có 2 nhóm cân bằng: Homestay & Coffee (đơn, phòng, trải nghiệm, đánh giá, ảnh, FAQ) và Tài chính (Đối soát, Hoàn trả, Thu chi). Dùng chung tài khoản admin (`is_admin()`). Bảng `finance_entries`, `refunds` tạo bằng `supabase/migrations/20261011000000_finance_tables.sql` (RLS chỉ admin; **chủ dự án chạy file này trong SQL Editor một lần**, trợ lý bị chặn tự tạo bảng). Tên mục tài chính: "Cổng Quản lý Đối soát & Xử lý Hoàn trả" (KHÔNG dùng tên/nhãn VNPAY hay tổ chức thật khác, vì web này không phải cổng của họ). Số liệu tài chính chỉ lưu trong Supabase, không để trong file trên GitHub.
+
 ## Quy tắc khi sửa
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).
 1. `git pull --rebase` trước khi làm.

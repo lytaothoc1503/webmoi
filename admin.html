@@ -40,6 +40,10 @@
         cursor: pointer; margin-bottom: 6px; font-size: 13.5px; font-weight: 600;
         transition: all 0.2s;
       }
+      .menu-group { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .6; margin: 18px 6px 6px; }
+      .fin-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+      .fin-form input, .fin-form select { padding: 9px 10px; border: 1px solid #ddd; border-radius: 8px; font: inherit; }
+      .fin-note { font-size: 12px; color: #8a6d3b; background: #fff7e6; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
       .menu-item.active, .menu-item:hover { background: var(--accent); color: #fff; }
 
       main { flex: 1; padding: 28px; overflow-y: auto; }
@@ -138,12 +142,17 @@
   <body style="visibility:hidden">
     <aside>
       <div class="brand-title">NHÀ CỦA AN MANAGER</div>
+      <div class="menu-group">🏡 Homestay & Coffee</div>
       <div class="menu-item active" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
       <div class="menu-item" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
-      <div class="menu-item" onclick="showPage('tours', this)">🧭 Tour Trải Nghiệm</div>
+      <div class="menu-item" onclick="showPage('tours', this)">🧭 Trải Nghiệm</div>
       <div class="menu-item" onclick="showPage('reviews', this)">⭐ Đánh Giá <span id="rv-badge" class="menu-badge" style="display:none"></span></div>
       <div class="menu-item" onclick="showPage('gallery', this)">📷 Thư Viện Ảnh</div>
       <div class="menu-item" onclick="showPage('faq', this)">❓ Câu Hỏi FAQ</div>
+      <div class="menu-group">💰 Tài chính</div>
+      <div class="menu-item" onclick="showPage('recon', this)">🧾 Đối Soát</div>
+      <div class="menu-item" onclick="showPage('refunds', this)">↩️ Hoàn Trả</div>
+      <div class="menu-item" onclick="showPage('ledger', this)">📒 Thu Chi</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
@@ -206,6 +215,66 @@
             </tbody>
           </table>
         </div>
+      </div>
+
+
+      <!-- TÀI CHÍNH: ĐỐI SOÁT -->
+      <div class="page-section" id="page-recon">
+        <div class="top-bar"><h2>Cổng Quản lý Đối soát & Xử lý Hoàn trả</h2></div>
+        <div class="fin-note" id="fin-setup-note" style="display:none">Chưa tạo bảng tài chính trong Supabase. Chạy file supabase/migrations/20261011000000_finance_tables.sql trong SQL Editor một lần.</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Chờ đối soát</div><div class="stat-num" id="rc-wait" style="color:#b45309">0</div></div>
+          <div class="stat-card"><div class="stat-label">Tiền chờ xác nhận</div><div class="stat-num" id="rc-wait-sum" style="color:#1e40af">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Đã đối soát</div><div class="stat-num" id="rc-ok" style="color:var(--green)">0</div></div>
+          <div class="stat-card"><div class="stat-label">Tiền đã xác nhận</div><div class="stat-num" id="rc-ok-sum" style="color:var(--green)">0 đ</div></div>
+        </div>
+        <div class="table-box"><table>
+          <thead><tr><th>Mã đơn</th><th>Khách & SĐT</th><th>Số tiền</th><th>Mã chuyển khoản</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+          <tbody id="recon-tbody"><tr><td colspan="6" style="text-align:center;color:#888">Đang tải...</td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- TÀI CHÍNH: HOÀN TRẢ -->
+      <div class="page-section" id="page-refunds">
+        <div class="top-bar"><h2>Xử lý Hoàn trả</h2></div>
+        <div class="fin-form">
+          <select id="rf-code"></select>
+          <input id="rf-amount" type="number" min="1" placeholder="Số tiền hoàn (đ)" />
+          <input id="rf-reason" type="text" maxlength="300" placeholder="Lý do (hủy đơn, đổi ngày...)" style="flex:1;min-width:200px" />
+          <button class="btn-add" onclick="addRefund()">+ Tạo yêu cầu hoàn</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Chờ xử lý</div><div class="stat-num" id="rf-wait" style="color:#b45309">0</div></div>
+          <div class="stat-card"><div class="stat-label">Đã hoàn</div><div class="stat-num" id="rf-done-sum" style="color:var(--green)">0 đ</div></div>
+        </div>
+        <div class="table-box"><table>
+          <thead><tr><th>Ngày tạo</th><th>Mã đơn</th><th>Số tiền</th><th>Lý do</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+          <tbody id="refunds-tbody"><tr><td colspan="6" style="text-align:center;color:#888">Đang tải...</td></tr></tbody>
+        </table></div>
+      </div>
+
+      <!-- TÀI CHÍNH: THU CHI -->
+      <div class="page-section" id="page-ledger">
+        <div class="top-bar"><h2>Thu Chi theo tháng</h2><button class="btn-export" onclick="exportLedger()">📊 Xuất CSV</button></div>
+        <div class="fin-form">
+          <input id="lg-date" type="date" />
+          <select id="lg-kind"><option value="thu">Thu</option><option value="chi">Chi</option></select>
+          <input id="lg-cat" type="text" maxlength="60" placeholder="Danh mục (nguyên liệu, điện, lương...)" />
+          <input id="lg-amount" type="number" min="1" placeholder="Số tiền (đ)" />
+          <input id="lg-note" type="text" maxlength="300" placeholder="Ghi chú" style="flex:1;min-width:160px" />
+          <button class="btn-add" onclick="addEntry()">+ Ghi khoản</button>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Thu (tháng này)</div><div class="stat-num" id="lg-in" style="color:var(--green)">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Chi (tháng này)</div><div class="stat-num" id="lg-out" style="color:#b45309">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Hoàn trả (tháng này)</div><div class="stat-num" id="lg-ref" style="color:#1e40af">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Còn lại (tạm tính)</div><div class="stat-num" id="lg-net">0 đ</div></div>
+        </div>
+        <p class="fin-note">Thu gồm đơn đặt phòng thành công/hoàn thành (theo ngày đặt) cộng các khoản thu ghi tay. Số liệu tạm tính để theo dõi, không thay sổ kế toán hộ kinh doanh.</p>
+        <div class="table-box"><table>
+          <thead><tr><th>Ngày</th><th>Loại</th><th>Danh mục</th><th>Số tiền</th><th>Ghi chú</th><th></th></tr></thead>
+          <tbody id="ledger-tbody"><tr><td colspan="6" style="text-align:center;color:#888">Đang tải...</td></tr></tbody>
+        </table></div>
       </div>
 
       <!-- ROOMS PAGE -->
@@ -295,6 +364,111 @@
         if (page === 'reviews') loadReviewsManage();
         if (page === 'gallery') loadGalleryManage();
         if (page === 'faq') loadFaqManage();
+        if (page === 'recon') loadRecon();
+        if (page === 'refunds') loadRefunds();
+        if (page === 'ledger') loadLedger();
+      }
+
+
+      /* ===== TÀI CHÍNH ===== */
+      const vnd = (n) => Number(n || 0).toLocaleString('vi-VN') + ' đ';
+      let refundsData = [], entriesData = [];
+      const finMissing = (error) => { if (error) { document.getElementById('fin-setup-note').style.display = 'block'; console.error(error.message); return true; } return false; };
+      const isRevenue = (b) => [ST.OK, ST.DONE].includes(normStatus(b.status));
+
+      function loadRecon() {
+        const rows = allBookings.filter(b => [ST.WAIT, ST.PAID, ST.OK, ST.DONE].includes(normStatus(b.status)));
+        const waiting = rows.filter(b => normStatus(b.status) === ST.PAID);
+        const ok = rows.filter(isRevenue);
+        document.getElementById('rc-wait').textContent = waiting.length;
+        document.getElementById('rc-wait-sum').textContent = vnd(waiting.reduce((a, b) => a + Number(b.total_price || 0), 0));
+        document.getElementById('rc-ok').textContent = ok.length;
+        document.getElementById('rc-ok-sum').textContent = vnd(ok.reduce((a, b) => a + Number(b.total_price || 0), 0));
+        const order = { [ST.PAID]: 0, [ST.WAIT]: 1, [ST.OK]: 2, [ST.DONE]: 3 };
+        rows.sort((a, b) => order[normStatus(a.status)] - order[normStatus(b.status)]);
+        document.getElementById('recon-tbody').innerHTML = rows.map(b => {
+          const st = normStatus(b.status);
+          const act = st === ST.PAID ? `<button class="btn-add" onclick="reconOk('${esc(b.id)}')">Đã nhận tiền</button>` : st === ST.WAIT ? '<small>Chờ khách chuyển</small>' : '✓';
+          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}</td></tr>`;
+        }).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có đơn</td></tr>';
+      }
+      async function reconOk(id) {
+        if (!confirm('Xác nhận đã nhận đủ tiền của đơn này?')) return;
+        await setStatus(id, ST.OK);
+      }
+
+      async function loadRefunds() {
+        const { data, error } = await supabaseClient.from('refunds').select('*').order('created_at', { ascending: false });
+        if (finMissing(error)) return;
+        refundsData = data || [];
+        const sel = document.getElementById('rf-code');
+        sel.innerHTML = '<option value="">Chọn đơn...</option>' + allBookings.map(b => `<option value="${esc(b.booking_code)}" data-amt="${Number(b.total_price || 0)}">${esc(b.booking_code)} - ${esc(b.fullname)} (${esc(normStatus(b.status))})</option>`).join('');
+        sel.onchange = () => { const o = sel.selectedOptions[0]; if (o && o.dataset.amt) document.getElementById('rf-amount').value = o.dataset.amt; };
+        document.getElementById('rf-wait').textContent = refundsData.filter(r => r.status === 'Chờ xử lý').length;
+        document.getElementById('rf-done-sum').textContent = vnd(refundsData.filter(r => r.status === 'Đã hoàn').reduce((a, r) => a + Number(r.amount), 0));
+        document.getElementById('refunds-tbody').innerHTML = refundsData.map(r => `<tr><td>${esc(new Date(r.created_at).toLocaleDateString('vi-VN'))}</td><td>${esc(r.booking_code)}</td><td>${esc(vnd(r.amount))}</td><td>${esc(r.reason || '')}</td><td>${esc(r.status)}</td><td>${r.status === 'Chờ xử lý' ? `<button class="btn-add" onclick="setRefund('${esc(r.id)}','Đã hoàn')">Đã hoàn</button> <button class="btn-export" onclick="setRefund('${esc(r.id)}','Từ chối')">Từ chối</button>` : ''} <button class="btn-export" onclick="delRefund('${esc(r.id)}')">Xóa</button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có yêu cầu hoàn trả</td></tr>';
+      }
+      async function addRefund() {
+        const code = document.getElementById('rf-code').value, amount = Number(document.getElementById('rf-amount').value);
+        if (!code || !(amount > 0)) { alert('Chọn đơn và nhập số tiền hoàn.'); return; }
+        const { error } = await supabaseClient.from('refunds').insert({ booking_code: code, amount, reason: document.getElementById('rf-reason').value.trim() || null });
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        document.getElementById('rf-amount').value = ''; document.getElementById('rf-reason').value = '';
+        loadRefunds();
+      }
+      async function setRefund(id, status) {
+        if (!confirm('Chuyển yêu cầu sang "' + status + '"?')) return;
+        const { error } = await supabaseClient.from('refunds').update({ status, done_at: new Date().toISOString() }).eq('id', id);
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        loadRefunds();
+      }
+      async function delRefund(id) {
+        if (!confirm('Xóa yêu cầu hoàn trả này?')) return;
+        const { error } = await supabaseClient.from('refunds').delete().eq('id', id);
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        loadRefunds();
+      }
+
+      async function loadLedger() {
+        document.getElementById('lg-date').value = document.getElementById('lg-date').value || new Date().toISOString().slice(0, 10);
+        const [e, r] = await Promise.all([
+          supabaseClient.from('finance_entries').select('*').order('entry_date', { ascending: false }),
+          supabaseClient.from('refunds').select('*')
+        ]);
+        if (finMissing(e.error || r.error)) return;
+        entriesData = e.data || []; refundsData = r.data || [];
+        const mk = new Date().toISOString().slice(0, 7);
+        const inMonth = (d) => String(d).slice(0, 7) === mk;
+        const bookingIn = allBookings.filter(b => isRevenue(b) && inMonth(b.created_at)).reduce((a, b) => a + Number(b.total_price || 0), 0);
+        const thu = bookingIn + entriesData.filter(x => x.kind === 'thu' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
+        const chi = entriesData.filter(x => x.kind === 'chi' && inMonth(x.entry_date)).reduce((a, x) => a + Number(x.amount), 0);
+        const ref = refundsData.filter(x => x.status === 'Đã hoàn' && inMonth(x.done_at || x.created_at)).reduce((a, x) => a + Number(x.amount), 0);
+        document.getElementById('lg-in').textContent = vnd(thu);
+        document.getElementById('lg-out').textContent = vnd(chi);
+        document.getElementById('lg-ref').textContent = vnd(ref);
+        const net = thu - chi - ref, el = document.getElementById('lg-net');
+        el.textContent = vnd(net); el.style.color = net >= 0 ? 'var(--green)' : '#b91c1c';
+        document.getElementById('ledger-tbody').innerHTML = entriesData.map(x => `<tr><td>${esc(x.entry_date)}</td><td>${x.kind === 'thu' ? 'Thu' : 'Chi'}</td><td>${esc(x.category)}</td><td>${esc(vnd(x.amount))}</td><td>${esc(x.note || '')}</td><td><button class="btn-export" onclick="delEntry('${esc(x.id)}')">Xóa</button></td></tr>`).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có khoản ghi tay</td></tr>';
+      }
+      async function addEntry() {
+        const amount = Number(document.getElementById('lg-amount').value), cat = document.getElementById('lg-cat').value.trim();
+        if (!cat || !(amount > 0)) { alert('Nhập danh mục và số tiền.'); return; }
+        const { error } = await supabaseClient.from('finance_entries').insert({ entry_date: document.getElementById('lg-date').value, kind: document.getElementById('lg-kind').value, category: cat, amount, note: document.getElementById('lg-note').value.trim() || null });
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        ['lg-cat', 'lg-amount', 'lg-note'].forEach(i => document.getElementById(i).value = '');
+        loadLedger();
+      }
+      async function delEntry(id) {
+        if (!confirm('Xóa khoản này?')) return;
+        const { error } = await supabaseClient.from('finance_entries').delete().eq('id', id);
+        if (error) { alert('Lỗi: ' + error.message); return; }
+        loadLedger();
+      }
+      function exportLedger() {
+        const q = (v) => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+        const rows = [['Ngày', 'Loại', 'Danh mục', 'Số tiền', 'Ghi chú']].concat(entriesData.map(x => [x.entry_date, x.kind, x.category, x.amount, x.note || '']));
+        const blob = new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'thu-chi.csv'; a.click();
       }
 
       /* ===== BOOKINGS ===== */
@@ -305,6 +479,7 @@
           populateRoomFilter();
           renderBookings();
           renderChart();
+          if (document.getElementById('page-recon').classList.contains('active')) loadRecon();
         });
       }
 
