@@ -72,12 +72,28 @@ window.SITE_DATA = {
     // price: số tiền (ví dụ 65000); price: 0 = hiện "Liên hệ". image_url: 'images/ten-anh.jpg' (không bắt buộc). Nhóm chưa có món thì web tự ẩn.
     dining: [
       { title: 'Bữa sáng', note: '', items: [
+        { name: 'Bữa sáng trên mây (mì thập cẩm + cà phê hoặc trà nóng)', price: 70000, desc: 'Tô mì thập cẩm nóng hổi kèm đồ uống ăn giữa trời mây', image_url: 'images/bua-sang-tren-may.jpg' },
+        { name: 'Xôi nếp nương + trứng', price: 40000, desc: 'Xôi nếp nương dẻo thơm ăn kèm trứng' },
+        { name: 'Bánh mì trứng ốp la', price: 30000, desc: 'Bánh mì nóng giòn với trứng ốp la' },
+        { name: 'Cháo nóng', price: 35000, desc: 'Cháo nóng cho buổi sáng lạnh' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
       { title: 'Món chính', note: '', items: [
+        { name: 'Cơm lam (ống)', price: 20000, desc: 'Cơm lam nướng thơm ăn kèm muối vừng' },
+        { name: 'Gà bản nướng (nửa con)', price: 220000, desc: 'Gà đồi nướng ướp mắc khén và hạt dổi' },
+        { name: 'Lợn bản nướng (đĩa)', price: 180000, desc: 'Thịt lợn bản nướng ướp thơm' },
+        { name: 'Thịt trâu gác bếp (đĩa)', price: 200000, desc: 'Thịt trâu gác bếp ăn kèm chẩm chéo' },
+        { name: 'Lẩu gà đen (2-3 người)', price: 320000, desc: 'Lẩu gà đen nóng cho đêm núi lạnh' },
+        { name: 'Rau rừng xào', price: 50000, desc: 'Rau theo mùa xào tỏi' },
+        { name: 'Combo bữa tối (mỗi người)', price: 150000, desc: 'Cơm kèm các món bản địa ăn tối tại nhà' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
       { title: 'Đồ uống', note: '', items: [
+        { name: 'Cà phê đen / nâu', price: 30000, desc: 'Cà phê pha ngay tại quán', image_url: 'images/ban-ghe-ngam-may.jpg' },
+        { name: 'Cà phê muối', price: 35000, desc: 'Cà phê muối béo nhẹ' },
+        { name: 'Trà nóng theo mùa', price: 25000, desc: 'Trà nóng cho ngày lạnh' },
+        { name: 'Nước ép trái cây', price: 35000, desc: 'Nước ép tươi' },
+        { name: 'Trà chiều ngắm hoàng hôn (mỗi người)', price: 100000, desc: 'Ấm trà nóng cùng bánh nhỏ ngắm hoàng hôn', image_url: 'images/hoang-hon-quan-cafe.jpg' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
     ],
@@ -98,8 +114,8 @@ window.SITE_DATA = {
   },
   catalogIsSample: false,
   services: [
-    { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 120000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
-    { icon: '🍜', name: 'Bữa sáng trên mây', price: 80000, unit: '/ người', image_url: 'images/bua-sang-tren-may.jpg', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
+    { icon: '🍵', name: 'Trà chiều ngắm hoàng hôn', price: 100000, unit: '/ người', image_url: 'images/hoang-hon-quan-cafe.jpg', time: '16:00 - 18:00 hằng ngày', description: 'Ấm trà nóng cùng bánh nhỏ, ngồi ngắm hoàng hôn trên biển mây.', includes: ['Ấm trà nóng theo mùa', 'Bánh / hạt nhỏ ăn kèm', 'Chỗ ngồi view hoàng hôn'], note: 'Nên đến sớm 15 phút để chọn chỗ đẹp. Nhắn nhà để giữ chỗ cho nhóm đông.' },
+    { icon: '🍜', name: 'Bữa sáng trên mây', price: 70000, unit: '/ người', image_url: 'images/bua-sang-tren-may.jpg', time: '7:00 - 9:30', description: 'Tô mì thập cẩm nóng hổi kèm đồ uống, ăn giữa trời mây.', includes: ['Mì thập cẩm', 'Cà phê hoặc trà nóng'], note: 'Khách nghỉ tại nhà có thể đặt kèm khi đặt phòng hoặc nhắn nhà.' },
     { icon: '☕', name: 'Cà phê & đồ uống', price: 30000, unit: 'từ / ly', image_url: 'images/ban-ghe-ngam-may.jpg', time: '7:00 - 21:00', description: 'Góc cà phê ngắm núi rừng ngay tại nhà, có chỗ ngồi ngoài trời.', includes: ['Cà phê, trà, nước ép', 'Chỗ ngồi ngoài trời ngắm mây'], note: 'Khách ở nhà được giảm khi gọi đồ uống tại quán.' },
     { icon: '🛵', name: 'Thuê xe máy', price: 150000, unit: '/ ngày', time: 'Theo nhu cầu', description: 'Có xe máy cho thuê để di chuyển quanh Tà Xùa và khu trung tâm.', includes: ['Xe máy số/tay ga', 'Mũ bảo hiểm'], note: 'Cần giấy tờ tùy thân khi nhận xe. Nhắn nhà để giữ xe trước.' },
     { icon: '🎒', name: 'Hỗ trợ hành lý & đưa đón', price: 0, unit: '', time: 'Báo trước khi đến', description: 'Nhà đi bộ lên hơi dốc, nhân viên hỗ trợ mang hành lý lên xuống và tư vấn xe di chuyển.', includes: ['Mang hành lý lên xuống', 'Tư vấn xe khứ hồi'], note: 'Báo giờ đến để nhà chuẩn bị. Chi phí đưa đón nhà sẽ báo khi bạn nhắn.' },
