@@ -10,7 +10,7 @@
     <script src="config.js"></script>
     <script src="admin-auth.js"></script>
     <script src="phieu.js" defer></script>
-    <script src="bieu-mau.js" defer></script>
+    <script src="bieu-mau.js?v=20261011p" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
     <style>
@@ -158,6 +158,7 @@
       .rp-step.now .rp-dot { background: #e8890c; color: #fff; box-shadow: 0 0 0 4px rgba(232,137,12,.25); } .rp-step.now .rp-st b { color: #8a4b00; font-size: 14.5px; }
       .rp-now { margin: 4px 14px 10px; background: #fff3dc; border: 1px solid #f0cf8a; border-radius: 10px; padding: 10px 12px; } .rp-now b { color: #8a4b00; } .rp-now p { margin: 6px 0 0; line-height: 1.5; font-size: 13px; } .rp-now.rp-bad { background: #fdecec; border-color: #f2b8b8; } .rp-now.rp-bad b { color: #b91c1c; } .rp-msg { font-style: italic; border-top: 1px dashed #e2c27a; padding-top: 6px; }
       .rp-foot { text-align: center; font-size: 11.5px; color: #6b7a7d; padding: 4px 10px 12px; }
+      .fm-ai { background: #fff; border: 1px solid #cfe3e3; border-radius: 12px; padding: 10px 14px; margin: 0 0 14px; } .fm-ai summary { cursor: pointer; font-weight: 700; color: var(--primary); } .fm-ai textarea { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 10px; border: 1px solid #cfd8dc; border-radius: 8px; font: inherit; font-size: 14px; } .fm-ai-note { font-size: 13px; line-height: 1.6; margin: 8px 0; } .fm-ai-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin: 4px 0 8px; } .fm-ai-row a { font-size: 13.5px; font-weight: 700; color: var(--primary); } .fm-ai-hint { font-size: 12.5px; color: #5f6f73; }
       .fm-sync { border-radius: 10px; padding: 12px 14px; margin: 10px 0; font-size: 13.5px; line-height: 1.55; } .fm-sync.ok { background: #e8f7ee; border: 1px solid #9bd5b0; color: #14532d; } .fm-sync.warn { background: #fff6e5; border: 1px solid #f0cf8a; color: #6b4a06; }
       .fm-sync-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; align-items: center; } .fm-sync-row select { padding: 8px; border-radius: 8px; border: 1px solid #ccc; max-width: 100%; } .fm-sync button:disabled { opacity: .5; cursor: not-allowed; } .fm-sync small { display: block; color: inherit; opacity: .85; }
       .fm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-bottom: 14px; }
@@ -333,6 +334,15 @@
         <div class="top-bar no-print"><h2>Biểu Mẫu In</h2><button class="btn-add" onclick="printForm()">In / Lưu PDF</button></div>
         <div class="fm-bar no-print"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
         <p class="fin-note no-print" id="fm-note"></p>
+        <details class="fm-ai no-print" id="fm-ai">
+          <summary>🤖 Nhờ AI điền nhanh (Gemini, Claude, ChatGPT, Sider...)</summary>
+          <p class="fm-ai-note"><b>3 bước:</b> (1) Dán tin nhắn của khách vào ô 1, bấm <b>Sao chép lời nhờ AI</b>. (2) Mở một AI bên dưới, dán vào và gửi. (3) Chép kết quả AI trả về dán vào ô 2, bấm <b>Điền vào phiếu</b>. Mọi ô vẫn sửa tay được. <b>Không dán CCCD, số tài khoản vào AI</b> (web không nhờ AI điền các ô đó).</p>
+          <textarea id="fm-ai-in" rows="4" maxlength="4000" placeholder="1) Dán tin nhắn / thông tin khách ở đây (tên, SĐT, ngày đến, ngày đi, số khách, số tiền...)"></textarea>
+          <div class="fm-ai-row"><button type="button" class="btn-add" id="fm-ai-copy">Sao chép lời nhờ AI</button>
+            <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Mở Gemini</a><a href="https://claude.ai/new" target="_blank" rel="noopener">Mở Claude</a><a href="https://chatgpt.com/" target="_blank" rel="noopener">Mở ChatGPT</a><span class="fm-ai-hint">Sider: bấm biểu tượng Sider trên trình duyệt rồi dán</span></div>
+          <textarea id="fm-ai-out" rows="4" maxlength="6000" placeholder="2) Dán kết quả AI trả về ở đây (dạng { ... })"></textarea>
+          <div class="fm-ai-row"><button type="button" class="btn-add" id="fm-ai-fill">Điền vào phiếu</button><span id="fm-ai-msg" class="fm-ai-hint" role="status"></span></div>
+        </details>
         <div class="fm-grid no-print" id="fm-fields"></div>
         <div class="no-print" id="fm-sync"></div>
         <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--primary)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>

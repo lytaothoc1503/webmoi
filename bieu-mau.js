@@ -165,6 +165,41 @@
     $('fm-fields').querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { state.f[i.dataset.k] = i.value.trim(); render(); }));
   }
 
+  /* ===== Nhờ AI điền nhanh: không dùng khóa API; chủ nhà chép lời nhờ sang AI bất kỳ rồi dán JSON trả về ===== */
+  const AI_SKIP = ['a_cccd', 'b_cccd', 'c_cccd', 'stk', 'b_cap', 'b_noicap', 'b_ns']; // không nhờ AI điền giấy tờ, tài khoản
+  const aiKeys = () => state.tpl.fields.filter((k) => !AI_SKIP.includes(k) && F[k]);
+  function aiPrompt(text) {
+    const lines = aiKeys().map((k) => '- "' + k + '": ' + F[k][0] + (F[k][1] === 'date' ? ' (định dạng yyyy-mm-dd)' : F[k][1] === 'number' ? ' (chỉ chữ số, đơn vị đồng)' : '')).join('\n');
+    return 'Bạn là trợ lý của homestay Nhà của An (Tà Xùa). Từ nội dung bên dưới, hãy điền thông tin vào các trường sau và CHỈ trả về một khối JSON duy nhất (không giải thích).\nQuy tắc: chỉ lấy thông tin có trong nội dung, KHÔNG bịa; trường nào không có thì để "" (rỗng); ngày theo yyyy-mm-dd (năm hiện tại nếu không ghi năm); số tiền chỉ chữ số.\nCác trường:\n' + lines + '\n\nNội dung:\n"""\n' + text + '\n"""';
+  }
+  function aiFill(raw) {
+    const m = String(raw || '').match(/\{[\s\S]*\}/); if (!m) return { n: 0, err: 'Không thấy khối { ... } trong kết quả.' };
+    let o; try { o = JSON.parse(m[0]); } catch (e) { return { n: 0, err: 'Kết quả AI chưa đúng định dạng JSON, nhờ AI gửi lại.' }; }
+    let n = 0;
+    aiKeys().forEach((k) => {
+      let v = o[k]; if (v === undefined || v === null) return; v = String(v).trim().slice(0, 120); if (!v) return;
+      const t = F[k][1];
+      if (t === 'date') { const d = v.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})$/); if (d) v = d[3] + '-' + d[2].padStart(2, '0') + '-' + d[1].padStart(2, '0'); if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return; }
+      if (t === 'number') { v = v.replace(/[^\d]/g, ''); if (!v) return; }
+      state.f[k] = v; n++;
+    });
+    return { n };
+  }
+  function initAI() {
+    const cp = $('fm-ai-copy'), fl = $('fm-ai-fill'); if (!cp || !fl) return;
+    const msg = (t) => { $('fm-ai-msg').textContent = t; };
+    cp.onclick = async () => {
+      const text = $('fm-ai-in').value.trim(); if (!text) { msg('Hãy dán tin nhắn của khách vào ô 1 trước.'); return; }
+      const p = aiPrompt(text);
+      try { await navigator.clipboard.writeText(p); msg('Đã sao chép. Mở AI, dán vào và gửi.'); } catch (e) { $('fm-ai-out').value = p; msg('Không tự sao chép được: lời nhờ AI đang ở ô 2, hãy chọn hết và chép.'); }
+    };
+    fl.onclick = () => {
+      const r = aiFill($('fm-ai-out').value);
+      if (r.err) { msg(r.err); return; }
+      drawFields(); render(); msg(r.n ? 'Đã điền ' + r.n + ' ô. Kiểm tra lại trước khi in.' : 'AI không điền được ô nào, hãy kiểm tra nội dung.');
+    };
+  }
+
   /* ===== Xác nhận tạo đơn: lưu phiếu thành đơn thật trong hệ thống (khách mới mở được link phiếu) ===== */
   const fmtT = (iso) => { try { const d = new Date(iso); return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN'); } catch (e) { return ''; } };
   const findBooking = () => {
@@ -254,7 +289,7 @@
     const list = (typeof allBookings !== 'undefined' ? allBookings : []);
     bk.innerHTML = '<option value="">Không chọn đơn (điền tay)</option>' + list.map((b) => `<option value="${esc2(b.id)}">${esc2(b.booking_code)} - ${esc2(b.fullname)}</option>`).join('');
     bk.onchange = () => { prefill(list.find((x) => x.id === bk.value)); drawFields(); render(); };
-    prefill(null); drawFields(); render();
+    prefill(null); drawFields(); render(); initAI();
   };
   const base = () => location.origin + location.pathname.replace(/[^/]*$/, '');
   function renderMsg() {
