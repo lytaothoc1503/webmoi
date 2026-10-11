@@ -91,7 +91,7 @@ window.SITE_DATA = {
     // ĂN UỐNG tại Nhà của An (nhà hàng). Chủ nhà tự điền: thêm dòng vào `items` của từng nhóm, bỏ dấu // ở đầu dòng mẫu.
     // price: số tiền (ví dụ 65000); price: 0 = hiện "Liên hệ". image_url: 'images/ten-anh.jpg' (không bắt buộc). Nhóm chưa có món thì web tự ẩn.
     dining: [
-      { title: 'Bữa sáng', note: '', items: [
+      { title: 'Bữa sáng', note: '', image_url: 'images/bua-sang-tren-may.jpg', items: [
         { name: 'Bữa sáng trên mây (mì thập cẩm + cà phê hoặc trà nóng)', price: 70000, desc: 'Tô mì thập cẩm nóng hổi kèm đồ uống ăn giữa trời mây', image_url: 'images/bua-sang-tren-may.jpg' },
         { name: 'Xôi nếp nương + trứng', price: 40000, desc: 'Xôi nếp nương dẻo thơm ăn kèm trứng' },
         { name: 'Bánh mì trứng ốp la', price: 30000, desc: 'Bánh mì nóng giòn với trứng ốp la' },
@@ -108,7 +108,7 @@ window.SITE_DATA = {
         { name: 'Combo bữa tối (mỗi người)', price: 150000, desc: 'Cơm kèm các món bản địa ăn tối tại nhà' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
-      { title: 'Đồ uống', note: '', items: [
+      { title: 'Đồ uống', note: '', image_url: 'images/hoang-hon-quan-cafe.jpg', items: [
         { name: 'Cà phê đen / nâu', price: 30000, desc: 'Cà phê pha ngay tại quán', image_url: 'images/ban-ghe-ngam-may.jpg' },
         { name: 'Cà phê muối', price: 35000, desc: 'Cà phê muối béo nhẹ' },
         { name: 'Trà nóng theo mùa', price: 25000, desc: 'Trà nóng cho ngày lạnh' },
