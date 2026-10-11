@@ -1133,6 +1133,15 @@
       .pw-wrap { position:relative; } .pw-wrap input { padding-right:44px !important; }
       .pw-eye { position:absolute; right:4px; top:4px; width:34px; height:34px; border:0; background:transparent; cursor:pointer; font-size:16px; opacity:.7; }
       .auth-forgot { display:inline-block; margin-top:6px; font-size:12.5px; color:var(--accent-orange); text-decoration:underline; }
+      .guest-hello { max-width: 640px; margin: 0 auto 22px; padding: 14px 16px; border: 1px solid var(--border, #e7dccf); border-radius: 12px; background: #fffaf4; text-align: center; }
+      .guest-hello .gh-line { margin: 0 0 10px; font-size: 15px; }
+      .guest-hello .gh-row { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; }
+      .guest-hello label { font-size: 13.5px; }
+      .guest-hello input { flex: 1 1 180px; max-width: 260px; padding: 9px 12px; border: 1px solid #d9cbb8; border-radius: 8px; font-size: 14px; }
+      .guest-hello .gh-save { padding: 9px 16px; border: 0; border-radius: 8px; background: var(--accent-orange, #d96b27); color: #fff; font-weight: 600; cursor: pointer; }
+      .guest-hello .gh-ok { display: block; min-height: 16px; margin-top: 6px; color: #2f7d4f; }
+      .guest-hello .gh-terms { display: block; margin-top: 4px; color: var(--text-muted); }
+      .guest-hello .gh-terms a { color: var(--accent-orange); text-decoration: underline; }
       .auth-fine { font-size:11.5px; color:var(--text-muted); text-align:center; margin-top:8px; } .auth-fine a { color:var(--accent-orange); }
       .btn-gg { margin-top:8px; background:#fff !important; color:#3c4043 !important; border:1px solid #d5c8be !important; }
       .auth-form input.bad { border-color:#b91c1c; }
@@ -1234,6 +1243,16 @@
         <span class="sec-sub">Không Gian Nghỉ Dưỡng</span>
         <h2 class="sec-title">Chọn Xem & Đặt Phòng</h2>
       </div>
+      <form class="guest-hello" id="guest-hello" hidden novalidate>
+        <p class="gh-line">Xin chào <strong id="gh-name"></strong>, rất vui được đón bạn.</p>
+        <div class="gh-row">
+          <label for="gh-call">Nhà nên gọi bạn là gì?</label>
+          <input type="text" id="gh-call" maxlength="30" autocomplete="nickname" placeholder="VD: An, chị Lan, anh Minh..." />
+          <button type="submit" class="gh-save">Lưu</button>
+        </div>
+        <small class="gh-ok" id="gh-ok" role="status"></small>
+        <small class="gh-terms">Xem nhanh <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách</a> của nhà.</small>
+      </form>
       <div class="rooms-grid" id="rooms-grid">
         <div style="text-align: center; color: var(--text-muted); padding: 40px;">Đang tải...</div>
       </div>
@@ -1458,7 +1477,7 @@
             <div class="pw-wrap"><input type="password" id="auth-password" name="password" autocomplete="current-password" placeholder="Ít nhất 6 ký tự" /><button type="button" class="pw-eye" id="auth-eye" aria-label="Hiện / ẩn mật khẩu" title="Hiện / ẩn mật khẩu">👁️</button></div></div>
           <div data-m="login"><a href="javascript:void(0)" class="auth-forgot" onclick="setAuthMode('forgot')">Quên mật khẩu?</a></div>
           <div data-m="signup"><label for="auth-year">Năm sinh <small style="font-weight:400">(không bắt buộc)</small></label><input type="number" id="auth-year" name="year" inputmode="numeric" min="1920" max="2100" placeholder="VD: 1995" /></div>
-          <label class="auth-agree" data-m="signup"><input type="checkbox" id="auth-agree" /> <span>Tôi đã đọc và đồng ý với <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách quyền riêng tư</a>, đồng ý để nhà lưu thông tin đặt phòng của tôi.</span></label>
+          <label class="auth-agree" data-m="signup"><input type="checkbox" id="auth-agree" /> <span>Tôi đã xem <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách</a> của nhà (ngắn gọn, dễ hiểu).</span></label>
           <div id="auth-ts" data-m="signup" style="margin:8px 0"></div>
           <div id="auth-msg" class="auth-msg" role="alert"></div>
           <button type="submit" id="auth-submit" class="btn-submit-booking" data-m="login signup reset">ĐĂNG NHẬP</button>
@@ -1466,7 +1485,7 @@
             <div class="auth-or" id="auth-or">hoặc</div>
             <button type="button" id="auth-fb" class="btn-send-fb" hidden>TIẾP TỤC VỚI FACEBOOK</button>
             <button type="button" id="auth-gg" class="btn-send-fb btn-gg" hidden>TIẾP TỤC VỚI GOOGLE</button>
-            <p class="auth-fine" data-m="login">Tiếp tục đồng nghĩa bạn đồng ý <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách</a>.</p>
+            <p class="auth-fine" data-m="login">Nhà chỉ dùng thông tin để giữ phòng cho bạn. Bạn có thể xem <a href="chinh-sach.html" target="_blank" rel="noopener">Điều khoản &amp; Chính sách</a> bất cứ lúc nào.</p>
           </div>
           <div data-m="forgot reset"><a href="javascript:void(0)" class="auth-forgot" onclick="setAuthMode('login')">← Quay lại đăng nhập</a></div>
         </form>

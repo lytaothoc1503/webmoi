@@ -62,7 +62,7 @@ function validateAuth() {
   if ((authMode === 'login' || authMode === 'signup') && !normPhone(phone)) return bad('auth-phone', 'Số điện thoại chưa đúng, gồm 10 số bắt đầu bằng 0, ví dụ 0912345678.');
   if (authMode !== 'forgot' && pw.length < 6) return bad('auth-password', 'Mật khẩu cần ít nhất 6 ký tự.');
   if (authMode === 'signup' && year && !(Number(year) >= 1920 && Number(year) <= new Date().getFullYear())) return bad('auth-year', 'Năm sinh chưa hợp lệ (hoặc để trống).');
-  if (authMode === 'signup' && !$('auth-agree').checked) { authMsg('Bạn cần tích đồng ý Điều khoản & Chính sách để tạo tài khoản.'); return false; }
+  if (authMode === 'signup' && !$('auth-agree').checked) { authMsg('Bạn nhấp vào ô "Tôi đã xem Điều khoản & Chính sách" để tiếp tục nhé.'); return false; }
   return true;
 }
 const doneAuth = (t) => { $('auth-modal').classList.remove('active'); $('auth-form').reset(); toast(t); };
@@ -110,7 +110,7 @@ $('auth-form').addEventListener('submit', async (e) => {
   } catch (err) { authMsg('Mất kết nối mạng, bạn thử lại nhé.'); } finally { btn.disabled = false; }
 });
 async function oauth(provider, label) {
-  if (authMode === 'signup' && !$('auth-agree').checked) { authMsg('Bạn cần tích đồng ý Điều khoản & Chính sách trước khi tiếp tục.'); return; }
+  if (authMode === 'signup' && !$('auth-agree').checked) { authMsg('Bạn nhấp vào ô "Tôi đã xem Điều khoản & Chính sách" để tiếp tục nhé.'); return; }
   const { error } = await db.auth.signInWithOAuth({ provider, options: { redirectTo: location.origin + location.pathname } });
   if (error) authMsg(/not enabled|Unsupported provider|provider is not/i.test(error.message) ? `Đăng nhập ${label} đang được cài đặt. Bạn dùng số điện thoại tạm nhé.` : authErr(error));
 }
@@ -129,12 +129,33 @@ async function syncAccountOrders() {
   data.forEach((r) => saveOrder({ code: r.booking_code, phone: r.phone, room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: r.notes || '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: 'none', note: r.admin_note || '', created: r.created_at, synced: true }));
   renderHistory(); refreshHistory();
 }
+/* Khung "Nhà nên gọi bạn là gì?": lưu vào hồ sơ tài khoản (user_metadata.call_name), chỉ hiện khi đã đăng nhập */
+function renderHello() {
+  const f = $('guest-hello'); if (!f) return;
+  if (!currentUser) { f.hidden = true; return; }
+  const um = currentUser.user_metadata || {};
+  const call = String(um.call_name || '').trim(), full = String(um.full_name || '').trim();
+  $('gh-name').textContent = call || full || 'bạn';
+  if (document.activeElement !== $('gh-call')) $('gh-call').value = call;
+  f.hidden = false;
+}
+if ($('guest-hello')) $('guest-hello').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const v = $('gh-call').value.replace(/[ -<>]/g, '').trim().slice(0, 30);
+  const ok = $('gh-ok'); ok.textContent = '';
+  if (!db || !currentUser) return;
+  const { data, error } = await db.auth.updateUser({ data: { call_name: v } });
+  if (error) { ok.textContent = 'Chưa lưu được, bạn thử lại sau nhé.'; return; }
+  if (data && data.user) currentUser = data.user;
+  renderHello();
+  ok.textContent = v ? 'Đã lưu. Nhà sẽ gọi bạn là ' + v + '.' : 'Đã bỏ tên gọi.';
+});
 async function applySession(session) {
   const before = currentUser && currentUser.id;
   currentUser = session ? session.user : null;
   // Thiết bị dùng chung: đăng xuất thì xóa lịch sử đơn lưu trên máy (đăng nhập lại sẽ tự đồng bộ về)
   if (before && !currentUser) { try { localStorage.removeItem('na_orders:' + before); } catch (e) { /* bỏ qua */ } renderHistory(); }
-  buildNav(); renderHistory();
+  buildNav(); renderHistory(); renderHello();
   if (currentUser && currentUser.id !== before) {
     const um = currentUser.user_metadata || {}; if (!$('bk-name').value) $('bk-name').value = um.full_name || ''; if (!$('bk-phone').value) $('bk-phone').value = um.phone || '';
     syncAccountOrders();
