@@ -33,7 +33,7 @@ window.SITE_DATA = {
   attractions: [
     { name: 'Sống lưng khủng long Háng Đồng', tag: 'Săn mây · Trekking', image_url: 'images/hero-san-may.jpg', text: 'Sống núi uốn lượn dài, nhìn ra các dãy núi, thung lũng và biển mây. Điểm nổi tiếng nhất Tà Xùa.' },
     { name: 'Đỉnh Gió', tag: 'Bình minh', image_url: 'images/vay-tay-bien-may.jpg', text: 'Nơi ngắm bình minh và săn mây, nhìn thấy nhiều lớp núi nối nhau. Có quán cà phê để ngồi ngắm.' },
-    { name: 'Cây táo mèo cô đơn', tag: 'Check-in', text: 'Một cây táo mèo đứng lẻ loi giữa đồi, trở thành biểu tượng được nhiều người tìm đến chụp ảnh.' },
+    { name: 'Cây táo mèo cô đơn', tag: 'Check-in', text: 'Một cây táo mèo đứng lẻ loi giữa đồi, trở thành biểu tượng được nhiều người tìm đến chụp ảnh. Nên đến khoảng 5 giờ sáng để đón bình minh dưới gốc cây; nhà sẽ chỉ đường cụ thể khi bạn nhận phòng.' },
     { name: 'Mỏm đá Đầu Rùa', tag: 'Ngắm cảnh', text: 'Tảng đá nhô ra khỏi vách núi, hình dáng giống đầu rùa, đứng đó nhìn xuống biển mây.' },
     { name: 'Mỏm Cá Heo', tag: 'Ngắm cảnh', text: 'Khối đá tự nhiên giống cá heo đang vươn lên giữa biển mây.' },
     { name: 'Thảo nguyên Tà Xùa', tag: 'Dã ngoại', text: 'Triền cỏ rộng trên đường đến Mỏm Cá Heo và Cây cô đơn, hợp để chụp ảnh và dã ngoại.' },
