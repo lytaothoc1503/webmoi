@@ -192,6 +192,20 @@ function openInfo(kind, i) {
   $('info-modal').classList.add('active');
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeInfo(); closeLightbox(); } });
+let placesList = [];
+function openPlace(i) {
+  const x = placesList[i]; if (!x) return;
+  $('info-box').style.maxWidth = '';
+  const fb = messengerHref();
+  $('info-body').innerHTML = `${x.image_url ? img(x.image_url, x.name, 'info-hero') : '<div class="kp-band" style="height:70px"></div>'}
+    <div class="info-in"><small class="kp-tag">${esc(x.tag || '')}</small><h3>${esc(x.name)}</h3>
+      <p style="font-size:14px;margin:8px 0">${esc(x.text)}</p>
+      ${(x.more || []).map((p) => `<p style="font-size:14px;margin:8px 0">${esc(p)}</p>`).join('')}
+      ${x.tip ? `<p class="info-meta">💡 <strong>Lưu ý:</strong> ${esc(x.tip)}</p>` : ''}
+      <div class="info-actions">${fb ? `<a class="btn-submit-booking alt" href="${esc(fb)}" target="_blank" rel="noopener">Nhắn nhà để hỏi đường và tình hình mây</a>` : ''}<a class="btn-submit-booking alt" href="javascript:void(0)" onclick="closeInfo()">Đóng</a></div>
+    </div>`;
+  $('info-modal').classList.add('active');
+}
 function closeInfo() { $('info-modal').classList.remove('active'); }
 function setupIntroVideo() {
   const v = S.introVideo, box = $('about-media');
@@ -251,7 +265,8 @@ function loadExplore() {
   const tips = D.cloudTips || [], at = D.attractions || [];
   if (!tips.length && !at.length) { $('kham-pha').hidden = true; return; }
   $('kp-tips').innerHTML = tips.map((t) => `<div class="kp-tip">${t.icon ? `<span class="ic">${esc(t.icon)}</span>` : ''}<strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div>`).join('');
-  $('kp-grid').innerHTML = at.filter((x) => x.image_url).concat(at.filter((x) => !x.image_url)).map((x) => `<div class="kp-card${x.image_url ? '' : ' kp-noimg'}">${x.image_url ? img(x.image_url, x.name) : '<div class="kp-band"></div>'}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
+  placesList = at.filter((x) => x.image_url).concat(at.filter((x) => !x.image_url));
+  $('kp-grid').innerHTML = placesList.map((x, i) => `<div class="kp-card${x.image_url ? '' : ' kp-noimg'}" role="button" tabindex="0" onclick="openPlace(${i})" onkeydown="if(event.key==='Enter')openPlace(${i})">${x.image_url ? img(x.image_url, x.name) : '<div class="kp-band"></div>'}<div class="kp-body"><small>${esc(x.tag || '')}</small><h4>${esc(x.name)}</h4><p>${esc(x.text)}</p>${(x.more || []).length ? '<span class="kp-more">Xem thêm ›</span>' : ''}</div></div>`).join('');
   $('kp-seasons').innerHTML = (D.seasons || []).map((x) => `<div class="kp-season">${x.image_url ? img(x.image_url, x.title) : ''}<div><small>${esc(x.months)}</small><h4>${esc(x.title)}</h4><p>${esc(x.text)}</p></div></div>`).join('');
   $('kp-seasons-box').hidden = !(D.seasons || []).length;
   $('kp-plan').innerHTML = (D.itinerary || []).map((d) => `<div class="kp-day"><h4>${esc(d.day)}</h4>${d.steps.map((st) => `<div class="kp-step">${st.image_url ? img(st.image_url, st.title) : ''}<div><small>${esc(st.time)}</small><strong>${esc(st.title)}</strong><p>${esc(st.text)}</p></div></div>`).join('')}</div>`).join('');
