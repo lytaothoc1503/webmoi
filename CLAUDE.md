@@ -19,7 +19,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## File chính
 | File | Vai trò |
 | --- | --- |
-| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (đang **để trống**, nên chưa hiện QR; điền tài khoản thật vào 4 ô `bank`), video, khóa công khai Supabase, `turnstileSiteKey` |
+| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (`bank`: MB, bankId 970422, STK đã điền; `accountName` chờ chủ nhà điền tên chủ TK, để trống vẫn hiện QR nhưng không ghi dòng Chủ tài khoản), video, khóa công khai Supabase, `turnstileSiteKey` |
 | `data.js` | Phòng, tour, dịch vụ, câu chuyện, chính sách hoàn hủy, FAQ, đánh giá, thư viện ảnh |
 | `index.html`, `app.js`, `account.js` | Trang chủ, đặt phòng, tra cứu đơn, đăng ký/đăng nhập |
 | `i18n.js` | Dịch Việt ↔ Anh |
@@ -61,6 +61,9 @@ Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh d
 ## Khóa đăng nhập quản trị (PIN + mã 2 bước, không lưu phiên)
 `auth.html` đăng nhập 3 lớp: mật khẩu, rồi mã 6 số ứng dụng xác thực (TOTP, nếu admin đã bật ở mục "🔐 Bảo Mật"), rồi mã PIN 6-8 số. PIN và TOTP do **máy chủ** kiểm (`supabase/migrations/20261011030000_admin_pin_mfa.sql`, chủ dự án chạy 1 lần trong SQL Editor): `is_admin()` (dùng trong mọi RLS) chỉ đúng khi phiên đã qua PIN (bảng `admin_pin_sessions`, 12 giờ) và đã aal2 nếu có TOTP; PIN băm bcrypt, sai 5 lần khóa 15 phút tăng dần; chưa đặt PIN thì lần đầu vào được và bị bắt đặt PIN ngay. Nếu chưa chạy file SQL này thì `auth.html` báo lỗi lúc gọi `admin_status` (phải chạy trước khi dùng).
 `admin-auth.js` tạo client Supabase cho admin: phiên chỉ nằm trong `sessionStorage` (khóa `nca-admin-auth`), không dùng localStorage; `admin.html` tự xóa phiên khi rời trang/tải lại (`pagehide`), sau 15 phút không thao tác, hoặc bấm Đăng xuất (gọi `admin_end_session` + signOut). Ô nhập đặt `autocomplete` để trình duyệt không nhớ. Mất điện thoại 2 bước: xóa yếu tố MFA ở Supabase Authentication > Users. Test: `/home/claude/work/pin_test.py` (cần mock Supabase có các RPC `admin_*`).
+
+## Thông tin thanh toán chỉ hiện đúng chỗ
+STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa sổ đơn ở `app.js` khi trạng thái Chờ thanh toán; phiếu `phieu.js` chỉ khi `còn lại > 0` và tổng > 0, tắt được bằng `hideBank:true`). KHÔNG hiện ở trang chủ, đơn đã thanh toán đủ/đã hủy, phiếu thu, hoàn trả, biên bản, giấy ủy quyền. Thêm chỗ hiển thị STK mới phải theo đúng quy tắc này.
 
 ## Quy tắc khi sửa
 0. KHÔNG hiện ngày/giờ "cập nhật" lên web (chủ dự án tự chủ động khi có thông tin mới).

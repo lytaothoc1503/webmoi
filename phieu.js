@@ -51,8 +51,8 @@
     const S = window.SITE || {}, B = S.bank || {}, C = S.contacts || {};
     const total = Number(d.total) || 0, paid = Number(d.paid) || 0, remain = Math.max(0, total - paid);
     const n = d.nights || nights(d.checkin, d.checkout);
-    const bankOn = B.bankId && B.accountNo && B.accountName;
-    const qr = bankOn && remain > 0 ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png?amount=${remain}&addInfo=${encodeURIComponent(d.tcode || d.code || '')}&accountName=${encodeURIComponent(B.accountName)}` : '';
+    const bankOn = B.bankId && B.accountNo && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
+    const qr = bankOn && remain > 0 ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png?amount=${remain}&addInfo=${encodeURIComponent(d.tcode || d.code || '')}${B.accountName ? '&accountName=' + encodeURIComponent(B.accountName) : ''}` : '';
     const steps = ['Đặt phòng', 'Chuyển khoản', 'Nhà xác nhận', 'Nhận phòng'];
     const now = d.nowStep ?? 2;
     const pay = `<div class="ns-sec"><h4>03 THANH TOÁN</h4><table>
@@ -60,7 +60,7 @@
       <tr><td>Đã thanh toán</td><td><b class="${paid > 0 ? 'ns-ok' : ''}">${paid > 0 ? vnd(paid) : (d.paid === undefined ? dots('', 12) : '0 đ')}</b></td></tr>
       <tr><td>Còn lại</td><td><b class="${remain > 0 ? 'ns-warn' : 'ns-ok'}">${total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12)}</b></td></tr></table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
-      <tr><td>Ngân hàng</td><td>${esc(B.bankName || B.bankId)}</td></tr><tr><td>Chủ tài khoản</td><td>${esc(B.accountName)}</td></tr>
+      <tr><td>Ngân hàng</td><td>${esc(B.bankName || B.bankId)}</td></tr>${B.accountName ? `<tr><td>Chủ tài khoản</td><td>${esc(B.accountName)}</td></tr>` : ''}
       <tr><td>Số tài khoản</td><td><b>${esc(B.accountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b>${esc(d.tcode || d.code || '')}</b></td></tr></table></div>
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="VietQR" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
