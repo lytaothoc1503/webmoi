@@ -63,7 +63,7 @@
       return HEAD + 'Đây là các điểm bất thường máy đã lọc sẵn trong phần đối soát/hoàn trả. Hãy sắp xếp theo mức nghiêm trọng, nói ngắn mỗi điểm nên kiểm tra gì và làm gì tiếp theo.\n\n' + (out.length ? out.join('\n') : '(Máy không thấy điểm bất thường nào. Hãy nói ngắn gọn tôi nên kiểm tra định kỳ những gì.)');
     },
     month() {
-      const mo = $('ai-month').value || ymd(new Date()).slice(0, 7), inM = (d) => String(d || '').slice(0, 7) === mo, list = bks();
+      const mo = (($('ai-month') || {}).value) || ymd(new Date()).slice(0, 7), inM = (d) => String(d || '').slice(0, 7) === mo, list = bks();
       const ok = list.filter((b) => [ST.OK, ST.DONE].includes(st(b)) && inM(b.checkin));
       const rev = ok.reduce((a, b) => a + (typeof paidOf === 'function' ? paidOf(b) : Number(b.total_price)), 0);
       const nights = ok.reduce((a, b) => { const n = Math.round((new Date(b.checkout) - new Date(b.checkin)) / 864e5); return a + (n > 0 ? n : 0); }, 0);
@@ -101,16 +101,19 @@
     window.open(url, '_blank', 'noopener');
     const sel = $('ai-open'); if (sel) sel.value = '';
   };
+  async function ensureFinance() {
+    if (!window.supabaseClient) return;
+    try {
+      if (!rfs().length) { const r = await supabaseClient.from('refunds').select('*').order('created_at', { ascending: false }); if (!r.error) refundsData = r.data || []; }
+      if (!ents().length) { const e = await supabaseClient.from('finance_entries').select('*').order('entry_date', { ascending: false }); if (!e.error) entriesData = e.data || []; }
+    } catch (e) { /* bảng tài chính chưa có thì bỏ qua */ }
+  }
+
   window.aiInit = async function () {
     const bl = bks().slice().sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || ''))).slice(0, 60);
     $('ai-bk').innerHTML = bl.length ? bl.map((b) => `<option value="${esc(b.id)}">${esc((b.booking_code || '?') + ' - ' + clip(b.fullname, 24) + ' - ' + st(b))}</option>`).join('') : '<option value="">Chưa có đơn</option>';
     if (!$('ai-month').value) $('ai-month').value = ymd(new Date()).slice(0, 7);
-    if (window.supabaseClient) {
-      try {
-        if (!rfs().length) { const r = await supabaseClient.from('refunds').select('*').order('created_at', { ascending: false }); if (!r.error) refundsData = r.data || []; }
-        if (!ents().length) { const e = await supabaseClient.from('finance_entries').select('*').order('entry_date', { ascending: false }); if (!e.error) entriesData = e.data || []; }
-      } catch (e) { /* bảng tài chính chưa có thì bỏ qua */ }
-    }
+    await ensureFinance();
     const rl = rfs();
     $('ai-rf').innerHTML = rl.length ? rl.map((r) => `<option value="${esc(r.id)}">${esc(r.booking_code + ' - ' + money(r.amount) + ' - ' + r.status)}</option>`).join('') : '<option value="">Chưa có yêu cầu hoàn </option>';
     if (reviews === null && window.supabaseClient) {
@@ -121,4 +124,91 @@
     }
     $('ai-rv').innerHTML = (reviews || []).length ? reviews.map((r) => `<option value="${esc(r.id)}">${esc(clip(r.author_name, 20) + ' - ' + (r.rating || 5) + '★ - ' + clip(r.content, 30))}</option>`).join('') : '<option value="">Chưa có đánh giá</option>';
   };
+  /* ===== Tiện ích AI nổi (góc phải), dùng ở mọi mục admin, gợi ý theo mục Tài chính ===== */
+  const WID_CSS = `
+  #aiw{position:fixed;right:14px;bottom:18px;z-index:900;display:flex;flex-direction:column;align-items:flex-end;gap:10px;font-family:'Montserrat',sans-serif}
+  #aiw *{box-sizing:border-box;font-family:inherit}
+  #aiw-fab{width:54px;height:54px;border-radius:50%;border:0;background:#fff;box-shadow:0 4px 16px rgba(11,59,70,.22);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+  #aiw-fab:hover{box-shadow:0 6px 20px rgba(11,59,70,.32)}
+  #aiw-fab .dot{position:absolute;top:9px;right:9px;width:10px;height:10px;border-radius:50%;background:#e8890c;border:2px solid #fff}
+  #aiw-panel{display:none;width:min(340px,calc(100vw - 28px));max-height:min(520px,calc(100vh - 100px));overflow:auto;background:#fff;border:1px solid #cfe3e3;border-radius:16px;box-shadow:0 10px 32px rgba(11,59,70,.25);padding:12px}
+  #aiw.open #aiw-panel{display:block}
+  #aiw-panel h4{margin:0 0 2px;font-size:14px;color:#0b3b46;display:flex;justify-content:space-between;align-items:center}
+  #aiw-panel h4 button{border:0;background:none;font-size:18px;cursor:pointer;color:#7a6e65}
+  #aiw-panel .sub{font-size:11.5px;color:#5f6f73;margin-bottom:8px;line-height:1.45}
+  #aiw-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  #aiw-chips button{border:1px solid #cfe3e3;background:#f4fafa;border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:600;color:#0b3b46;cursor:pointer}
+  #aiw-chips button:hover{background:#e3f2f2}
+  #aiw-q{width:100%;border:1px solid #cfd8dc;border-radius:10px;padding:8px;font-size:13px;resize:vertical;min-height:54px}
+  #aiw-row{display:flex;gap:6px;margin-top:6px}
+  #aiw-row button,#aiw-row select{flex:1;border:0;border-radius:10px;padding:8px;font-size:12.5px;font-weight:700;cursor:pointer}
+  #aiw-go{background:#e8890c;color:#fff}
+  #aiw-row select{background:#eef4f5;color:#0b3b46;border:1px solid #cfe3e3;font-weight:600}
+  #aiw-msg{font-size:12px;color:#0b6b4a;margin-top:6px;min-height:16px}
+  @media print{#aiw{display:none}}`;
+
+  const CHIPS = [
+    ['audit', '🔎 Soát đối soát'],
+    ['refpend', '↩️ Hoàn trả đang treo'],
+    ['month', '📊 Báo cáo tháng này'],
+    ['cash', '💰 Tiền thu / chi'],
+    ['today', '📋 Việc hôm nay'],
+  ];
+  const WID_TASKS = {
+    refpend() {
+      const p = rfs().filter((r) => r.status === 'Chờ xử lý');
+      return HEAD + 'Đây là các yêu cầu hoàn trả đang chờ. Hãy sắp xếp việc nào làm trước, nói ngắn mỗi yêu cầu cần làm gì tiếp (đối chiếu, duyệt, chuyển khoản, báo khách).\n\n'
+        + (p.length ? p.map((r) => { const b = bks().find((x) => x.booking_code === r.booking_code); return `- ${r.booking_code} | ${b ? clip(b.fullname, 30) : '?'} | hoàn ${money(r.amount)} | bước ${r.step || 1}/5 | tạo ${dmy(r.created_at)}`; }).join('\n') : '(Không có yêu cầu nào đang chờ.)');
+    },
+    cash() {
+      const mo = ymd(new Date()).slice(0, 7), inM = (d) => String(d || '').slice(0, 7) === mo, e = ents().filter((x) => inM(x.entry_date));
+      return HEAD + 'Đây là sổ thu chi tháng ' + mo.split('-').reverse().join('/') + '. Hãy tổng kết ngắn, chỉ ra khoản chi lớn/bất thường và gợi ý cắt giảm hợp lý.\n\n'
+        + (e.length ? e.map((x) => `- ${dmy(x.entry_date)} | ${x.kind === 'thu' ? 'THU' : 'CHI'} | ${clip(x.category, 30)} | ${money(x.amount)} | ${clip(x.note || x.description, 60)}`).join('\n') : '(Chưa có khoản nào trong tháng.)');
+    },
+  };
+  function snapshot() {
+    const list = bks(), ok = list.filter((b) => [ST.OK, ST.DONE].includes(st(b)));
+    const mo = ymd(new Date()).slice(0, 7), inM = (d) => String(d || '').slice(0, 7) === mo, sum = (a) => a.reduce((s, x) => s + Number(x.amount || 0), 0);
+    const rev = ok.filter((b) => inM(b.checkin)).reduce((a, b) => a + (typeof paidOf === 'function' ? paidOf(b) : Number(b.total_price)), 0);
+    return `Tóm tắt tháng ${mo.split('-').reverse().join('/')}: đơn thành công ${ok.filter((b) => inM(b.checkin)).length}, đã thu từ đơn ${money(rev)}, thu khác ${money(sum(ents().filter((x) => x.kind === 'thu' && inM(x.entry_date))))}, chi ${money(sum(ents().filter((x) => x.kind === 'chi' && inM(x.entry_date))))}, hoàn trả đang chờ ${rfs().filter((r) => r.status === 'Chờ xử lý').length}.`;
+  }
+  async function wCopy(text) {
+    const m = $('aiw-msg');
+    try { await navigator.clipboard.writeText(text); m.textContent = 'Đã sao chép. Chọn AI rồi dán và gửi.'; }
+    catch (e) { const q = $('aiw-q'); q.value = text; q.select(); m.textContent = 'Không tự chép được: bấm giữ, chọn hết và chép.'; }
+  }
+  async function wRun(k) {
+    $('aiw-msg').textContent = 'Đang gom số liệu...';
+    await ensureFinance();
+    const f = WID_TASKS[k] || TASKS[k];
+    const t = f && f();
+    if (t) wCopy(t);
+  }
+  function wAsk() {
+    const q = $('aiw-q').value.trim();
+    if (!q) { $('aiw-msg').textContent = 'Hãy gõ câu hỏi trước.'; return; }
+    ensureFinance().then(() => wCopy(HEAD + snapshot() + '\n\nCâu hỏi của tôi: ' + q));
+  }
+  function mountWidget() {
+    if ($('aiw')) return;
+    const st0 = document.createElement('style'); st0.textContent = WID_CSS; document.head.appendChild(st0);
+    const w = document.createElement('div'); w.id = 'aiw';
+    w.innerHTML = `<div id="aiw-panel" role="dialog" aria-label="Trợ lý AI tài chính">
+      <h4>🤖 Trợ lý AI · Tài chính <button type="button" id="aiw-x" aria-label="Đóng">×</button></h4>
+      <div class="sub">Bấm một việc: web gom số liệu có sẵn và sao chép lời nhờ. Không gửi STK/CCCD, SĐT chỉ 3 số cuối.</div>
+      <div id="aiw-chips"></div>
+      <textarea id="aiw-q" placeholder="Hoặc hỏi tự do về tài chính (vd: tháng này lãi hay lỗ?)"></textarea>
+      <div id="aiw-row"><button type="button" id="aiw-go">Soạn lời nhờ</button>
+        <select id="aiw-open"><option value="">Mở AI...</option><option value="https://gemini.google.com/app">Gemini</option><option value="https://claude.ai/new">Claude</option><option value="https://chatgpt.com/">ChatGPT</option><option value="https://copilot.microsoft.com/">Copilot</option></select></div>
+      <div id="aiw-msg"></div></div>
+      <button type="button" id="aiw-fab" aria-label="Mở trợ lý AI" title="Trợ lý AI tài chính">✨<span class="dot"></span></button>`;
+    document.body.appendChild(w);
+    const chips = $('aiw-chips');
+    CHIPS.forEach(([k, label]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.onclick = () => wRun(k); chips.appendChild(b); });
+    const toggle = () => { w.classList.toggle('open'); const d = $('aiw-fab').querySelector('.dot'); if (d) d.remove(); };
+    $('aiw-fab').onclick = toggle; $('aiw-x').onclick = toggle;
+    $('aiw-go').onclick = wAsk;
+    $('aiw-open').onchange = (e) => { if (e.target.value) { window.open(e.target.value, '_blank', 'noopener'); e.target.value = ''; } };
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mountWidget); else mountWidget();
 })();
