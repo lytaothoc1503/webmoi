@@ -6,6 +6,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 - Luôn trả lời **tiếng Việt có dấu đầy đủ**, ngắn gọn, kết luận trước.
 - Chủ dự án muốn trợ lý **tự làm** (sửa code, test, commit, push), không giao việc thủ công. Không liệt kê nhiều đề xuất: chỉ hỏi ngắn **có/không**.
 - Làm theo từng phần: xong phần nào báo phần đó, chờ chủ dự án đồng ý rồi mới sang phần tiếp.
+- **Làm xong là tự lưu vào dự án theo quy trình** (cập nhật file này, commit, push, gộp vào `main`, kiểm tra Actions xanh). KHÔNG bảo chủ dự án "xem/duyệt PR" hay "xem lệnh": cần thì chủ dự án tự vào xem. Chỉ dừng hỏi khi việc cần thông tin hoặc hành động của riêng chủ dự án (link, khóa, tài khoản).
 - Ảnh/đánh giá chủ dự án đưa lên là đã được đồng ý công khai, không cản trở. Không bắt khách phải được duyệt tài khoản thủ công.
 - Không ghi mật khẩu, khóa bí mật (`service_role`, Turnstile Secret...) vào code, tài liệu hay chat.
 - Chủ dự án sửa code trên điện thoại bằng github.dev và VS Code; lấy bản mới bằng `.\scripts\dong-bo.ps1` (tự bật pull.rebase + autoStash, giữ thay đổi chưa commit, báo khớp `origin/main`). Trợ lý luôn `git pull --rebase` trước khi sửa và trước khi push, và không để lại file chưa commit.
@@ -90,7 +91,11 @@ STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa
 
 **Chờ tiền/điều kiện:** mua tên miền (dự kiến `nhacuaantaxua.com`, giá .com khoảng 309-429 nghìn đồng/năm ở Tenten, chưa mua), Cloudflare (DNS, HTTPS, chống DDoS, email theo tên miền), đăng nhập Facebook/Google.
 
-**Chờ chủ dự án làm:** đổi mật khẩu admin (đang yếu) và bật 2FA GitHub/Supabase; tạo Cloudflare Turnstile rồi gửi **Site Key** (thứ tự: bật Site Key trên web trước, dán Secret vào Supabase `TURNSTILE_SECRET` sau).
+**Chờ chủ dự án làm:** gửi link nhận tin đơn mới (xem mục "Báo chủ nhà khi có đơn mới"); đổi mật khẩu admin (đang yếu) và bật 2FA GitHub/Supabase; tạo Cloudflare Turnstile rồi gửi **Site Key** (thứ tự: bật Site Key trên web trước, dán Secret vào Supabase `TURNSTILE_SECRET` sau).
+
+## Báo chủ nhà khi có đơn mới
+Code đã có trong repo nhưng **chưa bật trên Supabase thật** (chờ chủ dự án đưa link nhận tin). Gồm: Edge Function `supabase/functions/notify-booking/` (verify_jwt = false; chỉ nhận `{id, event}`, đọc lại đơn từ DB, gửi tin tới secret `NOTIFY_WEBHOOK_URL`, mỗi sự kiện báo 1 lần nhờ cột `bookings.notified_new_at` / `notified_paid_at`) và migration `20261012000000_notify_new_booking.sql` (thêm 2 cột cờ, bật `pg_net`, trigger khi có đơn mới `new` và khi đơn sang "Đã thanh toán - chờ xác nhận" `paid`; lỗi khi báo không làm hỏng việc đặt phòng).
+Để bật: chủ dự án tạo link (Zapier Catch Hook gửi Gmail, hoặc Slack Incoming Webhook) và gửi cho trợ lý; trợ lý triển khai function, đặt secret `NOTIFY_WEBHOOK_URL`, rồi chủ dự án chạy file SQL một lần trong SQL Editor (quy ước như các migration khác), sau đó đặt thử 1 đơn. KHÔNG ghi link webhook vào code hay chat. File migration này đã nằm trong repo: nếu cần đổi thì tạo file mới.
 
 ## Kiểm tra tự động (CI)
 Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web là HTML tĩnh, GitHub Pages tự build). File trong `supabase/migrations/` đã chạy rồi thì KHÔNG sửa hay dán đè; muốn đổi thì tạo file mới.
