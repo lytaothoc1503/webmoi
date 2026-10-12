@@ -52,13 +52,17 @@
     const total = Number(d.total) || 0, paid = Number(d.paid) || 0, remain = Math.max(0, total - paid);
     const n = d.nights || nights(d.checkin, d.checkout);
     const bankOn = B.bankId && B.accountNo && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
-    const qr = bankOn && remain > 0 ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png?amount=${remain}&addInfo=${encodeURIComponent(d.tcode || d.code || '')}${B.accountName ? '&accountName=' + encodeURIComponent(B.accountName) : ''}` : '';
+    const qr = bankOn && remain > 0 ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''; // không tích hợp sẵn số tiền/nội dung CK — khách tự ghi
     const steps = ['Đặt phòng', 'Chuyển khoản', 'Nhà xác nhận', 'Nhận phòng'];
     const now = d.nowStep ?? 2;
+    const dep = Number(d.depositPercent) || 0; // có giá trị = hiện cọc theo % thay vì số tiền VND cụ thể
     const pay = `<div class="ns-sec"><h4>03 THANH TOÁN</h4><table>
       <tr><td>Tổng tiền</td><td><b>${total > 0 ? vnd(total) : dots('', 12)}</b></td></tr>
-      <tr><td>Đã thanh toán</td><td><b class="${paid > 0 ? 'ns-ok' : ''}">${paid > 0 ? vnd(paid) : (d.paid === undefined ? dots('', 12) : '0 đ')}</b></td></tr>
-      <tr><td>Còn lại</td><td><b class="${remain > 0 ? 'ns-warn' : 'ns-ok'}">${total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12)}</b></td></tr></table></div>`;
+      ${dep > 0 ? `<tr><td>Đặt cọc</td><td><b class="ns-ok">${dep}% tổng tiền</b></td></tr>
+      <tr><td>Còn lại</td><td><b class="ns-warn">${100 - dep}% — thanh toán khi nhận phòng</b></td></tr>`
+      : `<tr><td>Đã thanh toán</td><td><b class="${paid > 0 ? 'ns-ok' : ''}">${paid > 0 ? vnd(paid) : (d.paid === undefined ? dots('', 12) : '0 đ')}</b></td></tr>
+      <tr><td>Còn lại</td><td><b class="${remain > 0 ? 'ns-warn' : 'ns-ok'}">${total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12)}</b></td></tr>`}
+      </table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
       <tr><td>Ngân hàng</td><td>${esc(B.bankName || B.bankId)}</td></tr>${B.accountName ? `<tr><td>Chủ tài khoản</td><td>${esc(B.accountName)}</td></tr>` : ''}
       <tr><td>Số tài khoản</td><td><b>${esc(B.accountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b>${esc(d.tcode || d.code || '')}</b></td></tr></table></div>
@@ -81,7 +85,7 @@
       <div class="ns-pay">${pay}${bankBox}</div>
       <div class="ns-flow">${steps.map((s, i) => `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
       <div class="ns-note"><b>Khi nhận phòng:</b> người đại diện đặt phòng chỉ cần mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Với khách đi cùng, bạn gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
-      <div class="ns-foot"><span>${esc(S.name || '')}</span><span>Địa chỉ: ${esc(S.address || '')}</span>${C.phone ? `<span>Hotline: ${esc(C.phone)}</span>` : ''}<span>Web: ${esc(location.origin + location.pathname.replace(/[^/]*$/, ''))}</span></div>
+      <div class="ns-foot"><span>${esc(S.name || '')}</span><span>Địa chỉ: ${esc(S.address || '')}</span>${C.phone ? `<span>Hotline: ${esc(C.phone)}</span>` : ''}</div>
       </div></div>`;
   };
 })();
