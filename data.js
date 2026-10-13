@@ -112,9 +112,16 @@ window.SITE_DATA = {
         { name: 'Combo bữa tối (mỗi người)', price: 150000, desc: 'Cơm kèm các món bản địa ăn tối tại nhà' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
-      { title: 'Đồ uống', note: '', image_url: 'images/hoang-hon-quan-cafe.webp', items: [
-        { name: 'Cà phê đen / nâu', price: 30000, desc: 'Cà phê pha ngay tại quán', image_url: 'images/ban-ghe-ngam-may.webp' },
+      { title: 'Đồ uống', note: 'Giá đề xuất, chủ nhà xem lại và chỉnh trước khi dùng.', image_url: 'images/hoang-hon-quan-cafe.webp', items: [
+        { name: 'Cà phê đen / nâu (nóng hoặc đá)', price: 30000, desc: 'Cà phê pha ngay tại quán', image_url: 'images/ban-ghe-ngam-may.webp' },
+        { name: 'Cà phê sữa', price: 30000, desc: 'Cà phê sữa đá truyền thống' },
         { name: 'Cà phê muối', price: 35000, desc: 'Cà phê muối béo nhẹ' },
+        { name: 'Bạc xỉu', price: 35000, desc: 'Nhiều sữa, ít đắng, dễ uống' },
+        { name: 'Trà gừng', price: 25000, desc: 'Trà gừng nóng ấm bụng cho ngày lạnh' },
+        { name: 'Matcha latte', price: 40000, desc: 'Trà xanh matcha pha cùng sữa tươi' },
+        { name: 'Trà đào cam sả', price: 35000, desc: 'Trà đào thơm mát kèm cam và sả' },
+        { name: 'Nước cam', price: 30000, desc: 'Cam vắt tươi' },
+        { name: 'Sinh tố (theo mùa)', price: 35000, desc: 'Sinh tố trái cây theo mùa' },
         { name: 'Trà nóng theo mùa', price: 25000, desc: 'Trà nóng cho ngày lạnh' },
         { name: 'Nước ép trái cây', price: 35000, desc: 'Nước ép tươi' },
         { name: 'Trà chiều ngắm hoàng hôn (mỗi người)', price: 100000, desc: 'Ấm trà nóng cùng bánh nhỏ ngắm hoàng hôn', image_url: 'images/hoang-hon-quan-cafe.webp' },
