@@ -51,8 +51,12 @@
     const S = window.SITE || {}, B = S.bank || {}, C = S.contacts || {};
     const total = Number(d.total) || 0, paid = Number(d.paid) || 0, remain = Math.max(0, total - paid);
     const n = d.nights || nights(d.checkin, d.checkout);
-    const bankOn = B.bankId && B.accountNo && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
-    const qr = bankOn && remain > 0 ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''; // không tích hợp sẵn số tiền/nội dung CK — khách tự ghi
+    // Ngân hàng/QR có thể ghi đè riêng cho từng phiếu (d.bankName/accountNo/accountName/qrImage), mặc định lấy từ config.js
+    const bName = d.bankName ? String(d.bankName).trim() : '', bNo = d.accountNo ? String(d.accountNo).trim() : '', bHolder = d.accountName !== undefined && String(d.accountName).trim() !== '' ? String(d.accountName).trim() : '';
+    const overridingBank = !!(bName || bNo || bHolder); // có ghi đè thì không tự tạo QR (VietQR cần mã ngân hàng, không phải tên) — bắt buộc tự tải ảnh QR
+    const useBankName = bName || B.bankName || B.bankId, useAccountNo = bNo || B.accountNo, useAccountName = bHolder || B.accountName;
+    const bankOn = (useAccountNo || d.qrImage) && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
+    const qr = d.qrImage ? d.qrImage : (!overridingBank && bankOn && remain > 0 && B.bankId && B.accountNo ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''); // không tích hợp sẵn số tiền/nội dung CK — khách tự ghi; d.qrImage (ảnh tự tải lên) luôn ưu tiên
     const steps = ['Đặt phòng', 'Chuyển khoản', 'Nhà xác nhận', 'Nhận phòng'];
     const now = d.nowStep ?? 2;
     const dep = Number(d.depositPercent) || 0; // có giá trị = hiện cọc theo % thay vì số tiền VND cụ thể
@@ -67,9 +71,9 @@
       <tr><td>Còn lại</td><td><b class="${remainManual !== null ? 'ns-warn' : (remain > 0 ? 'ns-warn' : 'ns-ok')}">${remainManual !== null ? vnd(remainManual) : (total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12))}</b></td></tr>`}
       </table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
-      <tr><td>Ngân hàng</td><td>${esc(B.bankName || B.bankId)}</td></tr>${B.accountName ? `<tr><td>Chủ tài khoản</td><td>${esc(B.accountName)}</td></tr>` : ''}
-      <tr><td>Số tài khoản</td><td><b>${esc(B.accountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b>${esc(d.tcode || d.code || '')}</b></td></tr></table></div>
-      <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="VietQR" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
+      <tr><td>Ngân hàng</td><td>${esc(useBankName)}</td></tr>${useAccountName ? `<tr><td>Chủ tài khoản</td><td>${esc(useAccountName)}</td></tr>` : ''}
+      <tr><td>Số tài khoản</td><td><b>${esc(useAccountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b>${esc(d.tcode || d.code || '')}</b></td></tr></table></div>
+      <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     return `<div class="nca-slip"><div class="ns-side">
       <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>

@@ -40,6 +40,7 @@
     tien: ['Số tiền (đ)', 'number'], lydo: ['Lý do', 'text'], hinhthuc: ['Hình thức giao nhận', 'text'],
     nh: ['Ngân hàng nhận', 'text'], stk: ['Số tài khoản nhận', 'text'], ctk: ['Tên chủ tài khoản', 'text'],
     ma_phieu: ['Mã booking trên phiếu khách xuất trình (đối chiếu)', 'text'], khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Số tiền cọc (đ)', 'number'], conlai: ['Số tiền cọc còn lại (đ, để trống = web tự tính)', 'number'], uudai: ['Ưu đãi (nếu có)', 'text'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
+    nh_p: ['Ngân hàng hiện trên phiếu (để trống = dùng mặc định config.js)', 'text'], stk_p: ['Số tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], ctk_p: ['Tên chủ tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], qr_img: ['Ảnh QR tự tải lên (thay QR tự tạo)', 'file'],
     b_ns: ['Khách: ngày sinh', 'text'], b_cap: ['Khách: CCCD cấp ngày', 'text'], b_noicap: ['Khách: CCCD cấp tại', 'text'], songay: ['Dự kiến hoàn tiền trong (số ngày)', 'text'],
     c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text']
   };
@@ -65,8 +66,8 @@
 
   const TEMPLATES = [
     { id: 'phieu-xn', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (gửi khách)', note: 'Khổ ngang A4. Gửi khách sau khi chốt booking; có mã QR khi đã nhập ngân hàng trong config.js.', land: true,
-      fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'b_cccd', 'ghichu'],
-      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2 }) },
+      fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
+      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2 }) },
     { id: 'bb-hoan-coc', group: 'Hoàn trả', name: 'Biên bản hoàn trả tiền đặt cọc (đầy đủ)', note: 'Hai bên ký, dùng khi hoàn cọc/hoàn tiền cho khách.',
       fields: ['ma_phieu', 'ngay', 'diadiem', 'so', 'a_ten', 'a_cccd', 'a_dc', 'a_sdt', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc', 'nh', 'stk', 'ctk'],
       body: (f) => `${head(f, 'BIÊN BẢN HOÀN TRẢ TIỀN ĐẶT CỌC')}
@@ -160,9 +161,20 @@
   function drawFields() {
     $('fm-fields').innerHTML = state.tpl.fields.map((k) => {
       const [label, type] = F[k];
+      if (type === 'file') {
+        const has = !!state.f[k];
+        return `<label class="fm-f"><span>${esc2(label)}</span><input data-k="${k}" type="file" accept="image/*" /><small class="fm-file-st">${has ? 'Đã chọn ảnh ✓ — <a href="#" data-clear="' + k + '">xóa ảnh</a>' : 'Chưa chọn ảnh'}</small></label>`;
+      }
       return `<label class="fm-f"><span>${esc2(label)}</span><input data-k="${k}" type="${type}" value="${esc2(state.f[k] ?? '')}" maxlength="120" autocomplete="off" /></label>`;
     }).join('');
-    $('fm-fields').querySelectorAll('input').forEach((i) => i.addEventListener('input', () => { state.f[i.dataset.k] = i.value.trim(); render(); }));
+    $('fm-fields').querySelectorAll('input[type]:not([type="file"])').forEach((i) => i.addEventListener('input', () => { state.f[i.dataset.k] = i.value.trim(); render(); }));
+    $('fm-fields').querySelectorAll('input[type="file"]').forEach((i) => i.addEventListener('change', () => {
+      const file = i.files && i.files[0]; if (!file) return;
+      const rd = new FileReader();
+      rd.onload = () => { state.f[i.dataset.k] = rd.result; drawFields(); render(); };
+      rd.readAsDataURL(file);
+    }));
+    $('fm-fields').querySelectorAll('[data-clear]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); state.f[a.dataset.clear] = ''; drawFields(); render(); }));
   }
 
   /* ===== Xác nhận tạo đơn: lưu phiếu thành đơn thật trong hệ thống (khách mới mở được link phiếu) ===== */
