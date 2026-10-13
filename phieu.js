@@ -56,12 +56,15 @@
     const steps = ['Đặt phòng', 'Chuyển khoản', 'Nhà xác nhận', 'Nhận phòng'];
     const now = d.nowStep ?? 2;
     const dep = Number(d.depositPercent) || 0; // có giá trị = hiện cọc theo % thay vì số tiền VND cụ thể
+    const promo = d.promo ? String(d.promo).trim() : ''; // ưu đãi (chữ tự do, ví dụ "giảm 100.000đ")
+    const remainManual = d.remainManual !== undefined && d.remainManual !== null && String(d.remainManual).trim() !== '' ? Number(d.remainManual) : null; // số tiền cọc còn lại ghi tay, thay cho số tự tính
     const pay = `<div class="ns-sec"><h4>03 THANH TOÁN</h4><table>
       <tr><td>Tổng tiền</td><td><b>${total > 0 ? vnd(total) : dots('', 12)}</b></td></tr>
+      ${promo ? `<tr><td>Ưu đãi</td><td><b class="ns-ok">${esc(promo)}</b></td></tr>` : ''}
       ${dep > 0 ? `<tr><td>Đặt cọc</td><td><b class="ns-ok">${dep}% tổng tiền</b></td></tr>
       <tr><td>Còn lại</td><td><b class="ns-warn">${100 - dep}% — thanh toán khi nhận phòng</b></td></tr>`
       : `<tr><td>Đã thanh toán</td><td><b class="${paid > 0 ? 'ns-ok' : ''}">${paid > 0 ? vnd(paid) : (d.paid === undefined ? dots('', 12) : '0 đ')}</b></td></tr>
-      <tr><td>Còn lại</td><td><b class="${remain > 0 ? 'ns-warn' : 'ns-ok'}">${total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12)}</b></td></tr>`}
+      <tr><td>Còn lại</td><td><b class="${remainManual !== null ? 'ns-warn' : (remain > 0 ? 'ns-warn' : 'ns-ok')}">${remainManual !== null ? vnd(remainManual) : (total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12))}</b></td></tr>`}
       </table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
       <tr><td>Ngân hàng</td><td>${esc(B.bankName || B.bankId)}</td></tr>${B.accountName ? `<tr><td>Chủ tài khoản</td><td>${esc(B.accountName)}</td></tr>` : ''}
