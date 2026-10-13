@@ -87,11 +87,9 @@ STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa
 ## Trạng thái hiện tại
 **Đã có:** đặt phòng + QR, tra cứu đơn, đăng ký SĐT, tiếng Anh, thư viện ảnh thật, tour/dịch vụ công khai, SEO cơ bản (canonical, sitemap, schema), RLS.
 
-**Chờ chủ dự án cung cấp:** tài khoản ngân hàng thật, Gmail nhận đơn, giá thật tour/dịch vụ, câu chuyện chủ nhà thật, chính sách hoàn hủy thật, video giới thiệu, link Messenger.
-
 **Chờ tiền/điều kiện:** mua tên miền (dự kiến `nhacuaantaxua.com`, giá .com khoảng 309-429 nghìn đồng/năm ở Tenten, chưa mua), Cloudflare (DNS, HTTPS, chống DDoS, email theo tên miền), đăng nhập Facebook/Google.
 
-**Chờ chủ dự án làm:** gửi link nhận tin đơn mới (xem mục "Báo chủ nhà khi có đơn mới"); đổi mật khẩu admin (đang yếu) và bật 2FA GitHub/Supabase; tạo Cloudflare Turnstile rồi gửi **Site Key** (thứ tự: bật Site Key trên web trước, dán Secret vào Supabase `TURNSTILE_SECRET` sau).
+**Việc chờ chủ dự án:** xem mục "Việc còn lại (xếp theo ưu tiên)" bên dưới (danh sách duy nhất, không lặp ở nơi khác).
 
 ## Báo chủ nhà khi có đơn mới
 Code đã có trong repo nhưng **chưa bật trên Supabase thật** (chờ chủ dự án đưa link nhận tin). Gồm: Edge Function `supabase/functions/notify-booking/` (verify_jwt = false; chỉ nhận `{id, event}`, đọc lại đơn từ DB, gửi tin tới secret `NOTIFY_WEBHOOK_URL`, mỗi sự kiện báo 1 lần nhờ cột `bookings.notified_new_at` / `notified_paid_at`) và migration `20261012000000_notify_new_booking.sql` (thêm 2 cột cờ, bật `pg_net`, trigger khi có đơn mới `new` và khi đơn sang "Đã thanh toán - chờ xác nhận" `paid`; lỗi khi báo không làm hỏng việc đặt phòng).
@@ -101,22 +99,27 @@ Code đã có trong repo nhưng **chưa bật trên Supabase thật** (chờ ch�
 Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web là HTML tĩnh, GitHub Pages tự build). File trong `supabase/migrations/` đã chạy rồi thì KHÔNG sửa hay dán đè; muốn đổi thì tạo file mới.
 `.github/workflows/kiem-tra.yml` chạy `node scripts/kiem-tra.js` mỗi lần đẩy lên `main`: cú pháp JS, ảnh trong `data.js` có file thật, cờ "mẫu" = false, không có khóa bí mật. Chỉ báo lỗi, không chặn đưa web lên GitHub Pages. Chạy tay: `node scripts/kiem-tra.js`.
 
-## Việc đang làm (cập nhật 11/10)
-- **Xong:** phần A (bỏ nhãn "mẫu"), B (ảnh, giao diện sáng), C (rà soát điện thoại/máy tính, đồng bộ dữ liệu), khóa admin PIN + 2 bước, hoàn trả + thẻ tiến độ (SQL đã chạy), số thực nhận (SQL đã chạy), phiếu `phieu.html?ma=`, STK MB + QR chỉ hiện đúng chỗ, chống cache `?v=`, cấu hình VS Code + Claude Code. Danh sách tiến độ cũ hiện trong VS Code ("Đang làm phần B") là bản cũ, bỏ qua.
-- **Không còn việc nào chờ trợ lý.** Mọi mục còn lại ở dưới đều cần thông tin hoặc hành động từ chủ dự án.
-- **Đăng nhập Facebook/Google:** nút đang ẩn (`socialLogin` trong `config.js` = false) vì chưa cấu hình nhà cung cấp trong Supabase. Khi có tên miền và đã bật Providers thì đổi thành true.
-- **Nguồn nội dung (đã chốt Hướng 1):** `data.js` là nơi sửa giá/ảnh/mô tả. Các bảng Supabase `rooms/tours/gallery/faq/reviews` để TRỐNG; nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`. Chuyển sang Supabase (Hướng 2) làm sau, khi lượng khách tăng: xem `supabase/ke-hoach/README.md`.
+## Việc đang làm (cập nhật 13/10)
+**Đã xong:** bỏ nhãn "mẫu"; ảnh và giao diện sáng; rà soát điện thoại/máy tính; khóa admin PIN + 2 bước; hoàn trả + thẻ tiến độ (SQL đã chạy); số thực nhận (SQL đã chạy); phiếu `phieu.html?ma=`; STK MB + QR chỉ hiện đúng chỗ; chống cache `?v=`; link Messenger (`contacts.messenger`); chính sách hoàn hủy (chủ dự án đã đồng ý bản trên web); 1 hạng phòng + ảnh từ Drive của chủ nhà; Cloudflare Web Analytics (`analyticsToken` đã điền); cấu hình VS Code + Claude Code. Danh sách tiến độ cũ hiện trong VS Code ("Đang làm phần B") là bản cũ, bỏ qua.
+**Không còn việc nào chờ trợ lý** ngoài những mục cần thông tin từ chủ dự án bên dưới. Mục nào có link/khóa thì chủ dự án gửi, trợ lý làm tiếp.
 
-## Việc còn lại (nhắc chủ dự án khi phù hợp)
--1. (Xong 11/10) Link Messenger: `contacts.messenger` = m.me/mã Trang (lấy từ link Meta Business của chủ nhà); chính sách hoàn hủy thật: chủ dự án đã đồng ý bản hiện có trên web. Dịch vụ "Thuê xe máy" và "Hỗ trợ hành lý & đưa đón" tạm ẩn trong `servicesPaused` (data.js) chờ xác nhận đăng ký ngành.
--2. Đo lượt xem: `config.js` > `analyticsToken` (Cloudflare Web Analytics, 32 ký tự hex). Chủ dự án tạo site ở Cloudflare > Analytics & Logs > Web Analytics rồi gửi token; để trống thì không nạp gì.
-0. Tên chủ tài khoản MB (`config.js` > `bank.accountName`): chủ dự án nói tên là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không, và đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại vào thứ Sáu 16/10; CHƯA điền, chờ chữ chính xác; ảnh thật 7 địa điểm chưa có ảnh (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
-1. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật của chủ nhà).
-2. (Xong) Phòng: chủ nhà xác nhận chỉ có 1 hạng phòng; ảnh lấy từ Drive của chủ nhà.
-3. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
-4. Ngân hàng thật, Gmail nhận đơn, câu chuyện chủ nhà, chính sách hoàn hủy thật, video, link Messenger.
-5. Đổi mật khẩu admin + bật 2FA; Turnstile Site Key; mua tên miền rồi bật Facebook/Google.
-6. Hướng 2 (chuyển nội dung sang Supabase): làm sau khi khách đông, xem `supabase/ke-hoach/`.
+## Việc còn lại (xếp theo ưu tiên, nhắc chủ dự án khi phù hợp)
+**P0: ảnh hưởng tiền và an toàn (làm trước)**
+1. Tên chủ tài khoản MB (`config.js` > `bank.accountName`, đang để trống): chủ dự án nói là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không; đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại thứ Sáu 16/10. CHƯA điền, chờ chữ chính xác.
+2. Đổi mật khẩu admin (đang yếu) + bật 2FA GitHub/Supabase.
+3. Đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
+4. Gửi link nhận tin đơn mới để bật báo đơn (mục "Báo chủ nhà khi có đơn mới").
+
+**P1: nội dung và chống gian lận**
+5. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật). Dịch vụ "Thuê xe máy" và "Hỗ trợ hành lý & đưa đón" tạm ẩn trong `servicesPaused` (data.js), chờ xác nhận đăng ký ngành.
+6. Tạo Cloudflare Turnstile rồi gửi **Site Key** (bật Site Key trên web trước, dán Secret vào Supabase `TURNSTILE_SECRET` sau).
+7. Câu chuyện chủ nhà thật, video giới thiệu/banner.
+8. Ảnh thật cho 7 địa điểm chưa có ảnh của nhà (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đang dùng ảnh chủ dự án cung cấp theo ghi chú ở mục Khám phá.
+
+**P2: khi có điều kiện**
+9. Mua tên miền (dự kiến `nhacuaantaxua.com`), rồi Cloudflare (DNS, HTTPS, email theo tên miền), rồi bật đăng nhập Facebook/Google (`socialLogin` trong `config.js` = false vì chưa cấu hình Providers trong Supabase).
+10. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
+11. Hướng 2 (chuyển nội dung sang Supabase): làm sau khi khách đông, xem `supabase/ke-hoach/`. Hiện theo Hướng 1: `data.js` là nơi sửa giá/ảnh/mô tả; các bảng `rooms/tours/gallery/faq/reviews` để TRỐNG (nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`).
 
 ## Điểm bảo mật đã rà (không cần sửa)
 Đã siết CSDL bằng `supabase/migrations/20261009000000_harden_bookings_and_grants.sql` (đã áp dụng): bỏ quyền thừa của khách chưa đăng nhập, giới hạn giá/độ dài/ngày của đơn. Chưa kiểm tra giá phía máy chủ vì giá nằm ở `data.js` (làm khi chuyển Hướng 2).
