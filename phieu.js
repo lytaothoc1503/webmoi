@@ -32,8 +32,8 @@
 .ns-foot{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:center;margin-top:8px;padding-top:6px;border-top:1px solid #d9c8a6;font-size:11.5px;color:#33454a}
 .ns-ok{color:#0a7a4b;font-weight:800}.ns-warn{color:#b45309;font-weight:800}
 @media print{body.print-phieu>*:not(#phieu-modal){display:none!important}body.print-phieu #phieu-modal{position:static!important;background:none!important;display:block!important;padding:0!important;overflow:visible!important}body.print-phieu #phieu-modal .modal-box{box-shadow:none!important;max-width:none!important;padding:0!important}body.print-phieu #phieu-modal .modal-close,body.print-phieu #phieu-modal .oc-btn{display:none!important}}
-@page nca-land{size:A4 landscape;margin:8mm}
-@media print{.nca-slip{page:nca-land;width:100%;max-width:none;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@page nca-land{size:A4 landscape;margin:0}
+@media print{.nca-slip{page:nca-land;width:auto;max-width:none;margin:8mm;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 @media(max-width:760px){.nca-slip{flex-direction:column}.ns-side{flex:none;flex-direction:row;gap:12px;padding:12px;text-align:left}.ns-side svg.mark{width:42px;height:42px}.ns-side svg.hill{display:none}.ns-main{margin:8px;padding:14px 12px}.ns-title{font-size:19px}.ns-grid,.ns-pay{grid-template-columns:1fr}.ns-qr{width:100%;max-width:220px;margin:0 auto}.ns-flow{flex-wrap:wrap}.ns-flow div{flex:1 1 45%}}`;
     document.head.appendChild(st);
   }
@@ -41,7 +41,7 @@
   /* d: {code,name,phone,guests,room,roomNo,checkin,checkout,total,paid,status,nowStep(0-3),cccdLine(bool),extra(note)} */
   /* In khổ ngang: chèn @page tạm thời lúc in (cách chắc chắn nhất trên mọi trình duyệt) */
   window.NCA_printLand = function (cls) {
-    const st = document.createElement('style'); st.textContent = '@page{size:A4 landscape;margin:8mm}'; document.head.appendChild(st);
+    const st = document.createElement('style'); st.textContent = '@page{size:A4 landscape;margin:0}'; document.head.appendChild(st);
     document.body.classList.add(cls);
     const done = () => { document.body.classList.remove(cls); st.remove(); window.removeEventListener('afterprint', done); };
     window.addEventListener('afterprint', done); window.print();

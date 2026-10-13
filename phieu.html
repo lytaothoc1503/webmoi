@@ -26,21 +26,18 @@
   <div class="bar" id="bar" hidden>
     <button type="button" id="b-print">In / Lưu PDF</button>
     <a class="alt" id="b-fb" href="#" target="_blank" rel="noopener">Nhắn Messenger cho nhà</a>
-    <a class="alt" id="b-call" href="#">Gọi nhà</a>
-    <a class="alt" href="./index.html">Về trang chủ</a>
   </div>
   <p class="hint" id="hint" hidden>Trên điện thoại: bấm "In / Lưu PDF" rồi chọn "Lưu dưới dạng PDF" để giữ phiếu trong máy.</p>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
 <script src="config.js?v=20261011s"></script>
-<script src="phieu.js?v=20261013b"></script>
+<script src="phieu.js?v=20261013c"></script>
 <script>
   (function () {
     const out = document.getElementById('out'), S = window.SITE || {}, CFG = S.supabase || {}, C = S.contacts || {};
     const msg = (t, s) => { out.innerHTML = '<div class="msg">' + t + (s ? '<small>' + s + '</small>' : '') + '</div>'; };
     const code = String(new URLSearchParams(location.search).get('ma') || '').trim().toUpperCase();
     if (C.facebook) document.getElementById('b-fb').href = C.facebook; else document.getElementById('b-fb').hidden = true;
-    if (C.phone) document.getElementById('b-call').href = 'tel:' + C.phone; else document.getElementById('b-call').hidden = true;
     if (!/^[A-Z0-9]{6,20}$/.test(code)) { msg('Đường dẫn chưa có mã đơn hợp lệ.', 'Bạn hãy mở lại đúng link nhà đã gửi, hoặc nhắn nhà kèm mã đơn.'); return; }
     if (!CFG.url || !CFG.anonKey || !window.supabase) { msg('Chưa mở được phiếu lúc này.', 'Bạn nhắn nhà kèm mã đơn ' + code + ' để được hỗ trợ.'); return; }
     const db = window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
@@ -57,7 +54,7 @@
       document.title = 'Phiếu xác nhận ' + r.booking_code + ' | Nhà của An';
     }).catch(() => msg('Chưa mở được phiếu lúc này.', 'Bạn thử lại sau ít phút.'));
     document.getElementById('b-print').addEventListener('click', () => {
-      const s = document.createElement('style'); s.textContent = '@page{size:A4 landscape;margin:8mm}'; document.head.appendChild(s);
+      const s = document.createElement('style'); s.textContent = '@page{size:A4 landscape;margin:0}'; document.head.appendChild(s);
       const fin = () => { s.remove(); window.removeEventListener('afterprint', fin); }; window.addEventListener('afterprint', fin); window.print();
     });
   })();
