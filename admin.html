@@ -564,7 +564,9 @@
           if (!confirm('Lưu ý: mã booking trên phiếu (' + codeCheck + ') không trùng với đơn đang chọn (' + code + ').\n\nBấm OK để vẫn tiếp tục tạo yêu cầu hoàn, hoặc Hủy để kiểm tra lại.')) { checkRefundCode(); return; }
           doiChieu = 'KHÔNG khớp (' + codeCheck + ' so với ' + code + '), admin chọn tiếp tục';
         }
-        if (b && amount > paidOf(b)) { alert('Số tiền hoàn không được vượt số đã thu (' + vnd(paidOf(b)) + ').'); return; }
+        if (b && amount > paidOf(b)) {
+          if (!confirm('Số tiền hoàn (' + vnd(amount) + ') đang vượt số đã thu của đơn (' + vnd(paidOf(b)) + ').\n\nBấm OK nếu bạn chắc chắn muốn tiếp tục, hoặc Hủy để sửa lại số tiền.')) return;
+        }
         if (bank.length < 2 || !/^\d{6,20}$/.test(acc) || name.length < 2 || !reason) { alert('Nhập đủ ngân hàng, số tài khoản (6-20 số), tên chủ tài khoản và lý do.'); return; }
         const { error } = await supabaseClient.from('refunds').insert({ booking_code: code, amount, reason: reason + ' | Đối chiếu mã booking trên phiếu: ' + doiChieu, bank_name: bank, account_no: acc, account_name: name });
         if (error) { alert('Lỗi: ' + error.message); return; }
