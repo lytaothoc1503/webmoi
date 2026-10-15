@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin.html
 Disallow: /auth.html
 Disallow: /phieu.html
-Sitemap: https://lytaothoc1503.github.io/webmoi/sitemap.xml
+Sitemap: https://nhacuaantaxua.com/sitemap.xml
