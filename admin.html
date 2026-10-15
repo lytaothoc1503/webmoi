@@ -387,7 +387,7 @@
 
       <div class="page-section" id="page-security">
         <div class="top-bar"><h2>Bảo mật đăng nhập quản trị</h2></div>
-        <p class="fin-note">Phiên đăng nhập chỉ nằm trong tab này: đóng tab, tải lại trang, rời trang hoặc để 15 phút không thao tác là tự đăng xuất, máy không giữ lại gì. PIN và mã 2 bước do máy chủ kiểm, không nằm trong code.</p>
+        <p class="fin-note">Phiên đăng nhập chỉ nằm trong tab này: đóng tab/trình duyệt, để 1 giờ không thao tác, hoặc bấm Đăng xuất là tự đăng xuất, máy không giữ lại gì. Tải lại trang hoặc chuyển qua lại trong admin không bị đăng xuất. PIN và mã 2 bước do máy chủ kiểm, không nằm trong code.</p>
         <div class="table-box" style="padding:18px;max-width:520px">
           <h3 style="margin-top:0">Đổi mã PIN (6-8 số)</h3>
           <input type="password" id="sc-old" inputmode="numeric" maxlength="8" autocomplete="new-password" placeholder="PIN hiện tại" style="width:100%;margin-bottom:8px">
@@ -1252,7 +1252,7 @@
 
       // ===== Không giữ phiên: rời trang / tải lại / bỏ máy lâu là đăng xuất =====
       let lastActive = Date.now(), leaving = false;
-      const IDLE_MS = 15 * 60 * 1000;
+      const IDLE_MS = 60 * 60 * 1000;
       ['click', 'keydown', 'touchstart', 'mousemove'].forEach((e) => window.addEventListener(e, () => { lastActive = Date.now(); }, { passive: true }));
       async function logoutAdmin(reason) {
         leaving = true;
@@ -1262,7 +1262,6 @@
       }
       setInterval(() => { if (Date.now() - lastActive > IDLE_MS) logoutAdmin('idle'); }, 30000);
       document.addEventListener('visibilitychange', () => { if (!document.hidden && Date.now() - lastActive > IDLE_MS) logoutAdmin('idle'); });
-      window.addEventListener('pagehide', () => { if (!leaving) NCA_adminWipe(true); });
 
       (async function initAdmin() {
         const { data } = await supabaseClient.auth.getSession();
