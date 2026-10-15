@@ -112,7 +112,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 
 **P1: nội dung và chống gian lận**
 5. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật). Dịch vụ "Thuê xe máy" và "Hỗ trợ hành lý & đưa đón" tạm ẩn trong `servicesPaused` (data.js), chờ xác nhận đăng ký ngành.
-6. Tạo Cloudflare Turnstile rồi gửi **Site Key** (bật Site Key trên web trước, dán Secret vào Supabase `TURNSTILE_SECRET` sau).
+6. Turnstile: Site Key ĐÃ bật trên web (`config.js`, 16/10). CÒN LẠI: chủ dự án vào Cloudflare > Turnstile > widget "Nha cua An dang ky" copy **Secret Key**, dán vào Supabase > Edge Functions > Secrets với tên `TURNSTILE_SECRET` (không gửi Secret vào chat/code).
 7. Câu chuyện chủ nhà thật, video giới thiệu/banner.
 8. Ảnh thật cho 7 địa điểm chưa có ảnh của nhà (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đang dùng ảnh chủ dự án cung cấp theo ghi chú ở mục Khám phá.
 
@@ -120,6 +120,9 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 9. Mua tên miền (dự kiến `nhacuaantaxua.com`), rồi Cloudflare (DNS, HTTPS, email theo tên miền), rồi bật đăng nhập Facebook/Google (`socialLogin` trong `config.js` = false vì chưa cấu hình Providers trong Supabase).
 10. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
 11. Hướng 2 (chuyển nội dung sang Supabase): làm sau khi khách đông, xem `supabase/ke-hoach/`. Hiện theo Hướng 1: `data.js` là nơi sửa giá/ảnh/mô tả; các bảng `rooms/tours/gallery/faq/reviews` để TRỐNG (nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`).
+
+## Cloudflare (cập nhật 16/10)
+Tên miền `nhacuaantaxua.com` chạy qua Cloudflare (gói Free) trước GitHub Pages. Canonical, og, sitemap, robots, JSON-LD đều dùng `https://nhacuaantaxua.com/` (KHÔNG dùng github.io). Cache Rule "Cache anh va tai nguyen tinh": ảnh/JS/CSS/font/mp4 edge TTL 7 ngày, browser TTL 1 ngày; HTML không bị cache (sửa là thấy ngay). Khi đổi file JS/CSS vẫn phải đổi `?v=` như quy tắc 00. Gói Workers for Platforms (25$/tháng) chưa dùng cho web này.
 
 ## Điểm bảo mật đã rà (không cần sửa)
 Đã siết CSDL bằng `supabase/migrations/20261009000000_harden_bookings_and_grants.sql` (đã áp dụng): bỏ quyền thừa của khách chưa đăng nhập, giới hạn giá/độ dài/ngày của đơn. Chưa kiểm tra giá phía máy chủ vì giá nằm ở `data.js` (làm khi chuyển Hướng 2).
