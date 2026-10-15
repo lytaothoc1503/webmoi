@@ -29,7 +29,7 @@ window.SITE = {
 
   // Cơ sở dữ liệu Supabase (Project Settings > API). Chỉ dán 'Project URL' và khóa 'anon public'.
   // KHÔNG BAO GIỜ dán khóa 'service_role' vào đây. Để trống thì web dùng dữ liệu trong data.js, và đơn chỉ gửi qua Facebook.
-  turnstileSiteKey: '', // Cloudflare Turnstile Site Key (công khai). Để trống = chưa bật chống bot.
+  turnstileSiteKey: '0x4AAAAAAFXz_8XBZ_1wZyjM', // Cloudflare Turnstile Site Key (công khai). Để trống = chưa bật chống bot.
   analyticsToken: '1ebe0021e8fa42b68026458c88562ffc', // Cloudflare Web Analytics token (công khai, không cookie). Để trống = chưa đo.
   // Đăng nhập mạng xã hội: chỉ bật (true) SAU KHI đã cấu hình nhà cung cấp trong Supabase → Authentication → Providers. Chưa bật thì nút bị ẩn.
   socialLogin: { facebook: false, google: false },
