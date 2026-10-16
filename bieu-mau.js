@@ -44,7 +44,8 @@
     don_vi: ['Tên đơn vị trên phiếu (để trống = Nhà của An)', 'text'], dia_chi_dv: ['Địa chỉ đơn vị (để trống = dùng địa chỉ Nhà của An)', 'text'], hotline_dv: ['Hotline đơn vị (để trống = dùng hotline Nhà của An)', 'text'], logo_dv: ['Logo đơn vị (để trống = dùng logo Nhà của An)', 'file'],
     b_ns: ['Khách: ngày sinh', 'text'], b_cap: ['Khách: CCCD cấp ngày', 'text'], b_noicap: ['Khách: CCCD cấp tại', 'text'], songay: ['Dự kiến hoàn tiền trong (số ngày)', 'text'],
     c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text'],
-    ck_ten: ['Tên người đã chuyển khoản (theo sao kê ngân hàng)', 'text'], ck_ngan_hang: ['Ngân hàng chuyển khoản', 'text'], ck_stk: ['Số tài khoản chuyển khoản (nếu có)', 'text']
+    ck_ten: ['Tên người đã chuyển khoản (theo sao kê ngân hàng)', 'text'], ck_ngan_hang: ['Ngân hàng chuyển khoản', 'text'], ck_stk: ['Số tài khoản chuyển khoản (nếu có)', 'text'],
+    ma_gd: ['Mã giao dịch ngân hàng (sau khi chuyển khoản xong)', 'text'], noidung_ck: ['Nội dung chuyển khoản', 'text']
   };
 
   const head = (f, title, sub) => `<div class="dp-qh"><b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b>Độc lập - Tự do - Hạnh phúc</b><br>-----------***-----------</div>
@@ -75,6 +76,17 @@
     { id: 'phieu-xn-dv', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (đơn vị khác)', note: 'Giống phiếu xác nhận của Nhà của An, nhưng tên đơn vị và logo tự gõ/tải lên — dùng khi làm sale booking online cho đơn vị khác. Để trống tên/logo thì phiếu vẫn hiện đúng như Nhà của An.', land: true,
       fields: ['don_vi', 'logo_dv', 'dia_chi_dv', 'hotline_dv', 'ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
       body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, orgName: f.don_vi || undefined, orgAddress: f.dia_chi_dv || undefined, orgPhone: f.hotline_dv || undefined, orgLogo: f.logo_dv || undefined }) },
+    { id: 'phieu-xn-hoan', group: 'Hoàn trả', name: 'Phiếu xác nhận hoàn tiền', note: 'Nhà gửi khách sau khi đã chuyển khoản hoàn tiền, ghi mã giao dịch ngân hàng thật để khách tự đối chiếu với sao kê của mình. Không phải biên bản có chữ ký hai bên.',
+      fields: ['ngay', 'diadiem', 'ma', 'b_ten', 'b_sdt', 'tien', 'nh', 'stk', 'ctk', 'ma_gd', 'noidung_ck', 'lydo'],
+      body: (f) => `${head(f, 'PHIẾU XÁC NHẬN HOÀN TIỀN')}
+        <p><i>${when(f)}.</i></p>
+        <p>Nhà của An Homestay Tà Xùa xác nhận đã hoàn tiền cho đơn đặt phòng mã ${dots(f.ma, 10)} của Ông/Bà ${dots(f.b_ten, 22)}${f.b_sdt ? ', điện thoại ' + dots(f.b_sdt, 12) : ''}.</p>
+        <p>Số tiền đã hoàn: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}).</p>
+        <p>${bank(f)}.</p>
+        <p>Mã giao dịch ngân hàng: <b>${dots(f.ma_gd, 20)}</b>${f.noidung_ck ? '; nội dung chuyển khoản: ' + dots(f.noidung_ck, 30) : ''}.</p>
+        ${f.lydo ? `<p>Ghi chú: ${dots(f.lydo, 40)}.</p>` : ''}
+        <p>Phiếu này để Quý khách tự đối chiếu với sao kê ngân hàng của mình; không thay thế Biên bản hoàn trả có chữ ký hai bên khi cần.</p>${sign1('ĐẠI DIỆN NHÀ CỦA AN', true)}` },
+
     { id: 'bb-hoan-coc', group: 'Hoàn trả', name: 'Biên bản hoàn trả tiền đặt cọc (đầy đủ)', note: 'Hai bên ký, dùng khi hoàn cọc/hoàn tiền cho khách.',
       fields: ['ma_phieu', 'ngay', 'diadiem', 'so', 'a_ten', 'a_cccd', 'a_dc', 'a_sdt', 'b_ten', 'b_cccd', 'b_dc', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc', 'nh', 'stk', 'ctk'],
       body: (f) => `${head(f, 'BIÊN BẢN HOÀN TRẢ TIỀN ĐẶT CỌC')}
