@@ -57,6 +57,13 @@
     const useBankName = bName || B.bankName || B.bankId, useAccountNo = bNo || B.accountNo, useAccountName = bHolder || B.accountName;
     const bankOn = (useAccountNo || d.qrImage) && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
     const qr = d.qrImage ? d.qrImage : (!overridingBank && bankOn && remain > 0 && B.bankId && B.accountNo ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''); // không tích hợp sẵn số tiền/nội dung CK — khách tự ghi; d.qrImage (ảnh tự tải lên) luôn ưu tiên
+    // Tên đơn vị/logo có thể ghi đè riêng cho từng phiếu (d.orgName/orgTag/orgLogo/orgAddress/orgPhone) — dùng khi làm phiếu cho đơn vị khác; để trống thì giữ đúng như phiếu Nhà của An
+    const orgName = d.orgName ? String(d.orgName).trim() : 'Nhà của An Homestay Tà Xùa';
+    const sideName = d.orgName ? String(d.orgName).trim().toUpperCase() : 'NHÀ CỦA AN';
+    const sideTag = d.orgTag !== undefined ? String(d.orgTag).trim() : 'HOMESTAY & COFFEE';
+    const orgLogo = d.orgLogo ? String(d.orgLogo).trim() : '';
+    const orgAddress = d.orgAddress !== undefined ? String(d.orgAddress).trim() : (S.address || '');
+    const orgPhone = d.orgPhone !== undefined ? String(d.orgPhone).trim() : (C.phone || '');
     const steps = ['Đặt phòng', 'Chuyển khoản', 'Nhà xác nhận', 'Nhận phòng'];
     const now = d.nowStep ?? 2;
     const dep = Number(d.depositPercent) || 0; // có giá trị = hiện cọc theo % thay vì số tiền VND cụ thể
@@ -76,11 +83,11 @@
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     return `<div class="nca-slip"><div class="ns-side">
-      <svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div><b>NHÀ CỦA AN</b><small>HOMESTAY &amp; COFFEE</small></div>
+      ${orgLogo ? `<img class="mark" src="${esc(orgLogo)}" alt="logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;background:#fff" />` : `<svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+      <div><b>${esc(sideName)}</b>${sideTag ? `<small>${esc(sideTag)}</small>` : ''}</div>
       <svg class="hill" viewBox="0 0 190 150" aria-hidden="true"><g fill="none" stroke="#c8902e" stroke-width="1.4" opacity=".85"><path d="M0 120c30-35 55-45 85-20 25-30 55-40 105 0"/><path d="M0 138c40-20 80-25 190 0"/><path d="M40 100l8-34 8 34M30 100h36M95 105l7-28 7 28M86 105h32M140 98l6-24 6 24M132 98h28"/><path d="M20 62c10-8 22-8 30 0M130 40c10-8 24-8 32 0M70 30c8-6 18-6 24 0"/></g></svg></div>
       <div class="ns-main"><h2 class="ns-title">PHIẾU XÁC NHẬN ĐẶT PHÒNG</h2>
-      <div class="ns-sub">Cảm ơn Quý khách đã chọn ${esc(S.name || 'Nhà của An Homestay Tà Xùa')} làm điểm dừng chân giữa biển mây.</div>
+      <div class="ns-sub">Cảm ơn Quý khách đã chọn ${esc(orgName)} làm điểm dừng chân giữa biển mây.</div>
       <div class="ns-code"><span>Mã booking</span><span>${dots(d.code, 10)}</span></div>
       <div class="ns-grid"><div class="ns-sec"><h4>01 THÔNG TIN KHÁCH</h4><table>
         <tr><td>Họ và tên</td><td><b>${dots(d.name, 20)}</b></td></tr><tr><td>Số điện thoại</td><td>${dots(d.phone, 14)}</td></tr><tr><td>Số khách</td><td>${dots(d.guests, 8)}</td></tr>
@@ -92,7 +99,7 @@
       <div class="ns-pay">${pay}${bankBox}</div>
       <div class="ns-flow">${steps.map((s, i) => `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
       <div class="ns-note"><b>Khi nhận phòng:</b> người đại diện đặt phòng chỉ cần mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Với khách đi cùng, bạn gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
-      <div class="ns-foot"><span>${esc(S.name || '')}</span><span>Địa chỉ: ${esc(S.address || '')}</span>${C.phone ? `<span>Hotline: ${esc(C.phone)}</span>` : ''}</div>
+      <div class="ns-foot"><span>${esc(orgName)}</span>${orgAddress ? `<span>Địa chỉ: ${esc(orgAddress)}</span>` : ''}${orgPhone ? `<span>Hotline: ${esc(orgPhone)}</span>` : ''}</div>
       </div></div>`;
   };
 })();
