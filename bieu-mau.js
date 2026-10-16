@@ -43,7 +43,8 @@
     nh_p: ['Ngân hàng hiện trên phiếu (để trống = dùng mặc định config.js)', 'text'], stk_p: ['Số tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], ctk_p: ['Tên chủ tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], qr_img: ['Ảnh QR tự tải lên (thay QR tự tạo)', 'file'],
     don_vi: ['Tên đơn vị trên phiếu (để trống = Nhà của An)', 'text'], dia_chi_dv: ['Địa chỉ đơn vị (để trống = dùng địa chỉ Nhà của An)', 'text'], hotline_dv: ['Hotline đơn vị (để trống = dùng hotline Nhà của An)', 'text'], logo_dv: ['Logo đơn vị (để trống = dùng logo Nhà của An)', 'file'],
     b_ns: ['Khách: ngày sinh', 'text'], b_cap: ['Khách: CCCD cấp ngày', 'text'], b_noicap: ['Khách: CCCD cấp tại', 'text'], songay: ['Dự kiến hoàn tiền trong (số ngày)', 'text'],
-    c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text']
+    c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text'],
+    ck_ten: ['Tên người đã chuyển khoản (theo sao kê ngân hàng)', 'text'], ck_ngan_hang: ['Ngân hàng chuyển khoản', 'text'], ck_stk: ['Số tài khoản chuyển khoản (nếu có)', 'text']
   };
 
   const head = (f, title, sub) => `<div class="dp-qh"><b>CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</b><br><b>Độc lập - Tự do - Hạnh phúc</b><br>-----------***-----------</div>
@@ -123,6 +124,19 @@
         <p>Nay tôi đề nghị Quý đơn vị hoàn lại số tiền: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}). Lý do: ${dots(f.lydo, 40)}.</p>
         ${chk(f)}<p>Thông tin nhận hoàn: ${bank(f)}.</p>
         <p>Tôi cam đoan thông tin trên là đúng và chịu trách nhiệm về thông tin đã cung cấp. Việc hoàn tiền thực hiện theo chính sách hoàn hủy của Nhà của An.</p>${sign1('NGƯỜI ĐỀ NGHỊ')}` },
+
+    { id: 'tb-khong-chinh-chu', group: 'Hoàn trả', name: 'Thông báo tạm giữ hoàn tiền (không khớp chính chủ)', note: 'Dùng khi người chuyển khoản gốc và người đề nghị nhận hoàn là hai người khác nhau — tạm giữ, chưa xử lý hoàn cho đến khi đối chiếu hoặc có ủy quyền hợp lệ.',
+      fields: ['ngay', 'diadiem', 'b_ten', 'b_sdt', 'ma', 'tien', 'ck_ten', 'ck_ngan_hang', 'ck_stk', 'lydo'],
+      body: (f) => `${head(f, 'THÔNG BÁO TẠM GIỮ HOÀN TIỀN (KHÔNG KHỚP CHÍNH CHỦ)')}
+        <p><i>${when(f)}.</i></p>
+        <p>Nhà của An Homestay Tà Xùa đã nhận được yêu cầu hoàn tiền cho đơn đặt phòng mã ${dots(f.ma, 10)}, số tiền <b>${money(f.tien)}</b>, do Ông/Bà ${dots(f.b_ten, 22)} (điện thoại ${dots(f.b_sdt, 12)}) đề nghị.</p>
+        <p>Tuy nhiên, theo sao kê ngân hàng, giao dịch chuyển khoản tương ứng được thực hiện bởi <b>${dots(f.ck_ten, 22)}</b>${f.ck_ngan_hang ? ', ngân hàng ' + dots(f.ck_ngan_hang, 14) : ''}${f.ck_stk ? ', số tài khoản ' + dots(f.ck_stk, 16) : ''}, <b>không trùng khớp</b> với người đề nghị nhận hoàn nêu trên.</p>
+        <p>Để đảm bảo tiền hoàn trả về đúng người, đúng tài khoản, Nhà của An <b>tạm thời chưa xử lý</b> yêu cầu hoàn tiền này. Đề nghị chọn một trong các cách sau để tiếp tục:</p>
+        <p>1. Nếu Ông/Bà ${dots(f.b_ten, 22)} chính là người đã chuyển khoản (dùng tài khoản đứng tên khác), gửi nhà ảnh chụp tài khoản ngân hàng dùng để chuyển khoản để đối chiếu.</p>
+        <p>2. Nếu nhờ người khác chuyển khoản hộ, đề nghị người đã chuyển khoản (Ông/Bà ${dots(f.ck_ten, 22)}) lập Giấy ủy quyền nhận tiền hoàn trả, ủy quyền cho Ông/Bà ${dots(f.b_ten, 22)} nhận thay (xem mẫu "Giấy ủy quyền nhận tiền hoàn trả").</p>
+        <p>3. Hoặc nhà hoàn trả trực tiếp về đúng tài khoản đã chuyển khoản ban đầu, đứng tên Ông/Bà ${dots(f.ck_ten, 22)}.</p>
+        ${f.lydo ? `<p>Ghi chú thêm: ${dots(f.lydo, 40)}.</p>` : ''}
+        <p>Thông báo này lập để lưu hồ sơ và gửi khách tham khảo; không phải văn bản tư vấn pháp lý.</p>${sign1('ĐẠI DIỆN NHÀ CỦA AN')}` },
 
     { id: 'phieu-thu', group: 'Khách đặt phòng', name: 'Phiếu thu tiền đặt cọc / thanh toán', note: 'Xác nhận nhà đã nhận tiền của khách.',
       fields: ['ngay', 'diadiem', 'so', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc'],
