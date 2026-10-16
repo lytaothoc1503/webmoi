@@ -56,8 +56,10 @@
   const partyB = (f, role) => `<p><b>BÊN B: ${role}</b> (sau đây gọi là "Bên B")</p>
     <p>Ông/Bà: ${dots(f.b_ten, 24)}; CCCD số: ${dots(f.b_cccd, 16)}</p>
     <p>Địa chỉ: ${dots(f.b_dc, 36)}; điện thoại: ${dots(f.b_sdt, 12)}</p>`;
-  const sign2 = (l, r) => `<div class="dp-sign"><div><b>${l}</b><br><i>(Ký, ghi rõ họ tên)</i></div><div><b>${r}</b><br><i>(Ký, ghi rõ họ tên)</i></div></div>`;
-  const sign1 = (l) => `<div class="dp-sign"><div></div><div><b>${l}</b><br><i>(Ký, ghi rõ họ tên)</i></div></div>`;
+  // Chữ ký thật của Nhà của An (images/chu-ky-an.png) — chỉ chèn vào đúng dòng ký của Nhà của An, không chèn vào dòng ký của khách/bên thứ 3
+  const sigImg = '<img src="images/chu-ky-an.png" alt="Chữ ký Nhà của An" style="height:46px;display:block;margin:2px auto" />';
+  const sign2 = (l, r, nha) => `<div class="dp-sign"><div><b>${l}</b><br>${nha === 'l' ? sigImg : ''}<i>(Ký, ghi rõ họ tên)</i></div><div><b>${r}</b><br>${nha === 'r' ? sigImg : ''}<i>(Ký, ghi rõ họ tên)</i></div></div>`;
+  const sign1 = (l, nha) => `<div class="dp-sign"><div></div><div><b>${l}</b><br>${nha ? sigImg : ''}<i>(Ký, ghi rõ họ tên)</i></div></div>`;
   const chk = (f) => {
     const a = String(f.ma_phieu || '').trim().toUpperCase(), m = String(f.ma || '').trim().toUpperCase();
     if (!a) return '<p>Đối chiếu mã booking: mã trên Phiếu xác nhận do khách xuất trình ' + dots('', 12) + ' ☐ trùng khớp ☐ không trùng khớp với mã trên hệ thống.</p>';
@@ -83,7 +85,7 @@
         <p>2. Lý do hoàn trả: ${dots(f.lydo, 40)}.</p>
         <p>3. Hình thức giao nhận: ${dots(f.hinhthuc, 20)}. ${f.stk ? bank(f) + '.' : ''}</p>
         <p>4. Bên B xác nhận đã nhận đủ số tiền nêu trên. Kể từ thời điểm này, hai bên không còn quyền và nghĩa vụ nào liên quan đến khoản tiền đặt cọc này và không khiếu nại gì thêm.</p>
-        <p>5. Biên bản được lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản.</p>${sign2('BÊN A (Bên nhận tiền đặt cọc)', 'BÊN B (Bên giao tiền đặt cọc)')}` },
+        <p>5. Biên bản được lập thành 02 bản có giá trị như nhau, mỗi bên giữ 01 bản.</p>${sign2('BÊN A (Bên nhận tiền đặt cọc)', 'BÊN B (Bên giao tiền đặt cọc)', 'l')}` },
 
     { id: 'bb-hoan-coc-gon', group: 'Hoàn trả', name: 'Biên bản hoàn trả tiền (bản gọn)', note: 'Một trang ngắn, dùng cho đơn nhỏ.',
       fields: ['ma_phieu', 'ngay', 'diadiem', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'tien', 'lydo', 'hinhthuc'],
@@ -92,7 +94,7 @@
         <p>Bên hoàn trả: <b>Nhà của An Homestay Tà Xùa</b>, đại diện ${dots(f.a_ten, 20)}.</p>
         <p>Bên nhận hoàn: Ông/Bà ${dots(f.b_ten, 22)}; điện thoại ${dots(f.b_sdt, 12)}.</p>
         <p>Nội dung: hoàn trả tiền đơn đặt phòng mã ${dots(f.ma, 10)}. Số tiền: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 24)}). Lý do: ${dots(f.lydo, 30)}. Hình thức: ${dots(f.hinhthuc, 18)}.</p>
-        ${chk(f)}<p>Bên nhận hoàn xác nhận đã nhận đủ tiền và không khiếu nại gì thêm.</p>${sign2('BÊN HOÀN TRẢ', 'BÊN NHẬN HOÀN')}` },
+        ${chk(f)}<p>Bên nhận hoàn xác nhận đã nhận đủ tiền và không khiếu nại gì thêm.</p>${sign2('BÊN HOÀN TRẢ', 'BÊN NHẬN HOÀN', 'l')}` },
 
     { id: 'uq-nhan-hoan', group: 'Ủy quyền', name: 'Giấy ủy quyền nhận tiền hoàn trả', note: 'Khách ủy quyền cho người khác nhận tiền hoàn thay.',
       fields: ['ngay', 'diadiem', 'b_ten', 'b_ns', 'b_cccd', 'b_cap', 'b_noicap', 'b_dc', 'b_sdt', 'c_ten', 'c_cccd', 'c_dc', 'c_sdt', 'ma', 'tien', 'nh', 'stk', 'ctk', 'songay'],
@@ -136,7 +138,7 @@
         <p>2. Nếu nhờ người khác chuyển khoản hộ, đề nghị người đã chuyển khoản (Ông/Bà ${dots(f.ck_ten, 22)}) lập Giấy ủy quyền nhận tiền hoàn trả, ủy quyền cho Ông/Bà ${dots(f.b_ten, 22)} nhận thay (xem mẫu "Giấy ủy quyền nhận tiền hoàn trả").</p>
         <p>3. Hoặc nhà hoàn trả trực tiếp về đúng tài khoản đã chuyển khoản ban đầu, đứng tên Ông/Bà ${dots(f.ck_ten, 22)}.</p>
         ${f.lydo ? `<p>Ghi chú thêm: ${dots(f.lydo, 40)}.</p>` : ''}
-        <p>Thông báo này lập để lưu hồ sơ và gửi khách tham khảo; không phải văn bản tư vấn pháp lý.</p>${sign1('ĐẠI DIỆN NHÀ CỦA AN')}` },
+        <p>Thông báo này lập để lưu hồ sơ và gửi khách tham khảo; không phải văn bản tư vấn pháp lý.</p>${sign1('ĐẠI DIỆN NHÀ CỦA AN', true)}` },
 
     { id: 'phieu-thu', group: 'Khách đặt phòng', name: 'Phiếu thu tiền đặt cọc / thanh toán', note: 'Xác nhận nhà đã nhận tiền của khách.',
       fields: ['ngay', 'diadiem', 'so', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc'],
@@ -146,7 +148,7 @@
         <p>Người nộp tiền: Ông/Bà ${dots(f.b_ten, 24)}; điện thoại ${dots(f.b_sdt, 12)}.</p>
         <p>Nội dung: ${f.lydo ? esc2(f.lydo) : 'Tiền đặt cọc / thanh toán'} cho ${booking(f)}.</p>
         <p>Số tiền: <b>${money(f.tien)}</b> (bằng chữ: ${dots(vnWords(f.tien), 28)}).</p>
-        <p>Hình thức: ${dots(f.hinhthuc, 20)}.</p>${sign2('NGƯỜI NỘP TIỀN', 'NGƯỜI THU TIỀN')}
+        <p>Hình thức: ${dots(f.hinhthuc, 20)}.</p>${sign2('NGƯỜI NỘP TIỀN', 'NGƯỜI THU TIỀN', 'r')}
         <p class="dp-c"><i>Người thu tiền: ${dots(f.a_ten, 20)}</i></p>` }
   ];
 
