@@ -294,4 +294,18 @@
     window.addEventListener('afterprint', done);
     window.print();
   };
+  // Xuất mẫu đang xem thành 1 file ảnh PNG (để gửi Messenger/Zalo nhanh, không cần mở file PDF)
+  window.exportFormImage = async function () {
+    if (!window.html2canvas) { alert('Chưa tải được công cụ xuất ảnh, thử tải lại trang.'); return; }
+    const el = $('fm-preview');
+    if (!el || !el.innerHTML.trim()) { alert('Chưa có nội dung để xuất ảnh.'); return; }
+    try {
+      const canvas = await window.html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      const a = document.createElement('a');
+      const ma = (state.f && state.f.ma ? String(state.f.ma).trim() : '') || new Date().toISOString().slice(0, 10);
+      a.download = `nha-cua-an-${ma}.png`;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    } catch (e) { alert('Không xuất được ảnh: ' + (e && e.message ? e.message : e)); }
+  };
 })();
