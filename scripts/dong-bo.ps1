@@ -8,3 +8,7 @@ $a = git rev-parse HEAD; $b = git rev-parse origin/main
 if ($a -eq $b) { Write-Host "Đã khớp GitHub ($($a.Substring(0,7)))." -ForegroundColor Green }
 else { Write-Host "Máy có commit chưa đẩy. Chạy: git push" -ForegroundColor Yellow }
 git status -sb
+
+PS C:\...\webmoi\cloudflare\thong-bao>
+npx wrangler secret put TELEGRAM_BOT_TOKEN
+npx wrangler secret put TELEGRAM_CHAT_ID
