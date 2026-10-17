@@ -14,7 +14,8 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 - VS Code: mở thư mục `webmoi`, cài tiện ích **Claude Code** (gợi ý sẵn trong `.vscode/extensions.json`), dùng terminal PowerShell (không dùng terminal Kali của dev-container). Ctrl+Shift+P > Tasks: Run Task > "Đồng bộ GitHub" hoặc "Kiểm tra web".
 
 ## Kiến trúc
-- Web tĩnh (HTML/CSS/JS thuần, không framework) chạy trên **GitHub Pages**: https://lytaothoc1503.github.io/webmoi/ (đẩy lên `main` là web tự cập nhật sau 1-3 phút).
+- Web tĩnh (HTML/CSS/JS thuần, không framework, không bước build) chạy trên **GitHub Pages**, tên miền chính https://nhacuaantaxua.com/ (`CNAME`, qua Cloudflare; github.io chỉ là địa chỉ gốc). Đẩy lên `main` là web tự cập nhật sau 1-3 phút.
+- Chạy thử trên máy: `npm install` rồi `npm start` (servor, tự tải lại). Kiểm tra: `node scripts/kiem-tra.js`. Không có framework test; kiểm tra giao diện bằng trình duyệt ở 390px và 1366px.
 - **Supabase** (project `hkfprewiprdztmdcoxzz`): Postgres + RLS (bật trên cả 7 bảng), Auth, Edge Function `customer-signup`.
 - Tài khoản khách: đăng ký bằng **số điện thoại** (email nội bộ `<sđt>@example.com`, không OTP/email), tạo qua Edge Function. Admin tách riêng (`auth.html`, bảng `admins`, `is_admin()`).
 - Ngôn ngữ: tiếng Việt mặc định, nút VI | EN; bản dịch nằm trong từ điển của `i18n.js` (chữ Việt mới cần thêm bản Anh).
@@ -30,6 +31,19 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 | `chinh-sach.html` | Chính sách và hoàn hủy |
 | `san-may-ta-xua.html` | Bài hướng dẫn săn mây (SEO, có schema Article/FAQ) |
 | `supabase/functions/customer-signup/` | Hàm đăng ký bằng SĐT, có chỗ nối Cloudflare Turnstile (tắt khi chưa có khóa) |
+| `supabase/functions/notify-booking/` | Báo chủ nhà khi có đơn mới/đã thanh toán (xem mục "Báo chủ nhà khi có đơn mới") |
+| `phieu.html`, `phieu.js` | Trang phiếu xác nhận cho khách (`?ma=MÃ`); `window.NCA_slip()` vẽ phiếu, dùng chung với admin |
+| `admin-auth.js` | Client Supabase của admin (phiên trong `sessionStorage`) |
+| `bieu-mau.js`, `vendor/html2canvas.min.js` | Mục Biểu Mẫu trong admin (mẫu in, xuất PNG) |
+| `ai-tro-ly.js` | Mục Trợ Lý AI trong admin (soạn "lời nhờ" để dán vào AI ngoài) |
+| `cloudflare/thong-bao/` | Worker nhận tin đơn mới, gửi Telegram |
+| `scripts/kiem-tra.js`, `scripts/dong-bo.ps1` | Kiểm tra tự động; đồng bộ GitHub cho chủ dự án |
+| `images/` | Ảnh web (ưu tiên `.webp`); `sitemap.xml`, `robots.txt`, `CNAME` ở gốc |
+| `HUONG-DAN-SUA.md`, `README.md` | Hướng dẫn sửa nhanh cho chủ nhà; giới thiệu và cài đặt Supabase |
+| `TASKS.md`, `SECURITY.md` | Bản cũ (chia việc 2 máy; mẫu mặc định của GitHub), không theo dõi việc ở đó: danh sách việc duy nhất nằm ở cuối file này |
+
+**Cách mã chạy:** `config.js` đặt `window.SITE`, `data.js` đặt `window.SITE_DATA`; `index.html` nạp theo thứ tự supabase-js (CDN, có `integrity`) → `config.js` → `data.js` → `phieu.js` → `app.js` → `account.js` → `i18n.js`. `getList()` trong `app.js` đọc bảng Supabase (`rooms/tours/gallery/faq/reviews`); bảng trống hoặc lỗi thì dùng dữ liệu `data.js`. Đơn lưu ở bảng `bookings` (mã đơn 8 ký tự = nội dung chuyển khoản) và bản sao trong trình duyệt khách. Luồng trạng thái (`ST` trong `app.js`): Chờ thanh toán → (khách bấm "Tôi đã chuyển khoản") Đã thanh toán - chờ xác nhận → (admin xác nhận) Đặt phòng thành công → Hoàn thành, hoặc Hủy đơn. `admin.html` nạp `config.js`, `admin-auth.js`, `phieu.js`, `bieu-mau.js`, `ai-tro-ly.js`, Chart.js; đổi `?v=` của `bieu-mau.js`/`ai-tro-ly.js` trong `admin.html` khi sửa.
+**Lưu ý kiểm tra:** `scripts/kiem-tra.js` chỉ soát cú pháp `config.js`, `data.js`, `app.js`, `account.js`, `i18n.js`, `admin-auth.js`; khi sửa `phieu.js`, `bieu-mau.js`, `ai-tro-ly.js` thì tự chạy thêm `node --check <file>`. Migration chạy tay trong SQL Editor theo thứ tự tên file.
 | `supabase/migrations/` | SQL tạo bảng và quyền |
 
 ## Mục Khám phá Tà Xùa
@@ -87,7 +101,7 @@ STK/QR chỉ hiện cho khách có đơn đang **chờ chuyển khoản** (cửa
 ## Trạng thái hiện tại
 **Đã có:** đặt phòng + QR, tra cứu đơn, đăng ký SĐT, tiếng Anh, thư viện ảnh thật, tour/dịch vụ công khai, SEO cơ bản (canonical, sitemap, schema), RLS.
 
-**Chờ tiền/điều kiện:** mua tên miền (dự kiến `nhacuaantaxua.com`, giá .com khoảng 309-429 nghìn đồng/năm ở Tenten, chưa mua), Cloudflare (DNS, HTTPS, chống DDoS, email theo tên miền), đăng nhập Facebook/Google.
+**Chờ tiền/điều kiện:** email theo tên miền, đăng nhập Facebook/Google (tên miền `nhacuaantaxua.com` và Cloudflare đã chạy, xem mục Cloudflare).
 
 **Việc chờ chủ dự án:** xem mục "Việc còn lại (xếp theo ưu tiên)" bên dưới (danh sách duy nhất, không lặp ở nơi khác).
 
@@ -119,7 +133,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 8. Ảnh thật cho 7 địa điểm chưa có ảnh của nhà (Cây táo mèo, Đầu Rùa, Cá Heo, thảo nguyên, ngắm sao, đồi chè, rừng rêu); đang dùng ảnh chủ dự án cung cấp theo ghi chú ở mục Khám phá.
 
 **P2: khi có điều kiện**
-9. Mua tên miền (dự kiến `nhacuaantaxua.com`), rồi Cloudflare (DNS, HTTPS, email theo tên miền), rồi bật đăng nhập Facebook/Google (`socialLogin` trong `config.js` = false vì chưa cấu hình Providers trong Supabase).
+9. (Tên miền + Cloudflare đã xong 16/10.) Còn: email theo tên miền, rồi bật đăng nhập Facebook/Google (`socialLogin` trong `config.js` = false vì chưa cấu hình Providers trong Supabase).
 10. Lỗi "tiện ích": chủ dự án chưa nói rõ mục nào (dịch vụ không có nút đặt? hay dòng ✓ dưới mỗi phòng?).
 11. Hướng 2 (chuyển nội dung sang Supabase): làm sau khi khách đông, xem `supabase/ke-hoach/`. Hiện theo Hướng 1: `data.js` là nơi sửa giá/ảnh/mô tả; các bảng `rooms/tours/gallery/faq/reviews` để TRỐNG (nếu có dữ liệu thì web dùng dữ liệu đó thay hoàn toàn `data.js`).
 
