@@ -129,3 +129,17 @@ Tên miền `nhacuaantaxua.com` chạy qua Cloudflare (gói Free) trước GitHu
 ## Điểm bảo mật đã rà (không cần sửa)
 Đã siết CSDL bằng `supabase/migrations/20261009000000_harden_bookings_and_grants.sql` (đã áp dụng): bỏ quyền thừa của khách chưa đăng nhập, giới hạn giá/độ dài/ngày của đơn. Chưa kiểm tra giá phía máy chủ vì giá nằm ở `data.js` (làm khi chuyển Hướng 2).
 RLS bật cả 7 bảng; mã đơn 8 ký tự ngẫu nhiên; tra cứu theo SĐT chỉ trả thông tin tối thiểu; không có khóa bí mật trong code/lịch sử git; hàm đăng ký có giới hạn theo IP. Chấp nhận có chủ ý: đăng ký SĐT không xác minh.
+
+## Agent skills
+
+### Issue tracker
+
+Issue nằm ở GitHub Issues của repo `lytaothoc1503/webmoi` (dùng `gh` CLI). Xem `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Dùng 5 nhãn mặc định: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. Xem `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context (một `GLOSSARY.md` + `docs/adr/` ở gốc repo). Xem `docs/agents/domain.md`.
