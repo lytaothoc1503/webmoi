@@ -1,4 +1,4 @@
-﻿# Cài khóa cho Worker báo đơn qua Telegram (chạy 1 lần, hoặc khi đổi bot / nghi lộ khóa).
+﻿# Cài khóa cho Worker anhomestay-web (báo đơn qua Telegram) (chạy 1 lần, hoặc khi đổi bot / nghi lộ khóa).
 # Cách chạy (terminal VS Code, ở thư mục webmoi):  npm run thong-bao:khoa
 # Script tự: kiểm token, lấy Chat ID, tạo NOTIFY_KEY mạnh, đặt 3 secret cho Worker, gửi thử 1 tin,
 # rồi chép sẵn link NOTIFY_WEBHOOK_URL vào bộ nhớ tạm để dán vào Supabase.
@@ -9,8 +9,8 @@ chcp 65001 > $null
 $OutputEncoding = [Text.UTF8Encoding]::new($false)
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Set-Location (Join-Path $PSScriptRoot '..\..')   # thư mục gốc webmoi (nơi có wrangler trong node_modules)
-$cauHinh = 'cloudflare/thong-bao/wrangler.toml'
-$worker = 'https://nha-cua-an-thong-bao.h30188410.workers.dev'
+$cauHinh = 'cloudflare/thong-bao/wrangler.jsonc'
+$worker = 'https://anhomestay-web.h30188410.workers.dev'
 
 function Dung($loi) { Write-Host $loi -ForegroundColor Red; exit 1 }
 function DocAn($nhan) {

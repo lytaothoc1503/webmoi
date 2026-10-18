@@ -1,0 +1,22 @@
+// Worker duy nhất: báo đơn Telegram (qua Queue) + kho ảnh R2. Deploy: npm run thong-bao (ở thư mục webmoi).
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "anhomestay-web",
+  "main": "index.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "r2_buckets": [
+    { "binding": "banhfuli-bucket", "bucket_name": "banhfuli" }
+  ],
+  "queues": {
+    "producers": [
+      { "binding": "THONG_BAO_QUEUE", "queue": "notify-telegram-queue" }
+    ],
+    "consumers": [
+      { "queue": "notify-telegram-queue", "max_batch_size": 10, "max_batch_timeout": 5, "max_retries": 5 }
+    ]
+  },
+  "routes": [
+    { "pattern": "nhacuaantaxua.com/webmoi/*", "zone_name": "nhacuaantaxua.com" }
+  ]
+}

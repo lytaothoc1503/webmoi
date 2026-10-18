@@ -1,6 +1,8 @@
-# Worker báo đơn mới (Telegram)
+# Worker `anhomestay-web` (báo đơn Telegram + kho ảnh R2)
 
-Luồng: đơn mới/khách báo chuyển khoản -> trigger DB -> Edge Function `notify-booking` -> **Worker này** -> Telegram của chủ nhà.
+Luồng báo đơn: đơn mới/khách báo chuyển khoản -> trigger DB -> Edge Function `notify-booking` -> **Worker này** -> Queue `notify-telegram-queue` -> Telegram của chủ nhà (Telegram lỗi thì Queue tự gửi lại sau 30 giây, tối đa 5 lần, giữ tin 24 giờ).
+Kho ảnh R2 (bucket `banhfuli`, route `nhacuaantaxua.com/webmoi/*`): xem file thì ai cũng xem được; tải lên/xóa phải có header `Authorization: Bearer <UPLOAD_KEY>` (chưa đặt secret `UPLOAD_KEY` = khóa hẳn).
+Cấu hình: `wrangler.jsonc` (file duy nhất). Link: https://anhomestay-web.h30188410.workers.dev
 
 ## Cài / đổi khóa (PowerShell, ở thư mục `webmoi`)
 ```powershell
