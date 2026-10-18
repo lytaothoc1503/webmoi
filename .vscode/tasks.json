@@ -10,7 +10,7 @@
         {
             "label": "Kiểm tra web",
             "type": "shell",
-            "command": "node scripts/kiem-tra.js",
+            "command": "powershell -Command \"[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false); node scripts/kiem-tra.js\"",
             "problemMatcher": []
         }
     ]

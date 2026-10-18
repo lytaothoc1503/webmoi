@@ -11,7 +11,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 - Không ghi mật khẩu, khóa bí mật (`service_role`, Turnstile Secret...) vào code, tài liệu hay chat.
 - Chủ dự án sửa code trên điện thoại bằng github.dev và VS Code; lấy bản mới bằng `.\scripts\dong-bo.ps1` (tự bật pull.rebase + autoStash, giữ thay đổi chưa commit, báo khớp `origin/main`). Trợ lý luôn `git pull --rebase` trước khi sửa và trước khi push, và không để lại file chưa commit.
 
-- VS Code: mở thư mục `webmoi`, cài tiện ích **Claude Code** (gợi ý sẵn trong `.vscode/extensions.json`), dùng terminal PowerShell (không dùng terminal Kali của dev-container). Ctrl+Shift+P > Tasks: Run Task > "Đồng bộ GitHub" hoặc "Kiểm tra web".
+- VS Code: mở thư mục `webmoi`, cài tiện ích **Claude Code** (gợi ý sẵn trong `.vscode/extensions.json`), dùng terminal PowerShell (không dùng terminal Kali của dev-container). Ctrl+Shift+P > Tasks: Run Task > "Đồng bộ GitHub" hoặc "Kiểm tra web". Chữ Việt trong terminal: `.vscode/settings.json` mở PowerShell ở UTF-8 (chcp 65001), `dong-bo.ps1` (lưu UTF-8 có BOM) và task "Kiểm tra web" cũng tự đặt UTF-8, `dong-bo.ps1` đặt `core.quotepath false`. Mọi file trong repo là UTF-8; file `.ps1` phải có BOM (PowerShell 5.1 cần BOM mới đọc đúng chữ Việt). Chữ hiển thị (giao diện, thông báo, commit) bằng tiếng Việt; tên biến/hàm/lệnh trong code giữ nguyên như cũ.
 
 ## Kiến trúc
 - Web tĩnh (HTML/CSS/JS thuần, không framework, không bước build) chạy trên **GitHub Pages**, tên miền chính https://nhacuaantaxua.com/ (`CNAME`, qua Cloudflare; github.io chỉ là địa chỉ gốc). Đẩy lên `main` là web tự cập nhật sau 1-3 phút.
