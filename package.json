@@ -2,8 +2,7 @@
   "scripts": {
     "start": "servor --reload",
     "build": "echo \"Static site, no build step required\"",
-    "deploy": "wrangler deploy",
-    "preview": "wrangler dev"
+    "thong-bao": "wrangler deploy --config cloudflare/thong-bao/wrangler.toml"
   },
   "dependencies": {
     "servor": "^4.0.2"
