@@ -10,3 +10,7 @@ AGENTS.md
 
 # File ghi chú khóa của chủ dự án (giữ trên máy, không đẩy lên GitHub)
 scripts/secrts
+
+# Công cụ MCP Kali của riêng chủ dự án (giữ trên máy, KHÔNG đẩy lên GitHub công khai)
+.mcp-kali/
+.vscode/mcp.json
