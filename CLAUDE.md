@@ -143,7 +143,7 @@ Tên miền `nhacuaantaxua.com` chạy qua Cloudflare (gói Free) trước GitHu
 
 ## Điểm bảo mật đã rà (không cần sửa)
 Đã siết CSDL bằng `supabase/migrations/20261009000000_harden_bookings_and_grants.sql` (đã áp dụng): bỏ quyền thừa của khách chưa đăng nhập, giới hạn giá/độ dài/ngày của đơn. Chưa kiểm tra giá phía máy chủ vì giá nằm ở `data.js` (làm khi chuyển Hướng 2).
-RLS bật cả 7 bảng; mã đơn 8 ký tự ngẫu nhiên; tra cứu theo SĐT chỉ trả thông tin tối thiểu; không có khóa bí mật trong code/lịch sử git; hàm đăng ký có giới hạn theo IP. Chấp nhận có chủ ý: đăng ký SĐT không xác minh.
+RLS bật cả 7 bảng; mã đơn 8 ký tự ngẫu nhiên; tra cứu theo SĐT chỉ trả thông tin tối thiểu; không có khóa bí mật trong code/lịch sử git; hàm đăng ký có giới hạn theo IP. Chấp nhận có chủ ý: đăng ký SĐT không xác minh. `20261018010000_rls_select_auth_uid.sql` (tối ưu RLS bookings bằng `(SELECT auth.uid())`, quyền không đổi): phần `customer_read_own_bookings` chủ dự án đã chạy 18/10; phần `public_insert_bookings` CHỜ chủ dự án chạy file này trong SQL Editor. Cột chủ đơn là `user_id` (KHÔNG có `customer_id`). Viết SQL thành file trong `supabase/migrations/`, không để file SQL lẻ ở gốc repo (GitHub Pages đăng công khai mọi file).
 
 ## Agent skills
 
