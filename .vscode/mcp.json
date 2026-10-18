@@ -1,0 +1,12 @@
+{
+  "servers": {
+    "kaliMcp": {
+      "type": "stdio",
+      "command": "c:\\Users\\user\\OneDrive\\Tài liệu\\GitHub\\webmoi\\.mcp-kali\\mcp-wrapper.cmd",
+      "args": [
+        "--server",
+        "http://192.168.1.1:5000"
+      ]
+    }
+  }
+}

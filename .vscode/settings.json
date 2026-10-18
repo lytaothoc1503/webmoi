@@ -12,5 +12,14 @@
     "git.pruneOnFetch": true,
     "files.eol": "\n",
     "files.insertFinalNewline": true,
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "chat.mcp.discovery.enabled": {
+        "claude-desktop": true,
+        "copilot": true,
+        "windsurf": true,
+        "cursor-global": true,
+        "cursor-workspace": true
+    },
+    "chat.agent.enabled": true,
+    "chat.mcp.access": "all"
 }

@@ -1,4 +1,4 @@
-// Worker duy nhất: báo đơn Telegram (qua Queue) + kho ảnh R2. Deploy: npm run thong-bao (ở thư mục webmoi).
+// Worker duy nhất: báo đơn qua Gmail (Queue + Email Routing) + kho ảnh R2. Deploy: npm run thong-bao (ở thư mục webmoi).
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "anhomestay-web",
@@ -7,6 +7,10 @@
   "workers_dev": true,
   "r2_buckets": [
     { "binding": "banhfuli-bucket", "bucket_name": "banhfuli" }
+  ],
+  // Gửi email qua Email Routing; địa chỉ nhận nằm trong secret NOTIFY_EMAIL_TO (không ghi vào repo công khai)
+  "send_email": [
+    { "name": "EMAIL" }
   ],
   "queues": {
     "producers": [
