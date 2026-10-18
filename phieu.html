@@ -49,7 +49,7 @@
       const st = norm(r.status), done = st === 'Đặt phòng thành công' || st === 'Hoàn thành';
       if (st === 'Hủy đơn') { msg('Đơn ' + code + ' đã được hủy.', 'Cần hỗ trợ thêm, bạn nhắn nhà kèm mã đơn.'); return; }
       const total = Number(r.total_price) || 0;
-      out.innerHTML = '<div class="slipbox">' + window.NCA_slip({ code: r.booking_code, tcode: r.transfer_code || r.booking_code, name: r.fullname, guests: r.guests || '', room: r.room, checkin: r.checkin, checkout: r.checkout, total: total, paid: done ? total : 0, hideBank: st !== 'Chờ thanh toán', nowStep: st === 'Hoàn thành' ? 3 : (done ? 2 : 1) }) + '</div>';
+      out.innerHTML = '<div class="slipbox">' + window.NCA_slip({ code: r.booking_code, tcode: r.transfer_code || r.booking_code, name: r.fullname, guests: r.guests || '', room: r.room, roomNo: r.slip_room_no || '', checkin: r.checkin, checkout: r.checkout, total: total, paid: done ? total : 0, promo: r.slip_promo || '', extra: r.slip_note || '', bankName: r.slip_bank_name || '', accountNo: r.slip_bank_account || '', accountName: r.slip_bank_holder || '', hideBank: st !== 'Chờ thanh toán', nowStep: st === 'Hoàn thành' ? 3 : (done ? 2 : 1) }) + '</div>';
       document.getElementById('bar').hidden = false; document.getElementById('hint').hidden = false;
       document.title = 'Phiếu xác nhận ' + r.booking_code + ' | Nhà của An';
     }).catch(() => msg('Chưa mở được phiếu lúc này.', 'Bạn thử lại sau ít phút.'));

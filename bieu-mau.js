@@ -184,6 +184,9 @@
       f.b_ten = b.fullname || ''; f.b_sdt = b.phone || ''; f.ma = b.booking_code || ''; f.phong = b.room || '';
       f.nhan = b.checkin || ''; f.tra = b.checkout || ''; f.tien = Number(b.total_price || 0) || ''; f.khach = b.guests || '';
       const okSt = typeof normStatus === 'function' ? normStatus(b.status) : ''; f.coc = (okSt === 'Đặt phòng thành công' || okSt === 'Hoàn thành') ? Number(b.total_price || 0) : 0;
+      // Ưu đãi/số phòng/ghi chú/ngân hàng ghi đè đã lưu cho đơn này (nếu có) — nạp lại để mọi máy chọn đơn này đều thấy đúng thông tin lần cuối đã lưu
+      f.sophong = b.slip_room_no || ''; f.uudai = b.slip_promo || ''; f.ghichu = b.slip_note || '';
+      f.nh_p = b.slip_bank_name || ''; f.stk_p = b.slip_bank_account || ''; f.ctk_p = b.slip_bank_holder || '';
     }
   }
   function render() {
@@ -250,6 +253,20 @@
       render();
     } catch (e) { out.textContent = 'Có lỗi kết nối, hãy thử lại.'; btn.disabled = false; }
   };
+  // Lưu riêng ưu đãi/số phòng/ghi chú/ngân hàng ghi đè vào đơn — tách khỏi "Cập nhật đơn" để không ảnh hưởng các trường cốt lõi (họ tên/SĐT/ngày/giá)
+  window.saveSlipFields = async function (id) {
+    const btn = $('fm-slip-save'), out = $('fm-slip-msg'); if (!btn) return;
+    btn.disabled = true; out.textContent = 'Đang lưu...';
+    try {
+      const f = state.f;
+      const patch = { slip_room_no: f.sophong || null, slip_promo: f.uudai || null, slip_note: f.ghichu || null, slip_bank_name: f.nh_p || null, slip_bank_account: f.stk_p || null, slip_bank_holder: f.ctk_p || null };
+      const r = await supabaseClient.from('bookings').update(patch).eq('id', id).select().single();
+      if (r.error) { out.textContent = 'Chưa lưu được (có thể CSDL chưa chạy bước cập nhật cho tính năng này): ' + (r.error.message || 'lỗi'); btn.disabled = false; return; }
+      const b = (typeof allBookings !== 'undefined' ? allBookings : []).find((x) => x.id === id); if (b) Object.assign(b, r.data || patch);
+      out.textContent = 'Đã lưu ✓ — máy khác chọn lại đơn này sẽ thấy đúng thông tin vừa lưu, khách tra cứu phiếu cũng thấy đúng như vậy.';
+      btn.disabled = false;
+    } catch (e) { out.textContent = 'Có lỗi kết nối, thử lại.'; btn.disabled = false; }
+  };
   function renderSync() {
     const box = $('fm-sync'); if (!box) return;
     if (!state.tpl.fields.includes('phong')) { box.innerHTML = ''; return; }
@@ -257,7 +274,8 @@
     if (b) {
       const via = /^\[Tạo từ Biểu Mẫu/.test(b.notes || '') ? ' ' + esc2(String(b.notes).split(']')[0].replace('[', '')) + '.' : '';
       const diff = diffOf(b), miss2 = missing();
-      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.</div>'
+      const slipBox = state.tpl.id === 'phieu-xn' ? '<div class="fm-sync-row"><button class="btn-export" id="fm-slip-save" onclick="saveSlipFields(\'' + esc2(b.id) + '\')">💾 Lưu ưu đãi/số phòng/ghi chú/ngân hàng cho đơn này (đồng bộ mọi máy + hiện đúng trên phiếu khách)</button></div><div id="fm-slip-msg"></div>' : '';
+      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.' + slipBox + '</div>'
         + (diff.length ? '<div class="fm-sync warn"><b>⚠️ Phiếu đang khác hệ thống</b>: ' + esc2(diff.join(', ')) + '. Khách sẽ chỉ thấy dữ liệu trong hệ thống cho đến khi bạn cập nhật.<div class="fm-sync-row"><button class="btn-export" id="fm-upd"' + (miss2.length ? ' disabled' : '') + ' onclick="updateBookingFromForm(\'' + esc2(b.id) + '\')">Cập nhật đơn theo phiếu này</button></div>' + (miss2.length ? '<small>Còn thiếu: ' + esc2(miss2.join(', ')) + '.</small>' : '') + '<div id="fm-sync-msg"></div></div>' : '');
       return;
     }
