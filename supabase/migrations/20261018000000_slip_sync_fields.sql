@@ -9,6 +9,8 @@
 
    Chủ dự án chạy file này một lần trong Supabase > SQL Editor > New query > Run. */
 
+BEGIN;
+
 ALTER TABLE public.bookings
   ADD COLUMN IF NOT EXISTS slip_room_no text,
   ADD COLUMN IF NOT EXISTS slip_promo text,
@@ -39,7 +41,9 @@ CREATE POLICY public_insert_bookings ON public.bookings FOR INSERT TO anon, auth
   );
 
 -- track_booking(): trả thêm các trường trên để phiếu khách xem/tra cứu hiện đúng như admin đã lập, không bị bớt.
-CREATE OR REPLACE FUNCTION public.track_booking(p_code text, p_phone text DEFAULT NULL::text)
+-- Đổi cột trả về nên phải DROP trước (CREATE OR REPLACE không đổi được kiểu trả về), rồi cấp lại đúng quyền cũ.
+DROP FUNCTION IF EXISTS public.track_booking(text, text);
+CREATE FUNCTION public.track_booking(p_code text, p_phone text DEFAULT NULL::text)
  RETURNS TABLE(booking_code text, room text, fullname text, checkin text, checkout text, guests text, total_price integer, transfer_code text, status text, created_at timestamp with time zone, paid_at timestamp with time zone, confirmed_at timestamp with time zone, admin_note text, review_status text, slip_room_no text, slip_promo text, slip_note text, slip_bank_name text, slip_bank_account text, slip_bank_holder text)
  LANGUAGE sql
  SECURITY DEFINER
@@ -56,3 +60,8 @@ AS $function$
     AND b.booking_code = upper(trim(p_code))
   LIMIT 1;
 $function$;
+
+REVOKE ALL ON FUNCTION public.track_booking(text, text) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.track_booking(text, text) TO anon, authenticated, service_role;
+
+COMMIT;
