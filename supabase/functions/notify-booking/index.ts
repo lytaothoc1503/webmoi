@@ -15,7 +15,11 @@ Deno.serve(async (req) => {
   const db = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { autoRefreshToken: false, persistSession: false } });
   const flag = event === "paid" ? "notified_paid_at" : "notified_new_at";
   // "Giành" quyền báo: chỉ 1 lần gọi cập nhật được dòng còn trống cờ
-  const { data: claimed } = await db.from("bookings").update({ [flag]: new Date().toISOString() }).eq("id", id).is(flag, null).select("*").maybeSingle();
+  // Báo "đã chuyển khoản" chỉ khi đơn THẬT SỰ đang ở trạng thái đó: chặn gọi giả event "paid" (khách biết id đơn của mình)
+  // để gửi tin "đã CK" khi chưa chuyển và chiếm cờ làm mất tin báo thật về sau.
+  let q = db.from("bookings").update({ [flag]: new Date().toISOString() }).eq("id", id).is(flag, null);
+  if (event === "paid") q = q.eq("status", "Đã thanh toán - chờ xác nhận");
+  const { data: claimed } = await q.select("*").maybeSingle();
   if (!claimed) return json({ skipped: "done_or_missing" });
   const o = claimed as Record<string, unknown>;
   const title = event === "paid" ? "💰 Khách báo ĐÃ CHUYỂN KHOẢN - cần xác nhận" : "🆕 Đơn đặt phòng mới";

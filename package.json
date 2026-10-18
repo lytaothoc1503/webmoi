@@ -1,9 +1,14 @@
 {
   "scripts": {
     "start": "servor --reload",
-    "build": "echo \"Static site, no build step required\""
+    "build": "echo \"Static site, no build step required\"",
+    "deploy": "wrangler deploy",
+    "preview": "wrangler dev"
   },
   "dependencies": {
     "servor": "^4.0.2"
+  },
+  "devDependencies": {
+    "wrangler": "^4.151.1"
   }
 }

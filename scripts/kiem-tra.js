@@ -5,7 +5,7 @@ const loi = [];
 const bao = (m) => loi.push(m);
 
 // 1. Cú pháp các file JavaScript
-for (const f of ['config.js', 'data.js', 'app.js', 'account.js', 'i18n.js', 'admin-auth.js']) {
+for (const f of ['config.js', 'data.js', 'app.js', 'account.js', 'i18n.js', 'admin-auth.js', 'phieu.js', 'bieu-mau.js', 'ai-tro-ly.js']) {
   try { cp.execFileSync(process.execPath, ['--check', path.join(root, f)], { stdio: 'pipe' }); }
   catch (e) { bao(`${f}: sai cú pháp JavaScript. ${String(e.stderr || e.message).split('\n').slice(0, 3).join(' ')}`); }
 }
