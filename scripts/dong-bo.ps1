@@ -1,4 +1,4 @@
-# Đồng bộ máy này với GitHub: lấy bản mới nhất, giữ nguyên thay đổi chưa commit.
+﻿# Đồng bộ máy này với GitHub: lấy bản mới nhất, giữ nguyên thay đổi chưa commit.
 # Cách chạy trong terminal VS Code (PowerShell):  .\scripts\dong-bo.ps1
 git config pull.rebase true
 git config rebase.autoStash true
