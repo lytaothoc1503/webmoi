@@ -7,3 +7,6 @@ AGENTS.md
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# File ghi chú khóa của chủ dự án (giữ trên máy, không đẩy lên GitHub)
+scripts/secrts
