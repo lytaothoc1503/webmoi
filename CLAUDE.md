@@ -9,6 +9,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 - **Làm xong là tự lưu vào dự án theo quy trình** (cập nhật file này, commit, push, gộp vào `main`, kiểm tra Actions xanh). KHÔNG bảo chủ dự án "xem/duyệt PR" hay "xem lệnh": cần thì chủ dự án tự vào xem. Chỉ dừng hỏi khi việc cần thông tin hoặc hành động của riêng chủ dự án (link, khóa, tài khoản).
 - Ảnh/đánh giá chủ dự án đưa lên là đã được đồng ý công khai, không cản trở. Không bắt khách phải được duyệt tài khoản thủ công.
 - Không ghi mật khẩu, khóa bí mật (`service_role`, Turnstile Secret...) vào code, tài liệu hay chat.
+- KHÔNG ghi mã đơn, tên/SĐT khách hay số liệu tiền thật vào file trong repo (kể cả CLAUDE.md): GitHub Pages đăng công khai MỌI file (ví dụ `nhacuaantaxua.com/CLAUDE.md` mở được), mà mã đơn là chìa khóa mở phiếu `phieu.html?ma=` (lộ tên khách, ngày ở). Cần nhắc đơn nào thì mô tả bằng ngày/trạng thái, xem chi tiết trong admin.
 - Chủ dự án sửa code trên điện thoại bằng github.dev và VS Code; lấy bản mới bằng `.\scripts\dong-bo.ps1` (tự bật pull.rebase + autoStash, giữ thay đổi chưa commit, báo khớp `origin/main`). Trợ lý luôn `git pull --rebase` trước khi sửa và trước khi push, và không để lại file chưa commit.
 
 - VS Code: mở thư mục `webmoi`, cài tiện ích **Claude Code** (gợi ý sẵn trong `.vscode/extensions.json`), dùng terminal PowerShell (không dùng terminal Kali của dev-container). Ctrl+Shift+P > Tasks: Run Task > "Đồng bộ GitHub" hoặc "Kiểm tra web". Chữ Việt trong terminal: `.vscode/settings.json` mở PowerShell ở UTF-8 (chcp 65001), `dong-bo.ps1` (lưu UTF-8 có BOM) và task "Kiểm tra web" cũng tự đặt UTF-8, `dong-bo.ps1` đặt `core.quotepath false`. Mọi file trong repo là UTF-8; file `.ps1` phải có BOM (PowerShell 5.1 cần BOM mới đọc đúng chữ Việt). Chữ hiển thị (giao diện, thông báo, commit) bằng tiếng Việt; tên biến/hàm/lệnh trong code giữ nguyên như cũ.
@@ -123,7 +124,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 **P0: ảnh hưởng tiền và an toàn (làm trước)**
 1. Tên chủ tài khoản MB (`config.js` > `bank.accountName`, đang để trống): chủ dự án nói là "CONG TY CNHH KE TAO" (chưa rõ có phải TNHH không; đây là tài khoản công ty trong khi nhà là hộ kinh doanh) và sẽ xác nhận lại thứ Sáu 16/10. CHƯA điền, chờ chữ chính xác.
 2. Đổi mật khẩu admin (đang yếu) + bật 2FA GitHub/Supabase.
-3. Đối chiếu và xác nhận đơn `NAPYCT3TMX` (đã chuyển khoản, chờ xác nhận).
+3. Đối chiếu và xác nhận đơn nhận phòng 11/10 đang ở trạng thái "Đã thanh toán - chờ xác nhận" (xem trong admin).
 4. Gửi link nhận tin đơn mới để bật báo đơn (mục "Báo chủ nhà khi có đơn mới").
 
 **P1: nội dung và chống gian lận**
