@@ -45,7 +45,10 @@ $khoa = -join ($b | ForEach-Object { $_.ToString('x2') })
 Write-Host '3) Đặt 3 secret cho Worker...' -ForegroundColor Cyan
 # Dùng "secret bulk" qua JSON: không bị dính ký tự xuống dòng như "echo ... | secret put" trên PowerShell
 $json = @{ TELEGRAM_BOT_TOKEN = $token; TELEGRAM_CHAT_ID = $chatId; NOTIFY_KEY = $khoa } | ConvertTo-Json -Compress
-$json | npx --no-install wrangler secret bulk --config $cauHinh | Out-Null
+# Gọi thẳng node (KHÔNG qua npx: npx.cmd trên PowerShell 5.1 làm mất dữ liệu đưa qua đường ống -> "No content found")
+$wr = Join-Path (Get-Location) 'node_modules/wrangler/bin/wrangler.js'
+if (-not (Test-Path $wr)) { Dung 'Chưa cài wrangler. Chạy "npm install" rồi chạy lại script.' }
+$json | node $wr secret bulk --config $cauHinh | Out-Null
 if ($LASTEXITCODE -ne 0) { Dung 'Wrangler báo lỗi khi đặt secret (chạy "npx wrangler login" rồi chạy lại script).' }
 Write-Host '   Đã đặt TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, NOTIFY_KEY.' -ForegroundColor Green
 
