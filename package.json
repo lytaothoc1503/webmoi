@@ -2,7 +2,8 @@
   "scripts": {
     "start": "servor --reload",
     "build": "echo \"Static site, no build step required\"",
-    "thong-bao": "wrangler deploy --config cloudflare/thong-bao/wrangler.toml"
+    "thong-bao": "wrangler deploy --config cloudflare/thong-bao/wrangler.toml",
+    "thong-bao:khoa": "powershell -ExecutionPolicy Bypass -File cloudflare/thong-bao/cai-khoa.ps1"
   },
   "dependencies": {
     "servor": "^4.0.2"
