@@ -669,6 +669,59 @@ async function markPaid(o, btn) {
 }
 
 /* ===== TRA CỨU ĐƠN + LỊCH SỬ ===== */
+// Dữ liệu đơn lấy từ hệ thống (track_booking) — luôn là bản admin lưu mới nhất, giống nhau trên mọi máy
+function rowToOrder(r) {
+  return { code: r.booking_code, phone: '', room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: r.review_status, note: r.admin_note || '', created: r.created_at, synced: true,
+    roomNo: r.slip_room_no || '', promo: r.slip_promo || '', slipNote: r.slip_note || '', bankName: r.slip_bank_name || '', accountNo: r.slip_bank_account || '', accountName: r.slip_bank_holder || '' };
+}
+// Tham số vẽ phiếu: dùng chung cho tra cứu, lịch sử và trang phieu.html để phiếu ở đâu cũng giống nhau
+function slipArgs(o) {
+  const st = normStatus(o.status), done = st === ST.OK || st === ST.DONE, inv = st === ST.INVALID, total = Number(o.total) || 0;
+  return { code: o.code, tcode: o.tcode || o.code, name: o.name, phone: o.phone || '', guests: o.guests || '', room: o.room, roomNo: o.roomNo || '', checkin: o.checkin, checkout: o.checkout, total, paid: done ? total : 0, promo: o.promo || '', extra: o.slipNote || '', bankName: o.bankName || '', accountNo: o.accountNo || '', accountName: o.accountName || '', hideBank: st !== ST.WAIT, invalid: inv, invalidReason: inv ? (o.note || '') : '', nowStep: st === ST.DONE ? 3 : (done ? 2 : 1) };
+}
+const slipLink = (o) => location.origin + location.pathname.replace(/[^/]*$/, '') + 'phieu.html?ma=' + encodeURIComponent(o.code);
+// Phần thêm khi khách tra mã đơn: ảnh phiếu đầy đủ + các mục hỗ trợ
+function lookupExtras(o) {
+  const st = normStatus(o.status), c = esc(o.code);
+  const mapUrl = S.mapQuery ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery) : '';
+  const slip = st !== ST.CANCEL && window.NCA_slip ? `<div class="lk-slip"><div class="lk-title">📄 Phiếu ${st === ST.INVALID ? 'chờ tra soát' : 'xác nhận đặt phòng'} của bạn</div><div class="lk-slip-box" id="lk-slip-${c}">${window.NCA_slip(slipArgs(o))}</div>
+    <div class="oc-actions"><button class="oc-btn primary" data-act="png" data-code="${c}">🖼️ Tải ảnh phiếu</button><button class="oc-btn" data-act="slip" data-code="${c}">🖨️ In / Lưu PDF</button><button class="oc-btn" data-act="link" data-code="${c}">🔗 Sao chép link phiếu</button></div></div>` : '';
+  const help = [
+    `<button class="oc-btn" data-act="fb" data-code="${c}">💬 Nhắn Messenger kèm mã đơn</button>`,
+    C.phone ? `<a class="oc-btn" href="tel:${esc(String(C.phone).replace(/[^\d+]/g, ''))}">📞 Gọi hotline ${esc(C.phone)}</a>` : '',
+    `<button class="oc-btn" data-act="copycode" data-code="${c}">📋 Sao chép mã đơn</button>`,
+    mapUrl ? `<a class="oc-btn" href="${esc(mapUrl)}" target="_blank" rel="noopener">🗺️ Chỉ đường đến nhà</a>` : '',
+    '<a class="oc-btn" href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">↩️ Chính sách đổi / hủy</a>',
+    '<a class="oc-btn" href="#faq">❓ Câu hỏi thường gặp</a>'
+  ].filter(Boolean).join('');
+  const tips = {
+    [ST.WAIT]: 'Chuyển khoản đúng số tiền và ghi nội dung đúng mã đơn để nhà nhận ra giao dịch của bạn ngay.',
+    [ST.PAID]: 'Gửi ảnh chụp giao dịch kèm mã đơn qua Messenger để nhà xác nhận nhanh hơn.',
+    [ST.INVALID]: 'Gửi ảnh chụp biên lai chuyển khoản thành công (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn để nhà đối chiếu với sao kê.',
+    [ST.OK]: 'Lưu ảnh phiếu trong điện thoại. Ngày đến, người đặt phòng mang CCCD hoặc VNeID; khách đi cùng gửi trước họ tên và số định danh.',
+    [ST.DONE]: 'Cảm ơn bạn đã ở cùng nhà. Bạn có thể viết đánh giá để giúp khách sau.',
+    [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, nhắn nhà kèm mã đơn để được hướng dẫn hoàn tiền theo chính sách.'
+  };
+  return slip + `<div class="lk-help"><div class="lk-title">🤝 Hỗ trợ cho đơn ${c}</div>${tips[st] ? `<p class="oc-note">${esc(tips[st])}</p>` : ''}<div class="oc-actions">${help}</div><p class="oc-note"><small>Nhà hỗ trợ 24/7. Khi nhắn, bạn chỉ cần gửi mã đơn — nhà xem được toàn bộ thông tin đơn.</small></p></div>`;
+}
+let h2cLoading = null;
+function loadH2C() {
+  if (window.html2canvas) return Promise.resolve();
+  return h2cLoading || (h2cLoading = new Promise((ok, bad) => { const sc = document.createElement('script'); sc.src = 'vendor/html2canvas.min.js'; sc.onload = ok; sc.onerror = bad; document.head.appendChild(sc); }));
+}
+async function saveSlipImage(o) {
+  // Luôn vẽ bản khổ ngang đầy đủ ngoài màn hình để ảnh giống phiếu in, dù khách đang xem trên điện thoại
+  let el = null, tmp = null;
+  { tmp = document.createElement('div'); tmp.style.cssText = 'position:fixed;left:-99999px;top:0;width:1060px'; tmp.innerHTML = window.NCA_slip(slipArgs(o)); document.body.appendChild(tmp); el = tmp.firstElementChild; }
+  toast('Đang tạo ảnh phiếu...');
+  try {
+    await loadH2C();
+    const canvas = await window.html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 1100 });
+    const a = document.createElement('a'); a.download = 'phieu-' + o.code + '.png'; a.href = canvas.toDataURL('image/png'); a.click();
+    toast('Đã tải ảnh phiếu ' + o.code);
+  } catch (e) { toast('Chưa tạo được ảnh, bạn dùng nút In / Lưu PDF nhé'); }
+  finally { if (tmp) tmp.remove(); }
+}
 function orderCard(o, opt) {
   opt = opt || {};
   const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL || st === ST.INVALID, c = esc(o.code);
@@ -676,7 +729,7 @@ function orderCard(o, opt) {
   const act = [];
   if (st === ST.WAIT) act.push(`<button class="oc-btn primary" data-act="pay" data-code="${c}">Tiếp tục thanh toán</button>`);
   if (st === ST.WAIT || st === ST.PAID || st === ST.OK || st === ST.INVALID) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
-  if ((st === ST.OK || st === ST.DONE) && window.NCA_slip) act.unshift(`<button class="oc-btn primary" data-act="slip" data-code="${c}">Xem / in phiếu xác nhận</button>`);
+  if (st !== ST.CANCEL && window.NCA_slip && !opt.lookup) act.unshift(`<button class="oc-btn primary" data-act="slip" data-code="${c}">Xem / in phiếu ${st === ST.INVALID ? 'chờ tra soát' : 'xác nhận'}</button>`);
   if (st === ST.OK || st === ST.DONE) {
     if (o.review === 'published') act.push('<span class="oc-chip ok">Đánh giá của bạn đã hiển thị ✓</span>');
     else if (o.review === 'pending') act.push('<span class="oc-chip">Đánh giá đang chờ nhà duyệt</span>');
@@ -705,7 +758,7 @@ async function refreshHistory() {
       let res; try { res = await db.rpc('track_booking', { p_code: o.code, p_phone: o.phone }); } catch (e) { return; }
       if (res.error) return;
       const r = res.data && res.data[0];
-      updates[o.code] = r ? { gone: false, synced: true, status: r.status, review: r.review_status, note: r.admin_note || '', total: r.total_price } : { gone: true };
+      updates[o.code] = r ? Object.assign(rowToOrder(r), { gone: false, phone: o.phone, notes: o.notes }) : { gone: true };
     }));
     const cur = getLocal(); cur.forEach((o) => { if (updates[o.code]) Object.assign(o, updates[o.code]); }); setLocal(cur);
   } finally { refreshing = false; renderHistory(); }
@@ -723,9 +776,9 @@ async function trackOrder() {
     if (res.error) { show('notfound', 'Chưa tra cứu được lúc này, bạn vui lòng thử lại sau.'); return; }
     const r = res.data && res.data[0];
     if (!r) { show('notfound', 'Không tìm thấy đơn với mã này. Vui lòng kiểm tra lại Mã đơn.'); return; }
-    const o = { code: r.booking_code, phone: '', room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: r.review_status, note: r.admin_note || '', created: r.created_at, synced: true };
+    const o = rowToOrder(r);
     lookupCache[o.code] = o;
-    show('found', orderCard(o, { lookup: true }));
+    show('found', orderCard(o, { lookup: true }) + lookupExtras(o));
     if (currentUser) { saveOrder(o); renderHistory(); }
     return;
   }
@@ -743,6 +796,9 @@ function onOrderAction(e) {
   else if (act === 'fb') sendViaFacebook(o);
   else if (act === 'review') openReview(o);
   else if (act === 'slip') openPhieu(o);
+  else if (act === 'png') saveSlipImage(o);
+  else if (act === 'link') copyText(slipLink(o)).then((ok) => toast(ok ? 'Đã sao chép link phiếu. Mở được trên mọi máy, không cần đăng nhập.' : slipLink(o)));
+  else if (act === 'copycode') copyText(o.code).then((ok) => toast(ok ? 'Đã sao chép mã đơn ' + o.code : o.code));
   else if (act === 'remove' && confirm('Xóa đơn này khỏi lịch sử trên thiết bị? (Đơn vẫn được lưu ở nhà)')) { setLocal(getLocal().filter((x) => x.code !== o.code)); renderHistory(); }
 }
 $('order-history').addEventListener('click', onOrderAction);
@@ -752,10 +808,10 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) refr
 /* ===== PHIẾU XÁC NHẬN (khách xem, in, lưu PDF) ===== */
 function openPhieu(o) {
   let m = document.getElementById('phieu-modal');
-  if (!m) { m = document.createElement('div'); m.id = 'phieu-modal'; m.className = 'modal-overlay'; document.body.appendChild(m); m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-p="close"]')) m.classList.remove('active'); if (e.target.closest('[data-p="print"]')) window.NCA_printLand('print-phieu');
+  if (!m) { m = document.createElement('div'); m.id = 'phieu-modal'; m.className = 'modal-overlay'; document.body.appendChild(m); m.addEventListener('click', (e) => { if (e.target === m || e.target.closest('[data-p="close"]')) m.classList.remove('active'); if (e.target.closest('[data-p="print"]')) window.NCA_printLand('print-phieu'); if (e.target.closest('[data-p="png"]') && m.onpng) m.onpng();
   }); }
-  const st = normStatus(o.status), paid = st === ST.OK || st === ST.DONE ? Number(o.total) || 0 : 0;
-  m.innerHTML = `<div class="modal-box" style="max-width:1100px;padding:14px;background:#fff"><span class="modal-close" data-p="close">&times;</span><div style="overflow:auto">${window.NCA_slip({ code: o.code, tcode: o.tcode, name: o.name, phone: o.phone || '', guests: o.guests, room: o.room, checkin: o.checkin, checkout: o.checkout, total: o.total, paid, nowStep: st === ST.DONE ? 3 : 2 })}</div><div style="text-align:center;margin-top:12px"><button type="button" class="oc-btn primary" data-p="print">In / Lưu PDF</button> <button type="button" class="oc-btn" data-p="close">Đóng</button></div></div>`;
+  m.innerHTML = `<div class="modal-box" style="max-width:1100px;padding:14px;background:#fff"><span class="modal-close" data-p="close">&times;</span><div style="overflow:auto">${window.NCA_slip(slipArgs(o))}</div><div style="text-align:center;margin-top:12px"><button type="button" class="oc-btn primary" data-p="print">In / Lưu PDF</button> <button type="button" class="oc-btn" data-p="png">🖼️ Tải ảnh phiếu</button> <button type="button" class="oc-btn" data-p="close">Đóng</button></div></div>`;
+  m.onpng = () => saveSlipImage(o);
   m.classList.add('active');
 }
 
