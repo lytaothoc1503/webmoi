@@ -78,10 +78,11 @@
     const dep = Number(d.depositPercent) || 0; // có giá trị = hiện cọc theo % thay vì số tiền VND cụ thể
     const promo = d.promo ? String(d.promo).trim() : ''; // ưu đãi (chữ tự do, ví dụ "giảm 100.000đ")
     const remainManual = d.remainManual !== undefined && d.remainManual !== null && String(d.remainManual).trim() !== '' ? Number(d.remainManual) : null; // số tiền cọc còn lại ghi tay, thay cho số tự tính
+    const invPay = d.invalid === true; // đơn chờ tra soát: ghi tình trạng cọc, không ghi số tiền
     const pay = `<div class="ns-sec"><h4>03 THANH TOÁN</h4><table>
       <tr><td>Tổng tiền</td><td><b>${total > 0 ? vnd(total) : dots('', 12)}</b></td></tr>
       ${promo ? `<tr><td>Ưu đãi</td><td><b class="ns-ok">${esc(promo)}</b></td></tr>` : ''}
-      ${dep > 0 ? `<tr><td>Đặt cọc</td><td><b class="ns-ok">${dep}% tổng tiền</b></td></tr>
+      ${invPay ? `<tr><td>Tiền cọc</td><td><b class="ns-warn">Đã cọc, đang chờ đối soát</b></td></tr>` : dep > 0 ? `<tr><td>Đặt cọc</td><td><b class="ns-ok">${dep}% tổng tiền</b></td></tr>
       <tr><td>Còn lại</td><td><b class="ns-warn">${100 - dep}% — thanh toán khi nhận phòng</b></td></tr>`
       : `<tr><td>Đã thanh toán</td><td><b class="${paid > 0 ? 'ns-ok' : ''}">${paid > 0 ? vnd(paid) : (d.paid === undefined ? dots('', 12) : '0 đ')}</b></td></tr>
       <tr><td>Còn lại</td><td><b class="${remainManual !== null ? 'ns-warn' : (remain > 0 ? 'ns-warn' : 'ns-ok')}">${remainManual !== null ? vnd(remainManual) : (total > 0 ? (remain > 0 ? vnd(remain) : 'Đã thanh toán đủ') : dots('', 12))}</b></td></tr>`}
@@ -94,10 +95,11 @@
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     const inv = d.invalid === true;
-    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CẢNH BÁO: GIAO DỊCH CHƯA ĐƯỢC NHẬN DẠNG</h5><ul>
-      <li><b>Lý do:</b> Nhà nhận được giao dịch chuyển khoản nhưng nội dung chuyển khoản không chứa hoặc ghi sai Mã đơn <b>${esc(d.tcode || d.code || '')}</b>, nên chưa đối chiếu được giao dịch với đơn của Quý khách.${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
-      <li><b>Hướng xử lý:</b> Đơn tạm chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng gửi <b>ảnh chụp biên lai chuyển khoản thành công</b> (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn <b>${esc(d.code || '')}</b> cho nhân viên hỗ trợ để Bộ phận Kế toán đối chiếu với sao kê ngân hàng.</li>
-      <li><b>Thời gian xử lý:</b> Đơn phòng được kích hoạt lại ngay sau khi Bộ phận Kế toán xác minh dòng tiền khớp với sao kê ngân hàng.</li></ul></div>`;
+    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CẢNH BÁO: GIAO DỊCH CHƯA ĐƯỢC NHẬN DẠNG TỰ ĐỘNG</h5><ul>
+      <li><b>Lý do:</b> Hệ thống ghi nhận lệnh chuyển khoản thành công trùng khớp số tiền, nhưng nội dung chuyển khoản của Quý khách không chứa hoặc ghi sai Mã đơn phòng (<b>${esc(d.tcode || d.code || '')}</b>).${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
+      <li><b>Quy định đối soát:</b> Đơn phòng chỉ được kích hoạt sau khi Bộ phận Kế toán xác minh giao dịch; Phòng Kinh doanh không tự ý duyệt mở đơn hàng này.</li>
+      <li><b>Hướng xử lý:</b> Mã đặt phòng của Quý khách tạm thời chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng cung cấp ngay <b>Ảnh chụp biên lai chuyển khoản thành công</b> cho nhân viên hỗ trợ để chuyển tiếp sang Bộ phận Kế toán làm thủ tục tra soát với sao kê ngân hàng.</li>
+      <li><b>Thời gian xử lý:</b> Đơn phòng sẽ được kích hoạt lại ngay sau khi Bộ phận Kế toán xác minh dòng tiền khớp với sao kê ngân hàng.</li></ul></div>`;
     const ct = !inv && d.contact === true, C2 = (window.SITE || {}).contacts || {};
     const contactBox = `<div class="ns-contactbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 TRAO ĐỔI VỚI NHÀ</h4><h5>💬 ĐƠN CẦN LIÊN HỆ NHÀ ĐỂ XỬ LÝ</h5>
       ${d.contactReason ? `<p><b>Nội dung:</b> ${esc(d.contactReason)}</p>` : ''}<p>Quý khách vui lòng nhắn Messenger${C2.phone ? ' hoặc gọi hotline <b>' + esc(C2.phone) + '</b>' : ''} kèm mã đơn <b>${esc(d.code || '')}</b> để nhà hỗ trợ. Quý khách <b>không cần chuyển thêm khoản tiền nào</b> cho đến khi nhà xác nhận lại đơn.</p></div>`;
