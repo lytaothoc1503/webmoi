@@ -473,7 +473,7 @@
       }
       const supabaseClient = NCA_adminClient();
       const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn' };
+      const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản' };
       const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
       // Số tiền ĐÃ THU thật: admin nhập khi xác nhận (received_amount); đơn cũ chưa có thì dùng giá đơn.
       const paidOf = (b) => Number(b.received_amount != null ? b.received_amount : b.total_price) || 0;
@@ -756,6 +756,8 @@
           const acts = [];
           if (st === ST.WAIT || st === ST.PAID) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.OK}')">Xác nhận thành công</button>`);
           if (st === ST.OK) acts.push(`<button class="btn-act btn-done" onclick="setStatus('${id}', '${ST.DONE}')">Hoàn thành</button>`);
+          if (st === ST.WAIT || st === ST.PAID) acts.push(`<button class="btn-act btn-cancel" onclick="markInvalid('${id}')">Báo sai booking</button>`);
+          if (st === ST.INVALID) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.WAIT}')">Khôi phục</button>`);
           if (st !== ST.CANCEL && st !== ST.DONE) acts.push(`<button class="btn-act btn-cancel" onclick="setStatus('${id}', '${ST.CANCEL}')">Hủy</button>`);
           acts.push(`<button class="btn-act btn-note" onclick="editNote('${id}')">Ghi chú</button>`);
           acts.push(`<button class="btn-act btn-del" onclick="deleteBooking('${id}')">Xóa</button>`);
@@ -832,6 +834,16 @@
         }
         let { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
         if (error && /received_amount/.test(error.message || '')) { delete patch.received_amount; ({ error } = await supabaseClient.from('bookings').update(patch).eq('id', id)); }   // CSDL chưa có cột (chưa chạy SQL) thì vẫn xác nhận được
+        if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
+        loadBookings();
+      }
+
+      async function markInvalid(id) {
+        const reason = prompt('Lý do báo sai booking cho khách thấy (vd: Trùng mã đơn / Sai nội dung chuyển khoản):', 'Nội dung chuyển khoản chưa khớp mã đơn, nhà chưa đối chiếu được giao dịch');
+        if (reason === null) return;
+        const patch = { status: ST.INVALID };
+        if (reason.trim()) patch.admin_note = reason.trim();
+        const { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
         if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
         loadBookings();
       }

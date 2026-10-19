@@ -48,6 +48,7 @@
       if (!r) { msg('Không tìm thấy đơn mã ' + code + '.', 'Nhà có thể chưa tạo đơn trên hệ thống. Bạn nhắn nhà kèm mã đơn để được kiểm tra.'); return; }
       const st = norm(r.status), done = st === 'Đặt phòng thành công' || st === 'Hoàn thành';
       if (st === 'Hủy đơn') { msg('Đơn ' + code + ' đã được hủy.', 'Cần hỗ trợ thêm, bạn nhắn nhà kèm mã đơn.'); return; }
+      if (st === 'Sai nội dung chuyển khoản') { msg('Đơn ' + code + ': chưa đối chiếu được giao dịch chuyển khoản.', (r.admin_note ? r.admin_note + ' ' : 'Nội dung chuyển khoản chưa khớp mã đơn này. ') + 'Bạn vui lòng nhắn nhà kèm mã đơn ' + code + ' và ảnh chụp giao dịch chuyển khoản để được kiểm tra, xác nhận lại.'); return; }
       const total = Number(r.total_price) || 0;
       out.innerHTML = '<div class="slipbox">' + window.NCA_slip({ code: r.booking_code, tcode: r.transfer_code || r.booking_code, name: r.fullname, guests: r.guests || '', room: r.room, roomNo: r.slip_room_no || '', checkin: r.checkin, checkout: r.checkout, total: total, paid: done ? total : 0, promo: r.slip_promo || '', extra: r.slip_note || '', bankName: r.slip_bank_name || '', accountNo: r.slip_bank_account || '', accountName: r.slip_bank_holder || '', hideBank: st !== 'Chờ thanh toán', nowStep: st === 'Hoàn thành' ? 3 : (done ? 2 : 1) }) + '</div>';
       document.getElementById('bar').hidden = false; document.getElementById('hint').hidden = false;

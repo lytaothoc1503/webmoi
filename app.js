@@ -514,17 +514,18 @@ function backToStep1() { showStep(1); }
 const bankOn = () => S.bank.bankId && S.bank.accountNo;
 
 /* ===== TRẠNG THÁI ĐƠN: Chờ thanh toán -> Đã thanh toán, chờ xác nhận -> Đặt phòng thành công -> Hoàn thành (hoặc Hủy) ===== */
-const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn' };
+const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản' };
 const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
 const RANK = { [ST.WAIT]: 0, [ST.PAID]: 1, [ST.OK]: 2, [ST.DONE]: 3 };
 const STEPS = ['Đã tạo đơn', 'Đã thanh toán, chờ xác nhận', 'Đặt phòng thành công', 'Hoàn thành'];
-const STCLASS = { [ST.WAIT]: 'st-wait', [ST.PAID]: 'st-paid', [ST.OK]: 'st-ok', [ST.DONE]: 'st-done', [ST.CANCEL]: 'st-cancel' };
+const STCLASS = { [ST.WAIT]: 'st-wait', [ST.PAID]: 'st-paid', [ST.OK]: 'st-ok', [ST.DONE]: 'st-done', [ST.CANCEL]: 'st-cancel', [ST.INVALID]: 'st-invalid' };
 const STMSG = {
   [ST.WAIT]: 'Đơn đã được tạo. Hoàn tất chuyển khoản để nhà giữ chỗ cho bạn.',
   [ST.PAID]: 'Nhà đã nhận thông báo thanh toán của bạn và đang đối chiếu giao dịch. Nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch để được xác nhận nhanh hơn.',
   [ST.OK]: 'Đặt phòng thành công! Hãy nhắn Facebook của nhà để nhận phiếu xác nhận dịch vụ chính thức.',
   [ST.DONE]: 'Cảm ơn bạn đã ở cùng Nhà của An. Hẹn gặp lại bạn!',
   [ST.CANCEL]: 'Đơn này đã được hủy. Cần hỗ trợ, bạn hãy liên hệ nhà qua Facebook.',
+  [ST.INVALID]: 'Nhà nhận được một giao dịch chuyển khoản nhưng nội dung ghi chưa đúng mã đơn, nên chưa đối chiếu được đây có phải khoản thanh toán cho đơn này không. Bạn vui lòng nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch chuyển khoản để được kiểm tra, xác nhận lại.',
 };
 const NEXT = {
   [ST.WAIT]: 'Chuyển khoản đúng số tiền và nội dung là mã đơn, rồi bấm "Tôi đã chuyển khoản". Chưa sẵn sàng, bạn cứ nhắn nhà, chưa mất phí gì.',
@@ -532,6 +533,7 @@ const NEXT = {
   [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, người đại diện đặt phòng mang CCCD hoặc VNeID để nhà làm thủ tục lưu trú (khách nước ngoài mang hộ chiếu). Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
   [ST.DONE]: 'Bạn có thể viết đánh giá để giúp khách sau chọn phòng dễ hơn.',
   [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, xem chính sách hoàn hủy hoặc nhắn nhà kèm mã đơn. Tiền hoàn về đúng tài khoản bạn cung cấp và có biên bản xác nhận.',
+  [ST.INVALID]: 'Nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch chuyển khoản (ngày giờ, số tiền, nội dung) để nhà đối chiếu và xác nhận lại đơn cho bạn.',
 };
 const vdate = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s.split('-').reverse().join('/') : s || '');
 function newCode() {
@@ -638,7 +640,7 @@ function renderOrderView() {
     body = `<div class="pay-note ok">${esc(STMSG[st])}${o.note ? '<br><em>' + esc(o.note) + '</em>' : ''}</div>
       <div class="ov-card confirm"><strong>📄 Phiếu xác nhận dịch vụ chính thức</strong><p>Liên hệ homestay qua Messenger kèm mã đơn <strong>${esc(o.code)}</strong> để nhận phiếu.</p><button type="button" class="btn-send-fb" data-ov="fb">LIÊN HỆ HOMESTAY ĐỂ NHẬN PHIẾU XÁC NHẬN</button></div>`;
   } else {
-    body = `<div class="pay-note ${st === ST.CANCEL ? 'bad' : 'ok'}">${esc(STMSG[st] || '')}${o.note ? '<br><em>' + esc(o.note) + '</em>' : ''}</div>`;
+    body = `<div class="pay-note ${(st === ST.CANCEL || st === ST.INVALID) ? 'bad' : 'ok'}">${esc(STMSG[st] || '')}${o.note ? '<br><em>' + esc(o.note) + '</em>' : ''}</div>`;
   }
   $('order-view').innerHTML = `<div class="booking-code-display">MÃ ĐƠN CỦA BẠN: <strong>${esc(o.code)}</strong><br>Hãy lưu mã này để tra cứu tình trạng đơn</div>
     <div style="text-align:center;margin:8px 0"><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
@@ -669,11 +671,11 @@ async function markPaid(o, btn) {
 /* ===== TRA CỨU ĐƠN + LỊCH SỬ ===== */
 function orderCard(o, opt) {
   opt = opt || {};
-  const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL, c = esc(o.code);
+  const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL || st === ST.INVALID, c = esc(o.code);
   const steps = STEPS.map((l, i) => `<li class="${!cancel && r >= i ? 'done' : ''}${!cancel && r === i ? ' now' : ''}"><span>${i + 1}</span>${l}</li>`).join('');
   const act = [];
   if (st === ST.WAIT) act.push(`<button class="oc-btn primary" data-act="pay" data-code="${c}">Tiếp tục thanh toán</button>`);
-  if (st === ST.WAIT || st === ST.PAID || st === ST.OK) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
+  if (st === ST.WAIT || st === ST.PAID || st === ST.OK || st === ST.INVALID) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
   if ((st === ST.OK || st === ST.DONE) && window.NCA_slip) act.unshift(`<button class="oc-btn primary" data-act="slip" data-code="${c}">Xem / in phiếu xác nhận</button>`);
   if (st === ST.OK || st === ST.DONE) {
     if (o.review === 'published') act.push('<span class="oc-chip ok">Đánh giá của bạn đã hiển thị ✓</span>');
