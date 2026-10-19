@@ -1133,6 +1133,12 @@
       .oc-steps li.now { font-weight: 700; } .oc-steps li.now span { box-shadow: 0 0 0 3px rgba(16,185,129,.25); }
       .oc-note { font-size: 12.5px; color: var(--text-muted); background: #faf4ef; border-radius: 8px; padding: 9px 12px; margin: 8px 0; }
       .oc-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      a.oc-btn { text-decoration: none; display: inline-block; }
+      .lk-slip, .lk-help { margin-top: 14px; background: #fff; border: 1px solid #eadfce; border-radius: 12px; padding: 12px; text-align: left; }
+      .lk-title { font-weight: 700; color: var(--primary-brown); margin-bottom: 8px; font-size: 14px; }
+      .lk-slip-box { overflow-x: auto; margin-bottom: 10px; -webkit-overflow-scrolling: touch; }
+      .lk-slip-box { container-type: inline-size; }
+      @container (max-width: 760px) { .lk-slip-box .nca-slip{flex-direction:column}.lk-slip-box .ns-side{flex:none;flex-direction:row;gap:12px;padding:12px;text-align:left}.lk-slip-box .ns-side svg.mark{width:42px;height:42px}.lk-slip-box .ns-side svg.hill{display:none}.lk-slip-box .ns-main{margin:8px;padding:14px 12px}.lk-slip-box .ns-title{font-size:19px}.lk-slip-box .ns-grid,.lk-slip-box .ns-pay{grid-template-columns:1fr}.lk-slip-box .ns-qr{width:100%;max-width:220px;margin:0 auto}.lk-slip-box .ns-flow{flex-wrap:wrap}.lk-slip-box .ns-flow div{flex:1 1 45%}.lk-slip-box .ns-alertbox{grid-column:auto} }
       .oc-btn { border: 1px solid #d5c8be; background: #fff; color: var(--primary-brown); padding: 8px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
       .oc-btn.primary { background: var(--accent-orange); border-color: var(--accent-orange); color: #fff; }
       .oc-link { background: none; border: 0; color: var(--text-muted); font-size: 12px; text-decoration: underline; cursor: pointer; }
@@ -1562,9 +1568,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
     <script src="config.js?v=20261016a"></script>
     <script src="data.js?v=20261013a"></script>
-    <script src="phieu.js?v=20261019a"></script>
-    <script src="app.js?v=20261019b"></script>
+    <script src="phieu.js?v=20261019b"></script>
+    <script src="app.js?v=20261019c"></script>
     <script src="account.js?v=20261011s"></script>
-    <script src="i18n.js?v=20261011s"></script>
+    <script src="i18n.js?v=20261019a"></script>
   </body>
 </html>
