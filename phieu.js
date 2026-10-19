@@ -31,6 +31,13 @@
 .ns-note{font-size:11.5px;background:#f3ead4;border-left:3px solid var(--gold);padding:6px 10px;margin-top:6px}
 .ns-foot{display:flex;flex-wrap:wrap;gap:4px 24px;justify-content:center;margin-top:8px;padding-top:6px;border-top:1px solid #d9c8a6;font-size:11.5px;color:#33454a}
 .ns-ok{color:#0a7a4b;font-weight:800}.ns-warn{color:#b45309;font-weight:800}
+.nca-slip.ns-alert{--g:#9a3412;--gold:#ea580c;--cream:#fff7ed;border-color:#fdba74}
+.nca-slip.ns-alert .ns-side{background:linear-gradient(180deg,#c2410c,#7c2d12);color:#ffedd5}
+.nca-slip.ns-alert .ns-sec td:first-child{background:#ffedd5}.nca-slip.ns-alert .ns-note{background:#ffedd5}
+.nca-slip.ns-alert .ns-flow div.on{color:#9a3412}.nca-slip.ns-alert .ns-flow div.cur{border-color:#dc2626;color:#b91c1c}
+.ns-alertbox{grid-column:2/4;border:2px solid #ea580c;background:#fff1e6;border-radius:6px;padding:10px 12px;color:#431407}
+.ns-alertbox h5{margin:0 0 6px;color:#c2410c;font-size:13.5px;letter-spacing:.02em}.ns-alertbox ul{margin:0;padding-left:18px}.ns-alertbox li{margin:3px 0}
+@media(max-width:760px){.ns-alertbox{grid-column:auto}}
 @media print{body.print-phieu>*:not(#phieu-modal){display:none!important}body.print-phieu #phieu-modal{position:static!important;background:none!important;display:block!important;padding:0!important;overflow:visible!important}body.print-phieu #phieu-modal .modal-box{box-shadow:none!important;max-width:none!important;padding:0!important}body.print-phieu #phieu-modal .modal-close,body.print-phieu #phieu-modal .oc-btn{display:none!important}}
 @page nca-land{size:A4 landscape;margin:0}
 @media print{.nca-slip{page:nca-land;width:auto;max-width:none;margin:8mm;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
@@ -84,11 +91,16 @@
       </div>
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
-    return `<div class="nca-slip"><div class="ns-side">
+    const inv = d.invalid === true;
+    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CẢNH BÁO: GIAO DỊCH CHƯA ĐƯỢC NHẬN DẠNG</h5><ul>
+      <li><b>Lý do:</b> Nhà nhận được giao dịch chuyển khoản nhưng nội dung chuyển khoản không chứa hoặc ghi sai Mã đơn <b>${esc(d.tcode || d.code || '')}</b>, nên chưa đối chiếu được giao dịch với đơn của Quý khách.${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
+      <li><b>Hướng xử lý:</b> Đơn tạm chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng gửi <b>ảnh chụp biên lai chuyển khoản thành công</b> (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn <b>${esc(d.code || '')}</b> cho nhân viên hỗ trợ để Bộ phận Kế toán đối chiếu với sao kê ngân hàng.</li>
+      <li><b>Thời gian xử lý:</b> Đơn phòng được kích hoạt lại ngay sau khi Bộ phận Kế toán xác minh dòng tiền khớp với sao kê ngân hàng.</li></ul></div>`;
+    return `<div class="nca-slip${inv ? ' ns-alert' : ''}"><div class="ns-side">
       ${orgLogo ? `<img class="mark" src="${esc(orgLogo)}" alt="logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;background:#fff" />` : `<svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
       <div><b>${esc(sideName)}</b>${sideTag ? `<small>${esc(sideTag)}</small>` : ''}</div>
       <svg class="hill" viewBox="0 0 190 150" aria-hidden="true"><g fill="none" stroke="#c8902e" stroke-width="1.4" opacity=".85"><path d="M0 120c30-35 55-45 85-20 25-30 55-40 105 0"/><path d="M0 138c40-20 80-25 190 0"/><path d="M40 100l8-34 8 34M30 100h36M95 105l7-28 7 28M86 105h32M140 98l6-24 6 24M132 98h28"/><path d="M20 62c10-8 22-8 30 0M130 40c10-8 24-8 32 0M70 30c8-6 18-6 24 0"/></g></svg></div>
-      <div class="ns-main"><h2 class="ns-title">PHIẾU XÁC NHẬN ĐẶT PHÒNG</h2>
+      <div class="ns-main"><h2 class="ns-title">${inv ? 'PHIẾU CHỜ TRA SOÁT' : 'PHIẾU XÁC NHẬN ĐẶT PHÒNG'}</h2>
       <div class="ns-sub">Cảm ơn Quý khách đã chọn ${esc(orgName)} làm điểm dừng chân giữa biển mây.</div>
       <div class="ns-code"><span>Mã booking</span><span>${dots(d.code, 10)}</span></div>
       <div class="ns-grid"><div class="ns-sec"><h4>01 THÔNG TIN KHÁCH</h4><table>
@@ -98,8 +110,8 @@
         <tr><td>Hạng phòng</td><td><b>${dots(d.room, 20)}</b></td></tr><tr><td>Số phòng</td><td>${dots(d.roomNo, 8)}</td></tr>
         <tr><td>Nhận phòng</td><td>${dots(vd(d.checkin), 10)}${S.checkin ? ' · từ ' + esc(S.checkin) : ''}</td></tr><tr><td>Trả phòng</td><td>${dots(vd(d.checkout), 10)}${S.checkout ? ' · trước ' + esc(S.checkout) : ''}</td></tr>
         <tr><td>Số đêm</td><td>${dots(n, 4)}</td></tr></table></div></div>
-      <div class="ns-pay">${pay}${bankBox}</div>
-      <div class="ns-flow">${steps.map((s, i) => `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
+      <div class="ns-pay">${pay}${inv ? alertBox : bankBox}</div>
+      <div class="ns-flow">${steps.map((s, i) => inv ? `<div class="${i < 1 ? 'on' : (i === 1 ? 'cur' : '')}">${i + 1}. ${i === 1 ? 'Chờ tra soát' : s}</div>` : `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
       <div class="ns-note"><b>Khi nhận phòng:</b> người đại diện đặt phòng chỉ cần mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Với khách đi cùng, bạn gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
       <div class="ns-foot"><span>${esc(orgName)}</span>${orgAddress ? `<span>Địa chỉ: ${esc(orgAddress)}</span>` : ''}${orgPhone ? `<span>Hotline: ${esc(orgPhone)}</span>` : ''}</div>
       </div></div>`;
