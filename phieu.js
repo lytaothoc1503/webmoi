@@ -79,7 +79,9 @@
       </table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
       <tr><td>Ngân hàng</td><td>${esc(useBankName)}</td></tr>${useAccountName ? `<tr><td>Chủ tài khoản</td><td>${esc(useAccountName)}</td></tr>` : ''}
-      <tr><td>Số tài khoản</td><td><b>${esc(useAccountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b>${esc(d.tcode || d.code || '')}</b></td></tr></table></div>
+      <tr><td>Số tài khoản</td><td><b>${esc(useAccountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b class="ns-warn" style="font-size:14px">${esc(d.tcode || d.code || '')}</b></td></tr></table>
+      <div class="ns-note" style="margin-top:6px"><b>⚠️ Ghi ĐÚNG nội dung chuyển khoản ở trên, không thêm/bớt chữ.</b> Nhà đối chiếu giao dịch theo đúng nội dung này; ghi sai hoặc thiếu, nhà sẽ không nhận ra được đây là đơn của bạn, cần thời gian kiểm tra thủ công và có thể chậm xác nhận phòng. Nhắn nhà kèm mã <b>${esc(d.code || '')}</b> nếu bạn lỡ ghi sai.</div>
+      </div>
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     return `<div class="nca-slip"><div class="ns-side">
