@@ -4,6 +4,11 @@
    Muốn dịch câu mới: thêm dòng  "câu tiếng Việt": "English text"  vào DICT. Câu chưa có trong DICT sẽ giữ nguyên tiếng Việt. */
 (function () {
   const DICT = /*DICT*/{
+"Cần liên hệ nhà": "Please contact us",
+"📄 Phiếu đặt phòng (cần liên hệ nhà) của bạn": "📄 Your booking slip (please contact us)",
+"Đơn này cần trao đổi thêm với nhà. Bạn vui lòng nhắn Messenger hoặc gọi hotline kèm mã đơn để nhà hỗ trợ; không cần chuyển thêm khoản tiền nào cho đến khi nhà xác nhận lại.": "This booking needs a quick chat with us. Please message us on Messenger or call the hotline with your booking code; you do not need to make any further payment until we reconfirm.",
+"Nhắn Messenger hoặc gọi hotline kèm mã đơn để nhà giải thích và xử lý đơn cho bạn.": "Message us on Messenger or call the hotline with your booking code so we can explain and sort out your booking.",
+"Nhắn Messenger hoặc gọi hotline kèm mã đơn. Không cần chuyển thêm khoản tiền nào cho đến khi nhà xác nhận lại đơn.": "Message us on Messenger or call the hotline with your booking code. No further payment is needed until we reconfirm your booking.",
 "🖼️ Tải ảnh phiếu": "🖼️ Download slip image",
 "🖨️ In / Lưu PDF": "🖨️ Print / Save PDF",
 "🔗 Sao chép link phiếu": "🔗 Copy slip link",
