@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
     <script src="config.js?v=20261016a"></script>
     <script src="admin-auth.js?v=20261018a"></script>
-    <script src="phieu.js?v=20261019b" defer></script>
+    <script src="phieu.js?v=20261019c" defer></script>
     <script src="vendor/html2canvas.min.js" defer></script>
     <script src="bieu-mau.js?v=20261019b" defer></script>
     <script src="ai-tro-ly.js?v=20261012a" defer></script>
@@ -232,6 +232,8 @@
             <option value="Đã thanh toán - chờ xác nhận">Đã thanh toán, chờ xác nhận</option>
             <option value="Đặt phòng thành công">Đặt phòng thành công</option>
             <option value="Hoàn thành">Hoàn thành</option>
+            <option value="Sai nội dung chuyển khoản">Sai nội dung chuyển khoản</option>
+            <option value="Cần liên hệ nhà">Cần liên hệ nhà</option>
             <option value="Hủy đơn">Đã hủy</option>
           </select>
           <select id="filter-room" onchange="renderBookings()">
@@ -473,7 +475,7 @@
       }
       const supabaseClient = NCA_adminClient();
       const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-      const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản' };
+      const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản', CONTACT: 'Cần liên hệ nhà' };
       const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
       // Số tiền ĐÃ THU thật: admin nhập khi xác nhận (received_amount); đơn cũ chưa có thì dùng giá đơn.
       const paidOf = (b) => Number(b.received_amount != null ? b.received_amount : b.total_price) || 0;
@@ -757,7 +759,8 @@
           if (st === ST.WAIT || st === ST.PAID) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.OK}')">Xác nhận thành công</button>`);
           if (st === ST.OK) acts.push(`<button class="btn-act btn-done" onclick="setStatus('${id}', '${ST.DONE}')">Hoàn thành</button>`);
           if (st === ST.WAIT || st === ST.PAID) acts.push(`<button class="btn-act btn-cancel" onclick="markInvalid('${id}')">Báo sai booking</button>`);
-          if (st === ST.INVALID) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.WAIT}')">Khôi phục</button>`);
+          if (st === ST.WAIT || st === ST.PAID || st === ST.OK) acts.push(`<button class="btn-act btn-edit" onclick="markContact('${id}')">Cần liên hệ</button>`);
+          if (st === ST.INVALID || st === ST.CONTACT) acts.push(`<button class="btn-act btn-confirm" onclick="setStatus('${id}', '${ST.WAIT}')">Khôi phục</button>`);
           if (st !== ST.CANCEL && st !== ST.DONE) acts.push(`<button class="btn-act btn-cancel" onclick="setStatus('${id}', '${ST.CANCEL}')">Hủy</button>`);
           acts.push(`<button class="btn-act btn-note" onclick="editNote('${id}')">Ghi chú</button>`);
           acts.push(`<button class="btn-act btn-del" onclick="deleteBooking('${id}')">Xóa</button>`);
@@ -839,11 +842,20 @@
       }
 
       async function markInvalid(id) {
-        const reason = prompt('Lý do báo sai booking cho khách thấy (vd: Trùng mã đơn / Sai nội dung chuyển khoản):', 'Nội dung chuyển khoản chưa khớp mã đơn, nhà chưa đối chiếu được giao dịch');
+        const reason = prompt('Lý do báo sai nội dung chuyển khoản cho khách thấy:', 'Nội dung chuyển khoản chưa khớp mã đơn, nhà chưa đối chiếu được giao dịch');
         if (reason === null) return;
         const patch = { status: ST.INVALID };
         if (reason.trim()) patch.admin_note = reason.trim();
         const { error } = await supabaseClient.from('bookings').update(patch).eq('id', id);
+        if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
+        loadBookings();
+      }
+
+      async function markContact(id) {
+        const reason = prompt('Lý do THẬT cần khách liên hệ (khách sẽ thấy trên phiếu), vd: Phòng đã kín ngày này, nhà cần đổi phòng cho bạn:', '');
+        if (reason === null) return;
+        if (!reason.trim()) { alert('Hãy ghi lý do để khách hiểu vì sao cần liên hệ.'); return; }
+        const { error } = await supabaseClient.from('bookings').update({ status: ST.CONTACT, admin_note: reason.trim() }).eq('id', id);
         if (error) { alert('Lỗi cập nhật: ' + error.message); return; }
         loadBookings();
       }
