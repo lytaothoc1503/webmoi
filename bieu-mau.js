@@ -72,7 +72,7 @@
   const TEMPLATES = [
     { id: 'phieu-xn', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (gửi khách)', note: 'Khổ ngang A4. Gửi khách sau khi chốt booking; có mã QR khi đã nhập ngân hàng trong config.js.', land: true,
       fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
-      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2 }) },
+      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, invalid: !!f.sai_ck, invalidReason: f.sai_ly || '' }) },
     { id: 'phieu-xn-dv', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (đơn vị khác)', note: 'Giống phiếu xác nhận của Nhà của An, nhưng tên đơn vị và logo tự gõ/tải lên — dùng khi làm sale booking online cho đơn vị khác. Để trống tên/logo thì phiếu vẫn hiện đúng như Nhà của An.', land: true,
       fields: ['don_vi', 'logo_dv', 'dia_chi_dv', 'hotline_dv', 'ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
       body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, orgName: f.don_vi || undefined, orgAddress: f.dia_chi_dv || undefined, orgPhone: f.hotline_dv || undefined, orgLogo: f.logo_dv || undefined }) },
@@ -180,11 +180,13 @@
     const t = new Date().toISOString().slice(0, 10), f = state.f;
     f.ngay = f.ngay || t; f.diadiem = f.diadiem || 'Tà Xùa, Bắc Yên, Sơn La';
     f.a_dc = f.a_dc || (window.SITE && window.SITE.address ? String(window.SITE.address).replace(/, Việt Nam$/, '') : '');
+    f.sai_ck = false; f.sai_ly = '';
     if (b) {
       f.b_ten = b.fullname || ''; f.b_sdt = b.phone || ''; f.ma = b.booking_code || ''; f.phong = b.room || '';
       f.nhan = b.checkin || ''; f.tra = b.checkout || ''; f.tien = Number(b.total_price || 0) || ''; f.khach = b.guests || '';
       const okSt = typeof normStatus === 'function' ? normStatus(b.status) : ''; f.coc = (okSt === 'Đặt phòng thành công' || okSt === 'Hoàn thành') ? Number(b.total_price || 0) : 0;
       // Ưu đãi/số phòng/ghi chú/ngân hàng ghi đè đã lưu cho đơn này (nếu có) — nạp lại để mọi máy chọn đơn này đều thấy đúng thông tin lần cuối đã lưu
+      f.sai_ck = (typeof normStatus === 'function' ? normStatus(b.status) : b.status) === 'Sai nội dung chuyển khoản'; f.sai_ly = f.sai_ck ? (b.admin_note || '') : '';
       f.sophong = b.slip_room_no || ''; f.uudai = b.slip_promo || ''; f.ghichu = b.slip_note || '';
       f.nh_p = b.slip_bank_name || ''; f.stk_p = b.slip_bank_account || ''; f.ctk_p = b.slip_bank_holder || '';
     }
@@ -254,6 +256,23 @@
     } catch (e) { out.textContent = 'Có lỗi kết nối, hãy thử lại.'; btn.disabled = false; }
   };
   // Lưu riêng ưu đãi/số phòng/ghi chú/ngân hàng ghi đè vào đơn — tách khỏi "Cập nhật đơn" để không ảnh hưởng các trường cốt lõi (họ tên/SĐT/ngày/giá)
+  window.toggleInvalid = async function (id) {
+    const btn = $('fm-inv'), out = $('fm-inv-msg'); if (!btn) return;
+    const on = !state.f.sai_ck;
+    let reason = '';
+    if (on) { const v = prompt('Lý do thêm cho khách thấy (có thể để trống):', ''); if (v === null) return; reason = v.trim(); }
+    btn.disabled = true; out.textContent = 'Đang lưu...';
+    try {
+      const patch = on ? { status: 'Sai nội dung chuyển khoản', admin_note: reason || null } : { status: 'Chờ thanh toán', admin_note: null };
+      const r = await supabaseClient.from('bookings').update(patch).eq('id', id).select().single();
+      if (r.error) { out.textContent = 'Chưa lưu được: ' + (r.error.message || 'lỗi'); btn.disabled = false; return; }
+      const b = (typeof allBookings !== 'undefined' ? allBookings : []).find((x) => x.id === id); if (b) Object.assign(b, r.data || patch);
+      state.f.sai_ck = on; state.f.sai_ly = on ? reason : '';
+      render();
+      const o2 = $('fm-inv-msg'); if (o2) o2.textContent = on ? 'Đã lưu ✓ — phiếu chuyển cam trên mọi máy và trên link phiếu của khách.' : 'Đã khôi phục ✓ — đơn về "Chờ thanh toán", phiếu xanh lại trên mọi máy.';
+      if (typeof loadBookings === 'function') loadBookings();
+    } catch (e) { out.textContent = 'Có lỗi kết nối, thử lại.'; btn.disabled = false; }
+  };
   window.saveSlipFields = async function (id) {
     const btn = $('fm-slip-save'), out = $('fm-slip-msg'); if (!btn) return;
     btn.disabled = true; out.textContent = 'Đang lưu...';
@@ -275,7 +294,8 @@
       const via = /^\[Tạo từ Biểu Mẫu/.test(b.notes || '') ? ' ' + esc2(String(b.notes).split(']')[0].replace('[', '')) + '.' : '';
       const diff = diffOf(b), miss2 = missing();
       const slipBox = state.tpl.id === 'phieu-xn' ? '<div class="fm-sync-row"><button class="btn-export" id="fm-slip-save" onclick="saveSlipFields(\'' + esc2(b.id) + '\')">💾 Lưu ưu đãi/số phòng/ghi chú/ngân hàng cho đơn này (đồng bộ mọi máy + hiện đúng trên phiếu khách)</button></div><div id="fm-slip-msg"></div>' : '';
-      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.' + slipBox + '</div>'
+      const invBtn = state.tpl.id === 'phieu-xn' ? '<div class="fm-sync-row"><button class="btn-export" id="fm-inv" style="background:' + (state.f.sai_ck ? '#0b3b46' : '#ea580c') + ';color:#fff" onclick="toggleInvalid(\'' + esc2(b.id) + '\')">' + (state.f.sai_ck ? '↩️ Khôi phục phiếu xanh (đã đối chiếu xong)' : '⚠️ Sai nội dung CK → chuyển phiếu sang cam (Chờ tra soát)') + '</button></div><div id="fm-inv-msg"></div>' : '';
+      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.' + invBtn + slipBox + '</div>'
         + (diff.length ? '<div class="fm-sync warn"><b>⚠️ Phiếu đang khác hệ thống</b>: ' + esc2(diff.join(', ')) + '. Khách sẽ chỉ thấy dữ liệu trong hệ thống cho đến khi bạn cập nhật.<div class="fm-sync-row"><button class="btn-export" id="fm-upd"' + (miss2.length ? ' disabled' : '') + ' onclick="updateBookingFromForm(\'' + esc2(b.id) + '\')">Cập nhật đơn theo phiếu này</button></div>' + (miss2.length ? '<small>Còn thiếu: ' + esc2(miss2.join(', ')) + '.</small>' : '') + '<div id="fm-sync-msg"></div></div>' : '');
       return;
     }
@@ -327,7 +347,7 @@
       xn: `Chào ${f.b_ten || 'bạn'}, Nhà của An xác nhận đơn đặt phòng mã ${code} (${f.phong || 'phòng'}, ${dmy(f.nhan) || '...'} → ${dmy(f.tra) || '...'}).\nBạn mở Phiếu xác nhận (xem, in hoặc lưu PDF, không cần đăng nhập) tại: ${link}\nNgày đến, người đặt phòng chỉ cần mang CCCD hoặc VNeID; khách đi cùng bạn gửi nhà họ tên và số CCCD để nhà khai báo lưu trú nhé. Cần hỏi đường đi hoặc đổi lịch, bạn nhắn nhà kèm mã ${code}.`,
       hoan: `Chào ${f.b_ten || 'bạn'}, Nhà của An đã ghi nhận yêu cầu hoàn tiền đơn ${code}${f.tien ? ' (' + new Intl.NumberFormat('vi-VN').format(Number(f.tien)) + ' đ)' : ''}.\nNhà sẽ chuyển về đúng tài khoản bạn cung cấp và gửi Biên bản hoàn trả để hai bên lưu. Bạn xem đơn tại: ${link}`,
       nhac: `Chào ${f.b_ten || 'bạn'}, nhắc lịch nhận phòng ${dmy(f.nhan) || '...'} tại Nhà của An (đơn ${code}). Nhận phòng từ ${(window.SITE && window.SITE.checkin) || '14:00'}. Người đặt phòng mang CCCD hoặc VNeID (khách đi cùng gửi nhà họ tên và số CCCD trước); đường đi và gửi xe nhà sẽ hướng dẫn khi bạn nhắn. Xem đơn: ${link}`,
-      sai_nd: `Chào ${f.b_ten || 'bạn'}, Nhà của An nhận được một giao dịch chuyển khoản nhưng nội dung ghi chưa đúng mã đơn ${code}, nên nhà chưa đối chiếu được đây có phải khoản thanh toán cho đơn của bạn không.\nBạn vui lòng nhắn tin lại cho nhà kèm mã đơn ${code} và ảnh chụp giao dịch chuyển khoản (ngày giờ, số tiền, nội dung) để nhà kiểm tra và xác nhận giúp bạn sớm nhất nhé. Xin lỗi vì sự bất tiện này ạ 🙏`,
+      sai_nd: `Chào ${f.b_ten || 'Anh/Chị'}, Nhà của An đã nhận được một giao dịch chuyển khoản trùng khớp với số tiền đơn ${code}. Tuy nhiên do nội dung chuyển khoản bị sai/thiếu mã đơn, nhà chưa đối chiếu tự động được giao dịch này với đơn của mình, nên chưa thể xác nhận phòng ngay được ạ.\nAnh/Chị vui lòng gửi giúp em ảnh chụp bill chuyển khoản thành công (thấy rõ ngày giờ, số tiền, nội dung) tại đây để em chuyển Bộ phận Kế toán đối chiếu với sao kê ngân hàng và xác nhận phòng cho mình sớm nhất nhé ạ! Xem phiếu: ${link}`,
       qc: `☁️ MÂY ĐANG VỀ TÀ XÙA — đừng lướt qua nếu bạn đang tìm chỗ "trốn" cuối tuần này.\n\n🏡 Nhà của An Homestay — phòng gỗ, cửa sổ nhìn thẳng ra biển mây, mở mắt ra là thấy mây trôi ngang thung lũng.\n☕ Có cà phê, trà chiều ngồi ngắm mây tan dần theo nắng.\n🥾 Gần các điểm săn mây đẹp nhất Tà Xùa, đi bộ vài phút là tới.\n\n📩 Phòng mùa săn mây hết nhanh, inbox để nhà báo giá và tư vấn lịch trình phù hợp cho bạn nhé.`
     };
     box.innerHTML = [['xn', 'Tin xác nhận đặt phòng'], ['hoan', 'Tin báo hoàn tiền'], ['nhac', 'Tin nhắc lịch nhận phòng'], ['sai_nd', 'Tin báo sai nội dung chuyển khoản (chưa nhận dạng được đơn)'], ['qc', 'Tin đăng Facebook/TikTok (săn mây)']].map(([k, l]) => `<div class="fm-msg"><b>${l}</b><textarea readonly rows="6" id="fm-m-${k}">${esc2(M[k]).replace(/\\n/g, '&#10;')}</textarea><button class="btn-export" data-copy="fm-m-${k}">Sao chép</button></div>`).join('');
