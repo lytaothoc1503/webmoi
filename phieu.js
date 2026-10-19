@@ -36,6 +36,8 @@
 .nca-slip.ns-alert .ns-sec td:first-child{background:#ffedd5}.nca-slip.ns-alert .ns-note{background:#ffedd5}
 .nca-slip.ns-alert .ns-flow div.on{color:#9a3412}.nca-slip.ns-alert .ns-flow div.cur{border-color:#dc2626;color:#b91c1c}
 .ns-alertbox{grid-column:2/4;border:2px solid #ea580c;background:#fff1e6;border-radius:6px;padding:10px 12px;color:#431407}
+.ns-contactbox{grid-column:2/4;border:2px solid #2563eb;background:#eff6ff;border-radius:6px;padding:10px 12px;color:#172554}.ns-contactbox h5{margin:0 0 6px;color:#1d4ed8;font-size:13.5px}.ns-contactbox p{margin:4px 0}
+@media(max-width:760px){.ns-contactbox{grid-column:auto}}
 .ns-alertbox h5{margin:0 0 6px;color:#c2410c;font-size:13.5px;letter-spacing:.02em}.ns-alertbox ul{margin:0;padding-left:18px}.ns-alertbox li{margin:3px 0}
 @media(max-width:760px){.ns-alertbox{grid-column:auto}}
 @media print{body.print-phieu>*:not(#phieu-modal){display:none!important}body.print-phieu #phieu-modal{position:static!important;background:none!important;display:block!important;padding:0!important;overflow:visible!important}body.print-phieu #phieu-modal .modal-box{box-shadow:none!important;max-width:none!important;padding:0!important}body.print-phieu #phieu-modal .modal-close,body.print-phieu #phieu-modal .oc-btn{display:none!important}}
@@ -96,6 +98,9 @@
       <li><b>Lý do:</b> Nhà nhận được giao dịch chuyển khoản nhưng nội dung chuyển khoản không chứa hoặc ghi sai Mã đơn <b>${esc(d.tcode || d.code || '')}</b>, nên chưa đối chiếu được giao dịch với đơn của Quý khách.${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
       <li><b>Hướng xử lý:</b> Đơn tạm chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng gửi <b>ảnh chụp biên lai chuyển khoản thành công</b> (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn <b>${esc(d.code || '')}</b> cho nhân viên hỗ trợ để Bộ phận Kế toán đối chiếu với sao kê ngân hàng.</li>
       <li><b>Thời gian xử lý:</b> Đơn phòng được kích hoạt lại ngay sau khi Bộ phận Kế toán xác minh dòng tiền khớp với sao kê ngân hàng.</li></ul></div>`;
+    const ct = !inv && d.contact === true, C2 = (window.SITE || {}).contacts || {};
+    const contactBox = `<div class="ns-contactbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 TRAO ĐỔI VỚI NHÀ</h4><h5>💬 ĐƠN CẦN LIÊN HỆ NHÀ ĐỂ XỬ LÝ</h5>
+      ${d.contactReason ? `<p><b>Nội dung:</b> ${esc(d.contactReason)}</p>` : ''}<p>Quý khách vui lòng nhắn Messenger${C2.phone ? ' hoặc gọi hotline <b>' + esc(C2.phone) + '</b>' : ''} kèm mã đơn <b>${esc(d.code || '')}</b> để nhà hỗ trợ. Quý khách <b>không cần chuyển thêm khoản tiền nào</b> cho đến khi nhà xác nhận lại đơn.</p></div>`;
     return `<div class="nca-slip${inv ? ' ns-alert' : ''}"><div class="ns-side">
       ${orgLogo ? `<img class="mark" src="${esc(orgLogo)}" alt="logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;background:#fff" />` : `<svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
       <div><b>${esc(sideName)}</b>${sideTag ? `<small>${esc(sideTag)}</small>` : ''}</div>
@@ -110,7 +115,7 @@
         <tr><td>Hạng phòng</td><td><b>${dots(d.room, 20)}</b></td></tr><tr><td>Số phòng</td><td>${dots(d.roomNo, 8)}</td></tr>
         <tr><td>Nhận phòng</td><td>${dots(vd(d.checkin), 10)}${S.checkin ? ' · từ ' + esc(S.checkin) : ''}</td></tr><tr><td>Trả phòng</td><td>${dots(vd(d.checkout), 10)}${S.checkout ? ' · trước ' + esc(S.checkout) : ''}</td></tr>
         <tr><td>Số đêm</td><td>${dots(n, 4)}</td></tr></table></div></div>
-      <div class="ns-pay">${pay}${inv ? alertBox : bankBox}</div>
+      <div class="ns-pay">${pay}${inv ? alertBox : (ct ? contactBox : bankBox)}</div>
       <div class="ns-flow">${steps.map((s, i) => inv ? `<div class="${i < 1 ? 'on' : (i === 1 ? 'cur' : '')}">${i + 1}. ${i === 1 ? 'Chờ tra soát' : s}</div>` : `<div class="${i <= now ? 'on' : ''}">${i + 1}. ${s}</div>`).join('')}</div>
       <div class="ns-note"><b>Khi nhận phòng:</b> người đại diện đặt phòng chỉ cần mang CCCD hoặc VNeID (khách nước ngoài mang hộ chiếu). Với khách đi cùng, bạn gửi nhà họ tên và số định danh để nhà khai báo lưu trú theo quy định. Muốn đổi hoặc hủy, nhắn nhà sớm kèm mã booking; hoàn tiền theo chính sách hoàn hủy đã công bố, về đúng tài khoản bạn cung cấp và có biên bản xác nhận.${d.extra ? '<br>' + esc(d.extra) : ''}</div>
       <div class="ns-foot"><span>${esc(orgName)}</span>${orgAddress ? `<span>Địa chỉ: ${esc(orgAddress)}</span>` : ''}${orgPhone ? `<span>Hotline: ${esc(orgPhone)}</span>` : ''}</div>
