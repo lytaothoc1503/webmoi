@@ -514,17 +514,18 @@ function backToStep1() { showStep(1); }
 const bankOn = () => S.bank.bankId && S.bank.accountNo;
 
 /* ===== TRẠNG THÁI ĐƠN: Chờ thanh toán -> Đã thanh toán, chờ xác nhận -> Đặt phòng thành công -> Hoàn thành (hoặc Hủy) ===== */
-const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản' };
+const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản', CONTACT: 'Cần liên hệ nhà' };
 const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
 const RANK = { [ST.WAIT]: 0, [ST.PAID]: 1, [ST.OK]: 2, [ST.DONE]: 3 };
 const STEPS = ['Đã tạo đơn', 'Đã thanh toán, chờ xác nhận', 'Đặt phòng thành công', 'Hoàn thành'];
-const STCLASS = { [ST.WAIT]: 'st-wait', [ST.PAID]: 'st-paid', [ST.OK]: 'st-ok', [ST.DONE]: 'st-done', [ST.CANCEL]: 'st-cancel', [ST.INVALID]: 'st-invalid' };
+const STCLASS = { [ST.WAIT]: 'st-wait', [ST.PAID]: 'st-paid', [ST.OK]: 'st-ok', [ST.DONE]: 'st-done', [ST.CANCEL]: 'st-cancel', [ST.INVALID]: 'st-invalid', [ST.CONTACT]: 'st-contact' };
 const STMSG = {
   [ST.WAIT]: 'Đơn đã được tạo. Hoàn tất chuyển khoản để nhà giữ chỗ cho bạn.',
   [ST.PAID]: 'Nhà đã nhận thông báo thanh toán của bạn và đang đối chiếu giao dịch. Nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch để được xác nhận nhanh hơn.',
   [ST.OK]: 'Đặt phòng thành công! Hãy nhắn Facebook của nhà để nhận phiếu xác nhận dịch vụ chính thức.',
   [ST.DONE]: 'Cảm ơn bạn đã ở cùng Nhà của An. Hẹn gặp lại bạn!',
   [ST.CANCEL]: 'Đơn này đã được hủy. Cần hỗ trợ, bạn hãy liên hệ nhà qua Facebook.',
+  [ST.CONTACT]: 'Đơn này cần trao đổi thêm với nhà. Bạn vui lòng nhắn Messenger hoặc gọi hotline kèm mã đơn để nhà hỗ trợ; không cần chuyển thêm khoản tiền nào cho đến khi nhà xác nhận lại.',
   [ST.INVALID]: 'Nhà nhận được một giao dịch chuyển khoản nhưng nội dung ghi chưa đúng mã đơn, nên chưa đối chiếu được đây có phải khoản thanh toán cho đơn này không. Bạn vui lòng nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch chuyển khoản để được kiểm tra, xác nhận lại.',
 };
 const NEXT = {
@@ -533,6 +534,7 @@ const NEXT = {
   [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, người đại diện đặt phòng mang CCCD hoặc VNeID để nhà làm thủ tục lưu trú (khách nước ngoài mang hộ chiếu). Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
   [ST.DONE]: 'Bạn có thể viết đánh giá để giúp khách sau chọn phòng dễ hơn.',
   [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, xem chính sách hoàn hủy hoặc nhắn nhà kèm mã đơn. Tiền hoàn về đúng tài khoản bạn cung cấp và có biên bản xác nhận.',
+  [ST.CONTACT]: 'Nhắn Messenger hoặc gọi hotline kèm mã đơn để nhà giải thích và xử lý đơn cho bạn.',
   [ST.INVALID]: 'Nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch chuyển khoản (ngày giờ, số tiền, nội dung) để nhà đối chiếu và xác nhận lại đơn cho bạn.',
 };
 const vdate = (s) => (/^\d{4}-\d{2}-\d{2}$/.test(s || '') ? s.split('-').reverse().join('/') : s || '');
@@ -677,14 +679,14 @@ function rowToOrder(r) {
 // Tham số vẽ phiếu: dùng chung cho tra cứu, lịch sử và trang phieu.html để phiếu ở đâu cũng giống nhau
 function slipArgs(o) {
   const st = normStatus(o.status), done = st === ST.OK || st === ST.DONE, inv = st === ST.INVALID, total = Number(o.total) || 0;
-  return { code: o.code, tcode: o.tcode || o.code, name: o.name, phone: o.phone || '', guests: o.guests || '', room: o.room, roomNo: o.roomNo || '', checkin: o.checkin, checkout: o.checkout, total, paid: done ? total : 0, promo: o.promo || '', extra: o.slipNote || '', bankName: o.bankName || '', accountNo: o.accountNo || '', accountName: o.accountName || '', hideBank: st !== ST.WAIT, invalid: inv, invalidReason: inv ? (o.note || '') : '', nowStep: st === ST.DONE ? 3 : (done ? 2 : 1) };
+  return { code: o.code, tcode: o.tcode || o.code, name: o.name, phone: o.phone || '', guests: o.guests || '', room: o.room, roomNo: o.roomNo || '', checkin: o.checkin, checkout: o.checkout, total, paid: done ? total : 0, promo: o.promo || '', extra: o.slipNote || '', bankName: o.bankName || '', accountNo: o.accountNo || '', accountName: o.accountName || '', hideBank: st !== ST.WAIT, invalid: inv, invalidReason: inv ? (o.note || '') : '', contact: st === ST.CONTACT, contactReason: st === ST.CONTACT ? (o.note || '') : '', nowStep: st === ST.DONE ? 3 : (done ? 2 : 1) };
 }
 const slipLink = (o) => location.origin + location.pathname.replace(/[^/]*$/, '') + 'phieu.html?ma=' + encodeURIComponent(o.code);
 // Phần thêm khi khách tra mã đơn: ảnh phiếu đầy đủ + các mục hỗ trợ
 function lookupExtras(o) {
   const st = normStatus(o.status), c = esc(o.code);
   const mapUrl = S.mapQuery ? 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery) : '';
-  const slip = st !== ST.CANCEL && window.NCA_slip ? `<div class="lk-slip"><div class="lk-title">📄 Phiếu ${st === ST.INVALID ? 'chờ tra soát' : 'xác nhận đặt phòng'} của bạn</div><div class="lk-slip-box" id="lk-slip-${c}">${window.NCA_slip(slipArgs(o))}</div>
+  const slip = st !== ST.CANCEL && window.NCA_slip ? `<div class="lk-slip"><div class="lk-title">📄 Phiếu ${st === ST.INVALID ? 'chờ tra soát' : (st === ST.CONTACT ? 'đặt phòng (cần liên hệ nhà)' : 'xác nhận đặt phòng')} của bạn</div><div class="lk-slip-box" id="lk-slip-${c}">${window.NCA_slip(slipArgs(o))}</div>
     <div class="oc-actions"><button class="oc-btn primary" data-act="png" data-code="${c}">🖼️ Tải ảnh phiếu</button><button class="oc-btn" data-act="slip" data-code="${c}">🖨️ In / Lưu PDF</button><button class="oc-btn" data-act="link" data-code="${c}">🔗 Sao chép link phiếu</button></div></div>` : '';
   const help = [
     `<button class="oc-btn" data-act="fb" data-code="${c}">💬 Nhắn Messenger kèm mã đơn</button>`,
@@ -700,7 +702,8 @@ function lookupExtras(o) {
     [ST.INVALID]: 'Gửi ảnh chụp biên lai chuyển khoản thành công (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn để nhà đối chiếu với sao kê.',
     [ST.OK]: 'Lưu ảnh phiếu trong điện thoại. Ngày đến, người đặt phòng mang CCCD hoặc VNeID; khách đi cùng gửi trước họ tên và số định danh.',
     [ST.DONE]: 'Cảm ơn bạn đã ở cùng nhà. Bạn có thể viết đánh giá để giúp khách sau.',
-    [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, nhắn nhà kèm mã đơn để được hướng dẫn hoàn tiền theo chính sách.'
+    [ST.CANCEL]: 'Nếu bạn đã chuyển khoản, nhắn nhà kèm mã đơn để được hướng dẫn hoàn tiền theo chính sách.',
+    [ST.CONTACT]: 'Nhắn Messenger hoặc gọi hotline kèm mã đơn. Không cần chuyển thêm khoản tiền nào cho đến khi nhà xác nhận lại đơn.'
   };
   return slip + `<div class="lk-help"><div class="lk-title">🤝 Hỗ trợ cho đơn ${c}</div>${tips[st] ? `<p class="oc-note">${esc(tips[st])}</p>` : ''}<div class="oc-actions">${help}</div><p class="oc-note"><small>Nhà hỗ trợ 24/7. Khi nhắn, bạn chỉ cần gửi mã đơn — nhà xem được toàn bộ thông tin đơn.</small></p></div>`;
 }
@@ -724,11 +727,11 @@ async function saveSlipImage(o) {
 }
 function orderCard(o, opt) {
   opt = opt || {};
-  const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL || st === ST.INVALID, c = esc(o.code);
+  const st = normStatus(o.status), r = RANK[st] ?? 0, cancel = st === ST.CANCEL || st === ST.INVALID || st === ST.CONTACT, c = esc(o.code);
   const steps = STEPS.map((l, i) => `<li class="${!cancel && r >= i ? 'done' : ''}${!cancel && r === i ? ' now' : ''}"><span>${i + 1}</span>${l}</li>`).join('');
   const act = [];
   if (st === ST.WAIT) act.push(`<button class="oc-btn primary" data-act="pay" data-code="${c}">Tiếp tục thanh toán</button>`);
-  if (st === ST.WAIT || st === ST.PAID || st === ST.OK || st === ST.INVALID) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
+  if (st === ST.WAIT || st === ST.PAID || st === ST.OK || st === ST.INVALID || st === ST.CONTACT) act.push(`<button class="oc-btn" data-act="fb" data-code="${c}">${st === ST.OK ? 'Nhắn Facebook nhận phiếu xác nhận' : 'Gửi minh chứng qua Facebook'}</button>`);
   if (st !== ST.CANCEL && window.NCA_slip && !opt.lookup) act.unshift(`<button class="oc-btn primary" data-act="slip" data-code="${c}">Xem / in phiếu ${st === ST.INVALID ? 'chờ tra soát' : 'xác nhận'}</button>`);
   if (st === ST.OK || st === ST.DONE) {
     if (o.review === 'published') act.push('<span class="oc-chip ok">Đánh giá của bạn đã hiển thị ✓</span>');
