@@ -95,11 +95,10 @@
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     const inv = d.invalid === true;
-    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CẢNH BÁO: GIAO DỊCH CHƯA ĐƯỢC NHẬN DẠNG TỰ ĐỘNG</h5><ul>
-      <li><b>Lý do:</b> Hệ thống ghi nhận lệnh chuyển khoản thành công trùng khớp số tiền, nhưng nội dung chuyển khoản của Quý khách không chứa hoặc ghi sai Mã đơn phòng (<b>${esc(d.tcode || d.code || '')}</b>).${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
-      <li><b>Quy định đối soát:</b> Đơn phòng chỉ được kích hoạt sau khi Bộ phận Kế toán xác minh giao dịch; Phòng Kinh doanh không tự ý duyệt mở đơn hàng này.</li>
-      <li><b>Hướng xử lý:</b> Mã đặt phòng của Quý khách tạm thời chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng cung cấp ngay <b>Ảnh chụp biên lai chuyển khoản thành công</b> cho nhân viên hỗ trợ để chuyển tiếp sang Bộ phận Kế toán làm thủ tục tra soát với sao kê ngân hàng.</li>
-      <li><b>Thời gian xử lý:</b> Đơn phòng sẽ được kích hoạt lại ngay sau khi Bộ phận Kế toán xác minh dòng tiền khớp với sao kê ngân hàng.</li></ul></div>`;
+    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CHƯA ĐỐI CHIẾU ĐƯỢC GIAO DỊCH</h5><ul>
+      <li><b>Lý do:</b> Nhà nhận được một giao dịch chuyển khoản, nhưng nội dung chuyển khoản của Quý khách không chứa hoặc ghi sai Mã đơn phòng (<b>${esc(d.tcode || d.code || '')}</b>), nên chưa đối chiếu được với đơn này.${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
+      <li><b>Hướng xử lý:</b> Mã đặt phòng của Quý khách tạm thời chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng gửi ngay <b>ảnh chụp biên lai chuyển khoản thành công</b> (rõ ngày giờ, số tiền, nội dung) cho nhà qua Messenger/điện thoại kèm mã đơn, để nhà kiểm tra lại sao kê ngân hàng và xác nhận giúp Quý khách.</li>
+      <li><b>Thời gian xử lý:</b> Đơn được xác nhận lại ngay sau khi nhà kiểm tra sao kê và khớp được giao dịch.</li></ul></div>`;
     const ct = !inv && d.contact === true, C2 = (window.SITE || {}).contacts || {};
     const contactBox = `<div class="ns-contactbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 TRAO ĐỔI VỚI NHÀ</h4><h5>💬 ĐƠN CẦN LIÊN HỆ NHÀ ĐỂ XỬ LÝ</h5>
       ${d.contactReason ? `<p><b>Nội dung:</b> ${esc(d.contactReason)}</p>` : ''}<p>Quý khách vui lòng nhắn Messenger${C2.phone ? ' hoặc gọi hotline <b>' + esc(C2.phone) + '</b>' : ''} kèm mã đơn <b>${esc(d.code || '')}</b> để nhà hỗ trợ. Quý khách <b>không cần chuyển thêm khoản tiền nào</b> cho đến khi nhà xác nhận lại đơn.</p></div>`;
