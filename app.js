@@ -124,6 +124,26 @@ async function getList(table, fallback, flag) {
   }
   return fallback || [];
 }
+// Cài đặt chung (giờ nhận/trả phòng, địa chỉ, liên hệ) — admin sửa trong trang quản trị, bảng site_settings ghi đè
+// lên mặc định của config.js nếu có giá trị (giai đoạn 1: không gồm ngân hàng, xem CLAUDE.md). Sửa S/C tại chỗ
+// (không gán lại S.contacts) để các biến đã đọc tham chiếu từ đầu (C ở app.js, phieu.js...) vẫn đúng.
+async function loadSiteSettings() {
+  if (!db) return;
+  try {
+    const { data, error } = await db.from('site_settings').select('key,value');
+    if (error || !data || !data.length) return;
+    const v = {};
+    data.forEach((r) => { if (r.value != null && String(r.value).trim() !== '') v[r.key] = String(r.value).trim(); });
+    if (v.checkin) S.checkin = v.checkin;
+    if (v.checkout) S.checkout = v.checkout;
+    if (v.address) S.address = v.address;
+    if (v.contact_phone) C.phone = v.contact_phone;
+    if (v.contact_messenger) C.messenger = v.contact_messenger;
+    if (v.contact_facebook) C.facebook = v.contact_facebook;
+    if (v.contact_email) C.email = v.contact_email;
+    document.querySelectorAll('[data-site]').forEach((el) => (el.textContent = S[el.dataset.site] || ''));
+  } catch (e) { /* lỗi mạng thì dùng config.js có sẵn */ }
+}
 const img = (u, alt, cls = '') => `<img ${cls ? `class="${cls}"` : ''} src="${esc(safeUrl(u))}" alt="${esc(alt)}" loading="lazy" onerror="imgFail(this)" />`;
 const priceHtml = (n, unit) => (Number(n) > 0 ? `${money(n)} <span style="font-size:12px;color:var(--text-muted);font-weight:normal">${unit}</span>` : '<span style="font-size:15px">Liên hệ báo giá</span>');
 const arg = (s) => esc(String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
@@ -839,6 +859,7 @@ async function submitReview() {
 
 /* ===== KHỞI TẠO ===== */
 (async function init() {
+  await loadSiteSettings();
   renderContacts();
   if (chref('facebook')) { $('hero-fb').href = chref('facebook'); $('sb-fb').href = chref('facebook'); } else { $('hero-fb').hidden = true; $('sb-fb').hidden = true; }
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';

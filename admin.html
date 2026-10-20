@@ -216,6 +216,7 @@
       <div class="menu-item" id="menu-ai" onclick="showPage('ai', this)">🤖 Trợ Lý AI</div>
       <div class="menu-item" id="menu-audit" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
       <div class="menu-item" id="menu-security" onclick="showPage('security', this)">🔐 Bảo Mật</div>
+      <div class="menu-item" id="menu-settings" onclick="showPage('settings', this)">⚙️ Cài Đặt Chung</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
@@ -445,6 +446,32 @@
         </div>
       </div>
 
+      <div class="page-section" id="page-settings">
+        <div class="top-bar"><h2>Cài Đặt Chung</h2><button class="btn-add" onclick="saveSettings()">💾 Lưu</button></div>
+        <p class="fin-note">Sửa ở đây thay cho sửa code: web tự lấy giá trị mới (khách tải lại trang là thấy). Để trống ô nào thì web dùng giá trị mặc định trong code như cũ. Thông tin ngân hàng chưa sửa được ở đây, sửa trong <code>config.js</code> như hiện tại.</p>
+        <div class="table-box" style="padding:18px;max-width:560px">
+          <h3 style="margin-top:0">Giờ nhận / trả phòng &amp; địa chỉ</h3>
+          <label class="fin-note">Giờ nhận phòng</label>
+          <input type="text" id="st-checkin" placeholder="VD: 14:00" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Giờ trả phòng</label>
+          <input type="text" id="st-checkout" placeholder="VD: 12:00" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Địa chỉ hiện trên web</label>
+          <input type="text" id="st-address" placeholder="Địa chỉ nhà" style="width:100%;margin-bottom:0">
+        </div>
+        <div class="table-box" style="padding:18px;max-width:560px;margin-top:16px">
+          <h3 style="margin-top:0">Liên hệ</h3>
+          <label class="fin-note">Số điện thoại / hotline</label>
+          <input type="text" id="st-phone" placeholder="VD: 09xxxxxxxx" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Link Messenger (m.me/...)</label>
+          <input type="text" id="st-messenger" placeholder="https://m.me/..." style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Link Facebook (fanpage)</label>
+          <input type="text" id="st-facebook" placeholder="https://facebook.com/..." style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Email liên hệ</label>
+          <input type="text" id="st-email" placeholder="email@..." style="width:100%;margin-bottom:0">
+        </div>
+        <div id="st-msg" class="fin-note" style="margin-top:10px"></div>
+      </div>
+
       <!-- ROOMS PAGE -->
       <div class="page-section" id="page-rooms">
         <div class="top-bar">
@@ -541,6 +568,7 @@
         if (page === 'forms') initForms();
         if (page === 'ai' && window.aiInit) window.aiInit();
         if (page === 'security') loadSecurity();
+        if (page === 'settings') loadSettings();
       }
 
 
@@ -1309,6 +1337,21 @@
       }
 
       // ===== Bảo mật đăng nhập =====
+      /* ===== CÀI ĐẶT CHUNG (bảng site_settings) ===== */
+      const ST_KEYS = { 'st-checkin': 'checkin', 'st-checkout': 'checkout', 'st-address': 'address', 'st-phone': 'contact_phone', 'st-messenger': 'contact_messenger', 'st-facebook': 'contact_facebook', 'st-email': 'contact_email' };
+      async function loadSettings() {
+        const msg = document.getElementById('st-msg'); msg.textContent = 'Đang tải...';
+        const { data, error } = await supabaseClient.from('site_settings').select('key,value');
+        Object.keys(ST_KEYS).forEach((id) => (document.getElementById(id).value = ''));
+        if (!error && data) data.forEach((r) => { const id = Object.keys(ST_KEYS).find((k) => ST_KEYS[k] === r.key); if (id) document.getElementById(id).value = r.value || ''; });
+        msg.textContent = error ? 'Chưa tải được cài đặt (có thể chưa chạy migration site_settings trong SQL Editor).' : '';
+      }
+      async function saveSettings() {
+        const msg = document.getElementById('st-msg'); msg.textContent = 'Đang lưu...';
+        const rows = Object.keys(ST_KEYS).map((id) => ({ key: ST_KEYS[id], value: document.getElementById(id).value.trim() || null }));
+        const { error } = await supabaseClient.from('site_settings').upsert(rows, { onConflict: 'key' });
+        msg.textContent = error ? 'Lỗi: chưa lưu được (' + error.message + ')' : 'Đã lưu. Khách tải lại trang web là thấy thay đổi.';
+      }
       const PIN_ERR = { wrong_old: 'PIN hiện tại chưa đúng.', weak: 'PIN mới quá dễ đoán.', format: 'PIN gồm 6 đến 8 chữ số.', locked: 'Đang bị khóa tạm do nhập sai, hãy thử lại sau.' };
       async function changePin() {
         const m = document.getElementById('sc-pin-msg'), o = document.getElementById('sc-old').value, n = document.getElementById('sc-new').value;

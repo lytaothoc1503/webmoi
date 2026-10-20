@@ -45,7 +45,20 @@
     if (!CFG.url || !CFG.anonKey || !window.supabase) { msg('Chưa mở được phiếu lúc này.', 'Bạn nhắn nhà kèm mã đơn ' + code + ' để được hỗ trợ.'); return; }
     const db = window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
     const norm = (s) => ({ 'Chờ duyệt tiền cọc': 'Chờ thanh toán', 'Đã duyệt phòng': 'Đặt phòng thành công' }[s] || s || 'Chờ thanh toán');
-    db.rpc('track_booking', { p_code: code, p_phone: null }).then(({ data, error }) => {
+    // Cài đặt chung admin sửa (bảng site_settings) ghi đè địa chỉ/liên hệ mặc định của config.js nếu có.
+    const applySettings = db.from('site_settings').select('key,value').then(({ data }) => {
+      (data || []).forEach((r) => {
+        if (r.value == null || String(r.value).trim() === '') return;
+        const v = String(r.value).trim();
+        if (r.key === 'address') S.address = v;
+        else if (r.key === 'contact_phone') C.phone = v;
+        else if (r.key === 'contact_messenger') C.messenger = v;
+        else if (r.key === 'contact_facebook') C.facebook = v;
+      });
+      if (C.messenger || C.facebook) document.getElementById('b-fb').href = C.messenger || C.facebook;
+      if (C.phone) { const t = document.getElementById('b-tel'); t.href = 'tel:' + String(C.phone).replace(/[^\d+]/g, ''); t.textContent = 'Gọi hotline ' + C.phone; t.hidden = false; }
+    }).catch(() => {});
+    applySettings.then(() => db.rpc('track_booking', { p_code: code, p_phone: null })).then(({ data, error }) => {
       if (error) { msg('Chưa mở được phiếu lúc này.', 'Bạn thử lại sau ít phút hoặc nhắn nhà kèm mã đơn ' + code + '.'); return; }
       const r = data && data[0];
       if (!r) { msg('Không tìm thấy đơn mã ' + code + '.', 'Nhà có thể chưa tạo đơn trên hệ thống. Bạn nhắn nhà kèm mã đơn để được kiểm tra.'); return; }
