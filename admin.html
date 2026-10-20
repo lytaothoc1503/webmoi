@@ -756,7 +756,7 @@
           const st = normStatus(b.status);
           if (new Date(b.created_at) >= today) todayOrders++;
           if ((st === ST.OK || st === ST.DONE) && b.confirmed_at && new Date(b.confirmed_at) >= today) todayRevenue += paidOf(b);
-          if (st === ST.WAIT || st === ST.PAID || st === ST.INVALID) pending++;
+          if (st === ST.WAIT || st === ST.PAID || st === ST.INVALID || st === ST.CONTACT) pending++;
         });
         const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
         set('home-today-orders', todayOrders);
