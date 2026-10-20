@@ -71,6 +71,12 @@
       .chart-box { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 20px; margin-bottom: 24px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
       .chart-box canvas { max-height: 240px; }
 
+      .tab-row { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+      .tab-item { background: none; border: none; border-bottom: 2.5px solid transparent; padding: 9px 4px; margin-right: 18px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+      .tab-item:hover { color: var(--primary); }
+      .tab-item.active { color: var(--primary); border-bottom-color: var(--accent); }
+      .tab-count { background: #eef0ef; color: #5c6b6e; border-radius: 10px; padding: 1px 8px; font-size: 11.5px; font-weight: 700; }
+      .tab-item.active .tab-count { background: var(--accent); color: #fff; }
       .filter-bar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
       .filter-bar input, .filter-bar select {
         padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none;
@@ -264,18 +270,11 @@
           <canvas id="revenue-chart"></canvas>
         </div>
 
+        <div class="tab-row" id="booking-tabs"></div>
+        <input type="hidden" id="filter-status" value="" />
+
         <div class="filter-bar">
           <input type="text" id="filter-search" placeholder="Tìm theo tên, SĐT, mã đơn..." oninput="renderBookings()" style="flex: 1; min-width: 200px;" />
-          <select id="filter-status" onchange="renderBookings()">
-            <option value="">Tất cả trạng thái</option>
-            <option value="Chờ thanh toán">Chờ thanh toán</option>
-            <option value="Đã thanh toán - chờ xác nhận">Đã thanh toán, chờ xác nhận</option>
-            <option value="Đặt phòng thành công">Đặt phòng thành công</option>
-            <option value="Hoàn thành">Hoàn thành</option>
-            <option value="Sai nội dung chuyển khoản">Sai nội dung chuyển khoản</option>
-            <option value="Cần liên hệ nhà">Cần liên hệ nhà</option>
-            <option value="Hủy đơn">Đã hủy</option>
-          </select>
           <select id="filter-room" onchange="renderBookings()">
             <option value="">Tất cả phòng/tour</option>
           </select>
@@ -777,15 +776,41 @@
         return st === ST.WAIT ? 'badge-wait' : st === ST.PAID ? 'badge-paid' : st === ST.OK ? 'badge-approved' : st === ST.DONE ? 'badge-done' : 'badge-rejected';
       }
 
+      function renderBookingTabs() {
+        const cur = document.getElementById('filter-status').value;
+        const counts = {};
+        allBookings.forEach(b => { const st = normStatus(b.status); counts[st] = (counts[st] || 0) + 1; });
+        const needs = (counts[ST.INVALID] || 0) + (counts[ST.CONTACT] || 0);
+        const TABS = [
+          ['', 'Tất cả', allBookings.length],
+          [ST.WAIT, 'Chờ thanh toán', counts[ST.WAIT] || 0],
+          [ST.PAID, 'Đã thanh toán', counts[ST.PAID] || 0],
+          [ST.OK, 'Đặt phòng TC', counts[ST.OK] || 0],
+          [ST.DONE, 'Hoàn thành', counts[ST.DONE] || 0],
+          ['__needs', 'Cần xử lý', needs],
+          [ST.CANCEL, 'Đã hủy', counts[ST.CANCEL] || 0],
+        ];
+        document.getElementById('booking-tabs').innerHTML = TABS.map(([val, label, count]) =>
+          `<button type="button" class="tab-item${cur === val ? ' active' : ''}" onclick="setBookingTab('${val.replace(/'/g, "\\'")}')">${esc(label)}<span class="tab-count">${count}</span></button>`
+        ).join('');
+      }
+
+      function setBookingTab(val) {
+        document.getElementById('filter-status').value = val;
+        renderBookings();
+      }
+
       function renderBookings() {
         const tbody = document.getElementById('bookings-tbody');
         const search = (document.getElementById('filter-search').value || '').toLowerCase();
         const statusFilter = document.getElementById('filter-status').value;
         const roomFilter = document.getElementById('filter-room').value;
+        renderBookingTabs();
 
         const filtered = allBookings.filter(b => {
           if (search && !((b.fullname || '').toLowerCase().includes(search) || (b.phone || '').includes(search) || (b.booking_code || '').toLowerCase().includes(search) || (b.transfer_code || '').toLowerCase().includes(search))) return false;
-          if (statusFilter && normStatus(b.status) !== statusFilter) return false;
+          if (statusFilter === '__needs') { if (![ST.INVALID, ST.CONTACT].includes(normStatus(b.status))) return false; }
+          else if (statusFilter && normStatus(b.status) !== statusFilter) return false;
           if (roomFilter && b.room !== roomFilter) return false;
           return true;
         });
