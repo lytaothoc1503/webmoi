@@ -128,6 +128,17 @@
       }
       .btn-save:hover { background: #b85417; }
 
+      .home-hero { background: linear-gradient(135deg, var(--primary), #0e4f5e); color: #fff; border-radius: 16px; padding: 24px 26px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+      .home-hero h2 { font-size: 20px; margin-bottom: 4px; }
+      .home-hero p { font-size: 13px; color: #cfe3e3; }
+      .home-hero .btn-view-web { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.25); color: #fff; }
+      .section-label { font-size: 13px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: .04em; margin: 4px 0 12px; }
+      .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; margin-bottom: 24px; }
+      .quick-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; gap: 12px; align-items: flex-start; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all .15s; text-decoration: none; color: inherit; }
+      .quick-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,0.07); }
+      .quick-ic { width: 40px; height: 40px; border-radius: 10px; background: #fdf1e2; color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+      .quick-card b { display: block; font-size: 13.5px; color: var(--primary); margin-bottom: 2px; }
+      .quick-card small { font-size: 11.5px; color: var(--muted); line-height: 1.4; }
       .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
       .manage-card { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
       .manage-card img { width: 100%; height: 160px; object-fit: cover; }
@@ -182,27 +193,55 @@
   <body style="visibility:hidden">
     <aside>
       <div class="brand-title"><svg width="44" height="44" viewBox="0 0 48 48" aria-hidden="true" style="display:block;margin:0 auto 8px"><rect width="48" height="48" rx="12" fill="#e8890c"/><path d="M10 23 24 11l14 12v14H10z" fill="#fff"/><path d="m18 28 4 4 8-9" fill="none" stroke="#0b3b46" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>HỆ THỐNG ĐỐI SOÁT<br>&amp; XỬ LÝ HOÀN TRẢ</div>
+      <div class="menu-item active" id="menu-home" onclick="showPage('home', this)">🏠 Trang Chủ</div>
       <div class="menu-group">🏡 Homestay & Coffee</div>
-      <div class="menu-item active" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
-      <div class="menu-item" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
-      <div class="menu-item" onclick="showPage('tours', this)">🧭 Trải Nghiệm</div>
-      <div class="menu-item" onclick="showPage('reviews', this)">⭐ Đánh Giá <span id="rv-badge" class="menu-badge" style="display:none"></span></div>
-      <div class="menu-item" onclick="showPage('gallery', this)">📷 Thư Viện Ảnh</div>
-      <div class="menu-item" onclick="showPage('faq', this)">❓ Câu Hỏi FAQ</div>
+      <div class="menu-item" id="menu-bookings" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
+      <div class="menu-item" id="menu-rooms" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
+      <div class="menu-item" id="menu-tours" onclick="showPage('tours', this)">🧭 Trải Nghiệm</div>
+      <div class="menu-item" id="menu-reviews" onclick="showPage('reviews', this)">⭐ Đánh Giá <span id="rv-badge" class="menu-badge" style="display:none"></span></div>
+      <div class="menu-item" id="menu-gallery" onclick="showPage('gallery', this)">📷 Thư Viện Ảnh</div>
+      <div class="menu-item" id="menu-faq" onclick="showPage('faq', this)">❓ Câu Hỏi FAQ</div>
       <div class="menu-group">💰 Tài chính</div>
-      <div class="menu-item" onclick="showPage('recon', this)">🧾 Đối Soát</div>
-      <div class="menu-item" onclick="showPage('refunds', this)">↩️ Hoàn Trả</div>
-      <div class="menu-item" onclick="showPage('ledger', this)">📒 Thu Chi</div>
-      <div class="menu-item" onclick="showPage('forms', this)">📄 Biểu Mẫu</div>
-      <div class="menu-item" onclick="showPage('ai', this)">🤖 Trợ Lý AI</div>
-      <div class="menu-item" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
-      <div class="menu-item" onclick="showPage('security', this)">🔐 Bảo Mật</div>
+      <div class="menu-item" id="menu-recon" onclick="showPage('recon', this)">🧾 Đối Soát</div>
+      <div class="menu-item" id="menu-refunds" onclick="showPage('refunds', this)">↩️ Hoàn Trả</div>
+      <div class="menu-item" id="menu-ledger" onclick="showPage('ledger', this)">📒 Thu Chi</div>
+      <div class="menu-item" id="menu-forms" onclick="showPage('forms', this)">📄 Biểu Mẫu</div>
+      <div class="menu-item" id="menu-ai" onclick="showPage('ai', this)">🤖 Trợ Lý AI</div>
+      <div class="menu-item" id="menu-audit" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
+      <div class="menu-item" id="menu-security" onclick="showPage('security', this)">🔐 Bảo Mật</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
     <main>
       <!-- BOOKINGS PAGE -->
-      <div class="page-section active" id="page-bookings">
+      <!-- TRANG CHỦ (TỔNG QUAN) -->
+      <div class="page-section active" id="page-home">
+        <div class="home-hero">
+          <div><h2>Chào mừng trở lại</h2><p>Nhà của An Homestay Tà Xùa — tổng quan hoạt động hôm nay</p></div>
+          <a href="./index.html" target="_blank" class="btn-view-web">🌐 Xem Trang Web</a>
+        </div>
+
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Đơn Mới Hôm Nay</div><div class="stat-num" id="home-today-orders">0</div></div>
+          <div class="stat-card"><div class="stat-label">Doanh Thu Hôm Nay</div><div class="stat-num" id="home-today-revenue" style="color: var(--green)">0 đ</div></div>
+          <div class="stat-card"><div class="stat-label">Đơn Cần Xử Lý</div><div class="stat-num" id="home-pending" style="color: #b45309">0</div></div>
+          <div class="stat-card"><div class="stat-label">Đánh Giá Chờ Duyệt</div><div class="stat-num" id="home-reviews" style="color: #1e40af">0</div></div>
+        </div>
+
+        <div class="section-label">Truy cập nhanh</div>
+        <div class="quick-grid">
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('bookings', document.getElementById('menu-bookings'))"><span class="quick-ic">📋</span><div><b>Đơn Đặt Phòng</b><small>Xem, xác nhận và quản lý đơn khách</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('recon', document.getElementById('menu-recon'))"><span class="quick-ic">🧾</span><div><b>Đối Soát</b><small>Kiểm tra giao dịch chuyển khoản</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('refunds', document.getElementById('menu-refunds'))"><span class="quick-ic">↩️</span><div><b>Hoàn Trả</b><small>Xử lý yêu cầu hoàn tiền khách</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('ledger', document.getElementById('menu-ledger'))"><span class="quick-ic">📒</span><div><b>Thu Chi</b><small>Sổ thu chi theo tháng</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('forms', document.getElementById('menu-forms'))"><span class="quick-ic">📄</span><div><b>Biểu Mẫu</b><small>Phiếu xác nhận, biên bản, tin nhắn mẫu</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('ai', document.getElementById('menu-ai'))"><span class="quick-ic">🤖</span><div><b>Trợ Lý AI</b><small>Soạn việc cần làm, báo cáo nhanh</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('gallery', document.getElementById('menu-gallery'))"><span class="quick-ic">📷</span><div><b>Thư Viện Ảnh</b><small>Quản lý ảnh hiển thị trên web</small></div></a>
+          <a href="javascript:void(0)" class="quick-card" onclick="showPage('security', document.getElementById('menu-security'))"><span class="quick-ic">🔐</span><div><b>Bảo Mật</b><small>PIN, xác thực 2 lớp cho tài khoản admin</small></div></a>
+        </div>
+      </div>
+
+      <div class="page-section" id="page-bookings">
         <div class="top-bar">
           <h2>Quản Lý Đơn Đặt Phòng & Thanh Toán</h2>
           <div style="display: flex; gap: 10px;">
@@ -705,8 +744,24 @@
           populateRoomFilter();
           renderBookings();
           renderChart();
+          renderHome();
           if (document.getElementById('page-recon').classList.contains('active')) loadRecon();
         });
+      }
+
+      function renderHome() {
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        let todayOrders = 0, todayRevenue = 0, pending = 0;
+        allBookings.forEach((b) => {
+          const st = normStatus(b.status);
+          if (new Date(b.created_at) >= today) todayOrders++;
+          if ((st === ST.OK || st === ST.DONE) && b.confirmed_at && new Date(b.confirmed_at) >= today) todayRevenue += paidOf(b);
+          if (st === ST.WAIT || st === ST.PAID || st === ST.INVALID) pending++;
+        });
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        set('home-today-orders', todayOrders);
+        set('home-today-revenue', todayRevenue.toLocaleString('vi-VN') + ' đ');
+        set('home-pending', pending);
       }
 
       function populateRoomFilter() {
@@ -1017,6 +1072,7 @@
         const { count } = await supabaseClient.from('reviews').select('id', { count: 'exact', head: true }).eq('is_published', false);
         const el = document.getElementById('rv-badge');
         el.textContent = count || 0; el.style.display = count ? 'inline-block' : 'none';
+        const home = document.getElementById('home-reviews'); if (home) home.textContent = count || 0;
       }
 
       function openReviewModal(id) {
