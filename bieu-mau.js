@@ -386,7 +386,8 @@
     const el = $('fm-preview');
     if (!el || !el.innerHTML.trim()) { alert('Chưa có nội dung để xuất ảnh.'); return; }
     try {
-      const canvas = await window.html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      // windowWidth ép html2canvas vẽ như màn hình máy tính (bỏ qua @media max-width mobile), để ảnh xuất từ điện thoại không bị dồn dọc, xấu
+      const canvas = await window.html2canvas(el, { scale: 2, backgroundColor: '#ffffff', useCORS: true, windowWidth: 1200 });
       const a = document.createElement('a');
       const ma = (state.f && state.f.ma ? String(state.f.ma).trim() : '') || new Date().toISOString().slice(0, 10);
       a.download = `nha-cua-an-${ma}.png`;

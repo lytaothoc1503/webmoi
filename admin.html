@@ -11,7 +11,7 @@
     <script src="admin-auth.js?v=20261018a"></script>
     <script src="phieu.js?v=20261019c" defer></script>
     <script src="vendor/html2canvas.min.js" defer></script>
-    <script src="bieu-mau.js?v=20261023a" defer></script>
+    <script src="bieu-mau.js?v=20261023b" defer></script>
     <script src="ai-tro-ly.js?v=20261012a" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
@@ -474,8 +474,8 @@
       </div>
 
       <div class="page-section" id="page-partners">
-        <div class="top-bar"><h2>Đối Tác / Sale</h2></div>
-        <p class="fin-note">Trang riêng <code>doi-tac.html</code> cho đối tác/Sale dùng Biểu Mẫu — họ chỉ đăng nhập bằng email dưới đây và chỉ thấy đúng đơn bạn giao (ô "Giao cho đối tác" trong Biểu Mẫu), không thấy đơn của khách khác, không có quyền admin. Xóa khỏi danh sách là mất quyền ngay (không cần đổi mật khẩu).</p>
+        <div class="top-bar"><h2>Đối Tác / Sale — Fuli8386</h2></div>
+        <p class="fin-note">Trang riêng <code>fuli8386.html</code> (tên chung hợp tác) cho đối tác/Sale dùng Biểu Mẫu — họ chỉ đăng nhập bằng email dưới đây và chỉ thấy đúng đơn bạn giao (ô "Giao cho đối tác" trong Biểu Mẫu), không thấy đơn của khách khác, không có quyền admin. Xóa khỏi danh sách là mất quyền ngay (không cần đổi mật khẩu). Link gửi đối tác: <code id="pt-link"></code> <button class="btn-export" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pt-link').textContent)" style="padding:2px 10px;font-size:11px">Sao chép</button></p>
         <div class="table-box" style="padding:18px;max-width:560px">
           <h3 style="margin-top:0">Thêm / đổi mật khẩu đối tác</h3>
           <label class="fin-note">Email đối tác (họ dùng email này để đăng nhập)</label>
@@ -1378,6 +1378,7 @@
       }
       /* ===== ĐỐI TÁC / SALE (bảng partners + Edge Function partner-invite) ===== */
       async function loadPartners() {
+        const lk = document.getElementById('pt-link'); if (lk) lk.textContent = location.origin + '/fuli8386.html';
         const tb = document.getElementById('pt-tbody'); tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Đang tải...</td></tr>';
         const { data, error } = await supabaseClient.from('partners').select('*').order('created_at', { ascending: false });
         if (error || !data) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Chưa tải được (có thể chưa chạy migration 20261023000000_partners.sql).</td></tr>'; return; }
@@ -1405,7 +1406,7 @@
         } catch (e) { msg.textContent = 'Có lỗi kết nối, thử lại.'; }
       }
       async function removePartner(id, email) {
-        if (!confirm('Xóa quyền đối tác "' + email + '"? Họ sẽ không vào được trang doi-tac.html nữa (tài khoản đăng nhập vẫn còn nhưng không còn quyền).')) return;
+        if (!confirm('Xóa quyền đối tác "' + email + '"? Họ sẽ không vào được trang fuli8386.html nữa (tài khoản đăng nhập vẫn còn nhưng không còn quyền).')) return;
         const { error } = await supabaseClient.from('partners').delete().eq('id', id);
         if (error) { alert('Chưa xóa được: ' + error.message); return; }
         loadPartners();
