@@ -698,6 +698,27 @@
         if (!iso) return '';
         const d = new Date(iso); return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN');
       };
+      /* ===== VietQR hoàn tiền: CHỈ cho chủ quét bằng app ngân hàng của mình, KHÔNG gửi khách ===== */
+      let rfQrId = null;
+      const RF_BANKS = [[/\b(mb|mbbank|quan doi)\b/, 'MB'], [/\b(vietcombank|vcb)\b/, 'VCB'], [/\b(vietinbank|ctg|cong thuong)\b/, 'ICB'], [/\bbidv\b/, 'BIDV'], [/\b(agribank|vba)\b/, 'VBA'], [/\b(techcombank|tcb)\b/, 'TCB'], [/\bacb\b/, 'ACB'], [/\b(vpbank|vpb)\b/, 'VPB'], [/\b(tpbank|tpb|tien phong)\b/, 'TPB'], [/\b(sacombank|stb)\b/, 'STB'], [/\b(hdbank|hdb)\b/, 'HDB'], [/\bvib\b/, 'VIB'], [/\bshb\b/, 'SHB'], [/\bocb\b/, 'OCB'], [/\bmsb\b/, 'MSB'], [/\bseabank\b/, 'SEAB'], [/\b(eximbank|exim)\b/, 'EIB'], [/\bscb\b/, 'SCB'], [/\b(lpbank|lienviet|lien viet)\b/, 'LPB'], [/\babbank\b/, 'ABB'], [/\b(namabank|nam a)\b/, 'NAB'], [/\b(bacabank|bac a)\b/, 'BAB'], [/\bvietabank\b/, 'VAB'], [/\bpvcombank\b/, 'PVCB'], [/\bncb\b/, 'NCB'], [/\bshinhan\b/, 'SHBVN'], [/\bcake\b/, 'CAKE'], [/\btimo\b/, 'TIMO'], [/\b(vietcapital|ban viet)\b/, 'VCCB'], [/\bkienlong\b/, 'KLB'], [/\b(baoviet|bao viet)\b/, 'BVB']];
+      function rfBankCode(name) {
+        const t = String(name || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toLowerCase();
+        const hit = RF_BANKS.find(([re]) => re.test(t));
+        return hit ? hit[1] : '';
+      }
+      function rfQrUrl(r) {
+        const code = rfBankCode(r.bank_name);
+        if (!code || !/^\d{6,20}$/.test(r.account_no || '')) return '';
+        return 'https://img.vietqr.io/image/' + code + '-' + r.account_no + '-compact2.png?amount=' + Math.round(Number(r.amount)) + '&addInfo=' + encodeURIComponent('Hoan tien ' + r.booking_code) + '&accountName=' + encodeURIComponent(r.account_name || '');
+      }
+      function rfQrBox(r) {
+        const url = rfQrUrl(r), show = rfQrId === r.id && url;
+        const head = '<div style="border:1px dashed #0b3b46;border-radius:10px;padding:10px;margin:10px 0;background:#f4fafb"><b style="color:var(--primary)">💳 Mã VietQR chuyển hoàn (chỉ để bạn quét)</b>';
+        const warn = '<p class="fin-note" style="margin:6px 0">KHÔNG gửi mã này cho khách và không chụp vào thẻ tiến độ. Quét bằng app ngân hàng của bạn, đối chiếu tên chủ tài khoản và số tiền trên app rồi mới xác nhận chuyển.</p>';
+        if (!url) return head + warn + '<small style="color:#b91c1c">Chưa tạo được mã: ngân hàng "' + esc(r.bank_name) + '" chưa nhận diện được hoặc số tài khoản chưa hợp lệ. Chuyển tay trên app ngân hàng.</small></div>';
+        if (!show) return head + warn + '<button class="btn-add" onclick="rfQrId=\'' + esc(r.id) + '\';openRefundProgress(\'' + esc(r.id) + '\')">Tạo mã VietQR</button> <small>(ảnh tải từ img.vietqr.io khi bấm nút)</small></div>';
+        return head + warn + '<div style="text-align:center"><img src="' + esc(url) + '" alt="Mã VietQR hoàn tiền" style="max-width:260px;width:100%"><br><small>' + esc(r.bank_name) + ' · ' + esc(r.account_name) + ' · ' + esc(vnd(r.amount)) + '</small></div></div>';
+      }
       function openRefundProgress(id) {
         const r = refundsData.find(x => x.id === id); if (!r) return;
         let m = document.getElementById('rp-modal');
@@ -719,6 +740,7 @@
           <div class="rp-info"><div><small>Mã booking</small><b>${esc(r.booking_code)}</b></div><div><small>Số tiền hoàn</small><b>${esc(vnd(r.amount))}</b></div><div class="rp-wide"><small>Nhận hoàn về</small><b>${esc(r.bank_name)} · ${esc(r.account_name)} · ${esc(acc)}</b></div></div>
           <div class="rp-steps">${stepsHtml}</div>${body}<div class="rp-foot">Thắc mắc, nhắn nhà kèm mã booking ${esc(r.booking_code)}</div></div>
           ${noStep ? '<p class="fin-note" style="color:#b91c1c">Chưa bật tiến độ: cần chạy file SQL 20261011040000_refund_progress.sql trong Supabase trước (xem hướng dẫn trong chat).</p>' : ''}
+          ${r.status === 'Chờ xử lý' ? rfQrBox(r) : ''}
           <input id="rp-note" type="text" maxlength="160" placeholder="Lời nhắn thêm cho khách (không lưu, hiện trên thẻ)" value="${esc(note)}" style="width:100%;margin:10px 0 8px;padding:9px;border:1px solid #ccc;border-radius:8px" oninput="openRefundProgress('${esc(r.id)}')">
           <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
             ${next ? `<button class="btn-add" onclick="advanceRefund('${esc(r.id)}')">Chuyển sang: ${esc(next)}</button>` : ''}
