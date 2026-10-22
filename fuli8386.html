@@ -18,10 +18,10 @@
     body { margin: 0; min-height: 100vh; color: var(--text); font-family: 'Montserrat', Arial, sans-serif; background: radial-gradient(1200px 700px at 50% -10%, #7a0e1c 0%, var(--red) 38%, var(--red-deep) 100%); background-attachment: fixed; }
     [hidden] { display: none !important; }
 
-    /* ===== Nền trang trí: cung điện cổ phong + nhành lộc lá (vẽ vector riêng, không dùng ảnh thật) ===== */
+    /* ===== Nền trang trí: ảnh cung điện cổ + nhành lộc lá (vector) ===== */
     .bg-art { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-    .bg-art .palace { position: absolute; left: 0; right: 0; bottom: -2vh; width: 100%; opacity: .16; }
-    .bg-art .sun { position: absolute; top: 6vh; left: 50%; transform: translateX(-50%); width: 240px; height: 240px; border-radius: 50%; background: radial-gradient(circle, rgba(233,200,119,.5), rgba(233,200,119,0) 70%); }
+    .bg-art .bg-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .32; filter: saturate(1.05); }
+    .bg-art .bg-tint { position: absolute; inset: 0; background: radial-gradient(1200px 700px at 50% -10%, rgba(122,14,28,.55) 0%, rgba(138,15,31,.78) 38%, rgba(61,8,16,.94) 100%); }
     .bg-art .leaf { position: absolute; opacity: .5; }
     .bg-art .leaf.tl { top: -10px; left: -10px; width: 130px; transform: rotate(-8deg); }
     .bg-art .leaf.br { bottom: -10px; right: -10px; width: 150px; transform: rotate(172deg); }
@@ -53,7 +53,7 @@
     .auth-wrap { position: relative; z-index: 1; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
     .auth-box { background: linear-gradient(180deg, #fffaf0, #fff3dc); border: 1.5px solid var(--gold); border-radius: 16px; padding: 34px 30px 28px; width: 100%; max-width: 380px; box-shadow: 0 18px 50px rgba(61,8,16,.45); position: relative; }
     .auth-box::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--gold-light); border-radius: 11px; pointer-events: none; }
-    .auth-crest { width: 54px; height: 54px; margin: 0 auto 10px; display: block; }
+    .auth-crest { width: 64px; height: 64px; margin: 0 auto 10px; display: block; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); box-shadow: 0 2px 10px rgba(90,10,20,.3); }
     .auth-box h1 { text-align: center; font-family: 'Noto Serif', serif; font-size: 21px; letter-spacing: .04em; color: var(--red-dark); margin: 0 0 2px; }
     .auth-box .sub { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 22px; }
     .auth-box label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; } .auth-box input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font: inherit; margin-bottom: 12px; background: #fffdf8; }
@@ -63,7 +63,7 @@
 
     header.ptop { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: linear-gradient(120deg, var(--red-dark), var(--red) 55%, var(--red-dark)); border-bottom: 2px solid var(--gold); color: #fdf3df; }
     header.ptop .brand { display: flex; align-items: center; gap: 10px; }
-    header.ptop .brand svg { width: 30px; height: 30px; }
+    header.ptop .brand img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--gold); }
     header.ptop .brand b { font-family: 'Noto Serif', serif; font-size: 16px; letter-spacing: .05em; }
     header.ptop .brand small { display: block; font-size: 10px; letter-spacing: .18em; color: var(--gold-light); opacity: .9; }
     header.ptop button { background: rgba(255,255,255,.08); color: #fdf3df; border: 1px solid var(--gold); border-radius: 8px; padding: 7px 14px; font-size: 12.5px; cursor: pointer; }
@@ -74,31 +74,16 @@
 </head>
 <body>
 <div class="bg-art" aria-hidden="true">
-  <div class="sun"></div>
+  <img class="bg-photo" src="images/fuli8386-nen.webp" alt="" />
+  <div class="bg-tint"></div>
   <svg class="leaf tl" viewBox="0 0 120 120"><g fill="none" stroke="#e9c877" stroke-width="2.4"><path d="M10 10c30 4 46 20 50 50-30-4-46-20-50-50Z" fill="#c99a3e" opacity=".55"/><path d="M14 14c24 8 34 22 38 42" stroke="#8a0f1f" stroke-width="1.4" opacity=".6"/><path d="M34 6c22 10 30 26 32 46-20-8-28-24-32-46Z" fill="#e9c877" opacity=".4"/></g></svg>
   <svg class="leaf tr" viewBox="0 0 120 120"><g fill="none" stroke="#e9c877" stroke-width="2.4"><path d="M10 10c30 4 46 20 50 50-30-4-46-20-50-50Z" fill="#c99a3e" opacity=".5"/></g></svg>
   <svg class="leaf br" viewBox="0 0 120 120"><g fill="none" stroke="#e9c877" stroke-width="2.4"><path d="M10 10c30 4 46 20 50 50-30-4-46-20-50-50Z" fill="#c99a3e" opacity=".55"/><path d="M14 14c24 8 34 22 38 42" stroke="#8a0f1f" stroke-width="1.4" opacity=".6"/><path d="M34 6c22 10 30 26 32 46-20-8-28-24-32-46Z" fill="#e9c877" opacity=".4"/></g></svg>
-  <svg class="palace" viewBox="0 0 1600 360" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <g fill="#e9c877">
-      <path d="M740 360V250h120v110zM770 250l-18-26h156l-18 26z"/>
-      <path d="M700 260c10-30 30-46 100-46s90 16 100 46z" opacity=".9"/>
-      <path d="M660 266c-18 2-30 10-34 24h468c-4-14-16-22-34-24-30-30-90-44-200-44s-170 14-200 44z"/>
-      <path d="M560 360V286h80v74zM1040 360V286h80v74z"/>
-      <path d="M500 296c8-18 22-28 60-28s52 10 60 28z" opacity=".85"/>
-      <path d="M980 296c8-18 22-28 60-28s52 10 60 28z" opacity=".85"/>
-      <path d="M360 360V300h70v60zM1250 360V300h70v60z" opacity=".8"/>
-      <path d="M320 322c6-14 18-22 50-22s44 8 50 22z" opacity=".65"/>
-      <path d="M1260 322c6-14 18-22 50-22s44 8 50 22z" opacity=".65"/>
-    </g>
-    <g stroke="#fdf3df" stroke-width="2" opacity=".35">
-      <line x1="770" y1="250" x2="770" y2="360"/><line x1="890" y1="250" x2="890" y2="360"/>
-    </g>
-  </svg>
 </div>
 
 <div class="auth-wrap no-print" id="login-box">
   <div class="auth-box">
-    <svg class="auth-crest" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#8a0f1f"/><path d="M10 23 24 11l14 12v14H10z" fill="#e9c877"/><path d="m18 28 4 4 8-9" fill="none" stroke="#8a0f1f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <img class="auth-crest" src="images/fuli8386-logo.webp" alt="Fuli8386" />
     <h1>FULI8386</h1>
     <div class="sub">Biểu Mẫu dành cho đối tác hợp tác</div>
     <form id="login-form" autocomplete="off">
@@ -114,7 +99,7 @@
 
 <div id="main-box" hidden>
   <header class="ptop no-print">
-    <div class="brand"><svg viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#e9c877"/><path d="M10 23 24 11l14 12v14H10z" fill="#8a0f1f"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e9c877" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="brand"><img src="images/fuli8386-logo.webp" alt="Fuli8386" />
       <div><b>FULI8386</b><small>BIỂU MẪU ĐỐI TÁC</small></div></div>
     <button id="logout-btn">Đăng xuất</button>
   </header>
