@@ -98,7 +98,8 @@
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
       : `<div class="ns-sec" style="grid-column:2/4"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><div class="ns-note" style="margin:0">Nhà sẽ gửi thông tin chuyển khoản qua Messenger/điện thoại kèm mã đơn <b>${esc(d.code || '')}</b>.</div></div>`;
     const inv = d.invalid === true;
-    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CHƯA ĐỐI CHIẾU ĐƯỢC GIAO DỊCH</h5><ul>
+    const alertBox = `<div class="ns-alertbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 THÔNG TIN CHUYỂN KHOẢN</h4><h5>⚠️ CHƯA ĐỐI CHIẾU ĐƯỢC GIAO DỊCH</h5>
+      <p style="margin:0 0 8px"><b>Tóm lại:</b> nhà đã nhận được một khoản chuyển khoản, nhưng chưa xác định được chắc chắn là của đơn này — cần Quý khách gửi lại ảnh chụp biên lai để nhà đối chiếu và xác nhận giúp.</p><ul>
       <li><b>Lý do:</b> Nhà nhận được một giao dịch chuyển khoản, nhưng nội dung chuyển khoản của Quý khách không chứa hoặc ghi sai Mã đơn phòng (<b>${esc(d.tcode || d.code || '')}</b>), nên chưa đối chiếu được với đơn này.${d.invalidReason ? ' ' + esc(d.invalidReason) : ''}</li>
       <li><b>Hướng xử lý:</b> Mã đặt phòng của Quý khách tạm thời chuyển sang trạng thái <b>Chờ tra soát thủ công</b>. Quý khách vui lòng gửi ngay <b>ảnh chụp biên lai chuyển khoản thành công</b> (rõ ngày giờ, số tiền, nội dung) cho nhà qua Messenger/điện thoại kèm mã đơn, để nhà kiểm tra lại sao kê ngân hàng và xác nhận giúp Quý khách.</li>
       <li><b>Thời gian xử lý:</b> Đơn được xác nhận lại ngay sau khi nhà kiểm tra sao kê và khớp được giao dịch.</li></ul></div>`;

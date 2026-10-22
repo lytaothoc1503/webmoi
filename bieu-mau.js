@@ -378,10 +378,16 @@
       return;
     }
     const miss = missing();
+    const statusRow = window.NCA_IS_PARTNER
+      ? '<button class="btn-export" id="fm-create"' + (miss.length ? ' disabled' : '') + ' onclick="createBookingFromForm()">Xác nhận tạo đơn</button>'
+      : '<select id="fm-st"><option value="Đặt phòng thành công">Đã chốt, đã nhận tiền (Đặt phòng thành công)</option><option value="Chờ thanh toán">Chưa nhận tiền (Chờ thanh toán)</option></select>'
+        + '<button class="btn-export" id="fm-create"' + (miss.length ? ' disabled' : '') + ' onclick="createBookingFromForm()">Xác nhận tạo đơn</button>';
+    const smallNote = window.NCA_IS_PARTNER
+      ? 'Đơn sẽ ở trạng thái <b>Chờ thanh toán</b> — Nhà của An xác nhận lại sau khi kiểm tra đã nhận tiền. Mã đơn trống thì tự tạo.'
+      : 'Bấm xác nhận để lưu đơn vào hệ thống. Mã đơn trống thì tự tạo.';
     box.innerHTML = '<div class="fm-sync warn"><b>⚪ Chưa đồng bộ</b>: phiếu này mới chỉ ở trên màn hình, <u>khách chưa mở được link</u> cho đến khi bạn xác nhận tạo đơn.'
-      + '<div class="fm-sync-row"><select id="fm-st"><option value="Đặt phòng thành công">Đã chốt, đã nhận tiền (Đặt phòng thành công)</option><option value="Chờ thanh toán">Chưa nhận tiền (Chờ thanh toán)</option></select>'
-      + '<button class="btn-export" id="fm-create"' + (miss.length ? ' disabled' : '') + ' onclick="createBookingFromForm()">Xác nhận tạo đơn</button></div>'
-      + (miss.length ? '<small>Còn thiếu: ' + esc2(miss.join(', ')) + '.</small>' : '<small>Bấm xác nhận để lưu đơn vào hệ thống. Mã đơn trống thì tự tạo.</small>') + '<div id="fm-sync-msg"></div></div>';
+      + '<div class="fm-sync-row fm-create-row">' + statusRow + '</div>'
+      + (miss.length ? '<small>Còn thiếu: ' + esc2(miss.join(', ')) + '.</small>' : '<small>' + smallNote + '</small>') + '<div id="fm-sync-msg"></div></div>';
   }
   window.createBookingFromForm = async function () {
     const f = state.f, btn = $('fm-create'), out = $('fm-sync-msg'); if (!btn) return;
@@ -393,8 +399,10 @@
       const ex = await supabaseClient.from('bookings').select('id').eq('booking_code', code).maybeSingle();
       if (ex.data) { out.textContent = 'Mã ' + code + ' đã có trong hệ thống. Hãy chọn đơn đó ở ô "Chọn đơn" hoặc đổi mã.'; btn.disabled = false; return; }
       const ses = await supabaseClient.auth.getSession(), who = (ses.data && ses.data.session && ses.data.session.user && ses.data.session.user.email) || 'quản trị';
-      const status = $('fm-st').value, now = new Date().toISOString();
+      // Đối tác (Fuli8386): luôn tạo đơn ở trạng thái Chờ thanh toán, tự gắn đúng email của mình (bắt buộc để RLS cho ghi + để đọc lại đúng đơn mình tạo).
+      const status = window.NCA_IS_PARTNER ? 'Chờ thanh toán' : $('fm-st').value, now = new Date().toISOString();
       const row = { booking_code: code, transfer_code: code, fullname: String(f.b_ten).trim().slice(0, 80), phone: String(f.b_sdt).replace(/[^\d+]/g, '').slice(0, 20), room: String(f.phong).trim().slice(0, 120), checkin: f.nhan, checkout: f.tra, guests: String(f.khach || '').slice(0, 100) || null, total_price: Math.round(Number(f.tien)), status, confirmed_at: status === 'Đặt phòng thành công' ? now : null, notes: ('[Tạo từ Biểu Mẫu bởi ' + who + ' lúc ' + fmtT(now) + ']').slice(0, 500) };
+      if (window.NCA_IS_PARTNER) row.partner_email = who;
       const r = await supabaseClient.from('bookings').insert(row).select().single();
       if (r.error) { out.textContent = 'Không lưu được: ' + (r.error.message || 'lỗi'); btn.disabled = false; return; }
       if (typeof allBookings !== 'undefined') allBookings.unshift(r.data);
