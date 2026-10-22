@@ -85,6 +85,23 @@
     header.ptop button:hover { background: rgba(255,255,255,.16); }
 
     .section-card { background: rgba(255,250,240,.9); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+    .nav-tabs button { background: rgba(255,255,255,.08); color: var(--gold-light); border: 1px solid var(--gold); border-radius: 999px; padding: 8px 18px; font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .nav-tabs button.on { background: linear-gradient(135deg, var(--gold), #a9782b); color: var(--red-deep); }
+    .home-hero { background: linear-gradient(135deg, rgba(122,14,28,.92), rgba(61,8,16,.96)); border: 1px solid var(--gold); border-radius: 16px; padding: 24px 22px; color: #fdf3df; margin-bottom: 16px; }
+    .home-hero .hh-eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--gold-light); margin-bottom: 6px; }
+    .home-hero h1 { font-family: 'Noto Serif', serif; font-size: 25px; margin: 0 0 6px; }
+    .home-hero p { font-size: 13px; color: #f0dcae; margin: 0; line-height: 1.55; }
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .stat-card { background: rgba(255,250,240,.92); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
+    .stat-card b { display: block; font-size: 26px; color: var(--red-dark); font-family: 'Noto Serif', serif; }
+    .stat-card span { font-size: 11.5px; color: var(--muted); }
+    .home-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
+    .home-actions .ha-card { flex: 1 1 220px; background: rgba(255,250,240,.92); border: 1px solid var(--border); border-radius: 12px; padding: 16px; cursor: pointer; text-align: left; }
+    .home-actions .ha-card:hover { border-color: var(--gold); }
+    .home-actions .ha-card b { display: block; font-size: 14.5px; color: var(--red-dark); margin-bottom: 4px; }
+    .home-actions .ha-card span { font-size: 12px; color: var(--muted); line-height: 1.4; }
   </style>
 </head>
 <body>
@@ -126,25 +143,45 @@
     <button id="logout-btn">Đăng xuất</button>
   </header>
   <div class="wrap">
-    <div class="top-bar no-print"><h2>Biểu Mẫu</h2><div><button class="btn-add" onclick="printForm()">In / Lưu PDF</button> <button class="btn-export" onclick="exportFormImage()">🖼️ Xuất ảnh (PNG)</button></div></div>
-    <p class="fin-note no-print">Chỉ thấy đúng đơn được giao cho email này. Thông tin điền thêm trên mẫu chỉ nằm trong trình duyệt, không lưu lại. Xuất ảnh/in trên điện thoại vẫn giữ đúng bố cục như trên máy tính.</p>
-    <div class="section-card no-print">
-      <div class="fm-bar"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
-      <p class="fin-note" id="fm-note" style="margin-bottom:0"></p>
+    <div class="nav-tabs no-print">
+      <button id="nav-home" class="on" onclick="switchView('home')">🏠 Trang chủ</button>
+      <button id="nav-forms" onclick="switchView('forms')">📄 Biểu Mẫu</button>
     </div>
-    <div class="section-card no-print" id="fm-auto-box">
-      <label for="fm-auto-text" style="display:block;font-size:12.5px;font-weight:700;color:var(--red-dark);margin-bottom:6px">⚡ Dán tin nhắn khách gửi, tự động điền ô bên dưới</label>
-      <textarea id="fm-auto-text" rows="3" placeholder="Dán nguyên văn tin nhắn khách (tên, SĐT, ngày nhận/trả phòng, số khách...) rồi bấm Tự động điền" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px;background:#fffdf8;resize:vertical"></textarea>
-      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <button type="button" class="btn-add" onclick="autoFillFromText()">⚡ Tự động điền</button>
-        <span id="fm-auto-msg" style="font-size:11.5px;color:var(--muted)"></span>
+
+    <div id="view-home">
+      <div class="home-hero">
+        <div class="hh-eyebrow">ĐỐI TÁC &amp; SALE</div>
+        <h1 id="hh-title">Xin chào!</h1>
+        <p>Đây là nơi bạn xem nhanh các đơn đang được giao và lập đủ loại giấy tờ (phiếu xác nhận, hoàn trả, ủy quyền...) cho khách của mình. Mọi thông tin điền thêm chỉ nằm trong trình duyệt, không lưu lại.</p>
+      </div>
+      <div class="stat-grid" id="hh-stats"></div>
+      <div class="home-actions">
+        <button type="button" class="ha-card" onclick="switchView('forms')"><b>📑 Phiếu xác nhận đặt phòng</b><span>Lập phiếu gửi khách sau khi đã chốt booking, hoặc tự tạo đơn mới.</span></button>
+        <button type="button" class="ha-card" onclick="switchView('forms')"><b>🧾 Giấy tờ khác</b><span>Phiếu thu, hoàn trả, ủy quyền... — chọn trong mục Biểu Mẫu.</span></button>
       </div>
     </div>
-    <div class="fm-grid section-card no-print" id="fm-fields"></div>
-    <div class="no-print" id="fm-sync"></div>
-    <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--gold-light)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
-    <div class="fm-msgs no-print" id="fm-msg"></div>
-    <div class="dpaper" id="fm-preview"></div>
+
+    <div id="view-forms" hidden>
+      <div class="top-bar no-print"><h2>Biểu Mẫu</h2><div><button class="btn-add" onclick="printForm()">In / Lưu PDF</button> <button class="btn-export" onclick="exportFormImage()">🖼️ Xuất ảnh (PNG)</button></div></div>
+      <p class="fin-note no-print">Chỉ thấy đúng đơn được giao cho email này. Thông tin điền thêm trên mẫu chỉ nằm trong trình duyệt, không lưu lại. Xuất ảnh/in trên điện thoại vẫn giữ đúng bố cục như trên máy tính.</p>
+      <div class="section-card no-print">
+        <div class="fm-bar"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
+        <p class="fin-note" id="fm-note" style="margin-bottom:0"></p>
+      </div>
+      <div class="section-card no-print" id="fm-auto-box">
+        <label for="fm-auto-text" style="display:block;font-size:12.5px;font-weight:700;color:var(--red-dark);margin-bottom:6px">⚡ Dán tin nhắn khách gửi, tự động điền ô bên dưới</label>
+        <textarea id="fm-auto-text" rows="3" placeholder="Dán nguyên văn tin nhắn khách (tên, SĐT, ngày nhận/trả phòng, số khách...) rồi bấm Tự động điền" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px;background:#fffdf8;resize:vertical"></textarea>
+        <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn-add" onclick="autoFillFromText()">⚡ Tự động điền</button>
+          <span id="fm-auto-msg" style="font-size:11.5px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="fm-grid section-card no-print" id="fm-fields"></div>
+      <div class="no-print" id="fm-sync"></div>
+      <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--gold-light)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
+      <div class="fm-msgs no-print" id="fm-msg"></div>
+      <div class="dpaper" id="fm-preview"></div>
+    </div>
   </div>
 </div>
 
@@ -175,15 +212,40 @@
     const { data } = await client.from('bookings').select('*').order('created_at', { ascending: false });
     window.allBookings = data || [];
     if (window.initForms) window.initForms();
+    renderHome();
   };
 
   function fail(t) { msg.textContent = t; btn.disabled = false; }
+
+  // Chuyển giữa Trang chủ và Biểu Mẫu — chỉ đổi hiển thị, không tải lại dữ liệu.
+  window.switchView = function (name) {
+    $('view-home').hidden = name !== 'home';
+    $('view-forms').hidden = name !== 'forms';
+    $('nav-home').classList.toggle('on', name === 'home');
+    $('nav-forms').classList.toggle('on', name === 'forms');
+  };
+
+  // Vẽ lời chào + vài số liệu nhanh (đơn được giao cho đúng email này) ở Trang chủ.
+  function renderHome() {
+    const list = window.allBookings || [];
+    const dem = (okFn) => list.filter(okFn).length;
+    const stats = [
+      ['Tổng đơn được giao', list.length],
+      ['Chờ thanh toán', dem((o) => o.status === 'Chờ thanh toán')],
+      ['Chờ xác nhận', dem((o) => o.status === 'Đã thanh toán - chờ xác nhận')],
+      ['Đặt phòng thành công', dem((o) => o.status === 'Đặt phòng thành công' || o.status === 'Hoàn thành')]
+    ];
+    $('hh-stats').innerHTML = stats.map((s) => `<div class="stat-card"><b>${s[1]}</b><span>${s[0]}</span></div>`).join('');
+  }
 
   async function enterApp() {
     const { data: isPartner, error } = await client.rpc('is_partner');
     if (error || isPartner !== true) { await client.auth.signOut(); fail('Tài khoản này chưa được cấp quyền đối tác. Liên hệ Nhà của An để được thêm.'); return; }
     window.NCA_IS_PARTNER = true; // bieu-mau.js dựa vào cờ này để khóa trạng thái "Chờ thanh toán" và tự gắn partner_email khi đối tác tạo đơn mới
     $('login-box').hidden = true; $('main-box').hidden = false;
+    const { data: userData } = await client.auth.getUser();
+    const email = userData && userData.user && userData.user.email;
+    if (email) $('hh-title').textContent = 'Xin chào, ' + email;
     await loadBookings();
   }
 
