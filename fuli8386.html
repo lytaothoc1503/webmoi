@@ -11,7 +11,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
   <script src="config.js?v=20261016a"></script>
   <script src="phieu.js?v=20261019c"></script>
-  <script src="bieu-mau.js?v=20261023b" defer></script>
+  <script src="bieu-mau.js?v=20261023c" defer></script>
+  <script src="vendor/html2canvas.min.js" defer></script>
   <style>
     :root { --red: #8a0f1f; --red-dark: #5c0a15; --red-deep: #3d0810; --gold: #c99a3e; --gold-light: #e9c877; --border: #e3cfa3; --text: #2a1510; --muted: #8a6a52; --cream: #fffaf0; }
     * { box-sizing: border-box; }
@@ -29,7 +30,7 @@
 
     .wrap { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
     .top-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .top-bar h2 { font-size: 18px; color: var(--red-dark); margin: 0; font-family: 'Noto Serif', serif; }
+    .top-bar h2 { font-size: 18px; color: var(--gold-light); margin: 0; font-family: 'Noto Serif', serif; }
     .btn-add, .btn-export { background: linear-gradient(135deg, var(--red), var(--red-dark)); color: #fdf3df; border: 1px solid var(--gold); border-radius: 8px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 2px 6px rgba(90,10,20,.25); }
     .btn-export { background: #fffaf0; color: var(--red-dark); border: 1.5px solid var(--gold); }
     .btn-add:hover, .btn-export:hover { filter: brightness(1.05); }
@@ -70,6 +71,8 @@
     .auth-form button:hover { filter: brightness(1.06); } .auth-form button:disabled { opacity: .6; cursor: default; }
     .auth-msg { font-size: 13px; color: #b91c1c; min-height: 18px; margin-top: 10px; }
     .auth-foot { margin-top: 22px; padding-top: 14px; border-top: 1px dashed var(--border); font-size: 11.5px; color: var(--muted); text-align: center; }
+    .auth-foot a { color: var(--red); font-weight: 700; text-decoration: none; }
+    .auth-foot a:hover { text-decoration: underline; }
     @media (max-width: 680px) { .auth-card { grid-template-columns: 1fr; max-width: 420px; border-radius: 18px; } .auth-visual { min-height: 170px; } .auth-visual img { object-position: 50% 24%; } .auth-visual .av-text b { font-size: 24px; } .auth-form { padding: 28px 24px 30px; } }
 
     header.ptop { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: linear-gradient(120deg, var(--red-dark), var(--red) 55%, var(--red-dark)); border-bottom: 2px solid var(--gold); color: #fdf3df; }
@@ -110,7 +113,7 @@
         <button type="submit" id="pl-btn">Đăng nhập</button>
         <div class="auth-msg" id="pl-msg"></div>
       </form>
-      <div class="auth-foot">Chưa có tài khoản? Liên hệ Nhà của An để được cấp quyền.</div>
+      <div class="auth-foot">Chưa có tài khoản? Nhắn Telegram <a href="https://t.me/Xmagic09" target="_blank" rel="noopener">@Xmagic09</a><span id="af-email-wrap"></span> để được cấp quyền.</div>
     </div>
   </div>
 </div>
@@ -128,9 +131,17 @@
       <div class="fm-bar"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
       <p class="fin-note" id="fm-note" style="margin-bottom:0"></p>
     </div>
-    <div class="fm-grid no-print" id="fm-fields"></div>
+    <div class="section-card no-print" id="fm-auto-box">
+      <label for="fm-auto-text" style="display:block;font-size:12.5px;font-weight:700;color:var(--red-dark);margin-bottom:6px">⚡ Dán tin nhắn khách gửi, tự động điền ô bên dưới</label>
+      <textarea id="fm-auto-text" rows="3" placeholder="Dán nguyên văn tin nhắn khách (tên, SĐT, ngày nhận/trả phòng, số khách...) rồi bấm Tự động điền" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font:inherit;font-size:13px;background:#fffdf8;resize:vertical"></textarea>
+      <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <button type="button" class="btn-add" onclick="autoFillFromText()">⚡ Tự động điền</button>
+        <span id="fm-auto-msg" style="font-size:11.5px;color:var(--muted)"></span>
+      </div>
+    </div>
+    <div class="fm-grid section-card no-print" id="fm-fields"></div>
     <div class="no-print" id="fm-sync"></div>
-    <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--red-dark)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
+    <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--gold-light)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
     <div class="fm-msgs no-print" id="fm-msg"></div>
     <div class="dpaper" id="fm-preview"></div>
   </div>
@@ -141,6 +152,12 @@
   const CFG = (window.SITE && window.SITE.supabase) || {};
   const $ = (id) => document.getElementById(id);
   const msg = $('pl-msg'), btn = $('pl-btn');
+  // email liên hệ lấy từ config.js (contacts.email), chỉ hiện khi đã điền
+  (function () {
+    const em = window.SITE && window.SITE.contacts && window.SITE.contacts.email;
+    const wrap = $('af-email-wrap');
+    if (em && wrap) wrap.innerHTML = ' hoặc gửi mail <a href="mailto:' + em + '">' + em + '</a>';
+  })();
   if (!CFG.url || !CFG.anonKey) { msg.textContent = 'Chưa cấu hình được, báo Nhà của An.'; btn.disabled = true; return; }
 
   // Phiên chỉ nằm trong tab này (giống admin.html): đóng tab là tự mất, không dùng chung phiên với admin.

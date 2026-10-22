@@ -214,6 +214,66 @@
     $('fm-fields').querySelectorAll('[data-clear]').forEach((a) => a.addEventListener('click', (e) => { e.preventDefault(); state.f[a.dataset.clear] = ''; drawFields(); render(); }));
   }
 
+  // Tự động điền từ tin nhắn khách dán vào (đoán bằng chữ/ký hiệu quen thuộc, KHÔNG dùng AI, không gửi đi đâu cả).
+  // Chỉ điền ô nào đang có trong mẫu đang chọn (state.tpl.fields) và người dùng luôn kiểm tra lại trước khi dùng.
+  function parseMoneyVi(s) {
+    let m = s.match(/(\d+(?:[.,]\d+)?)\s*tri[eệ]u/i);
+    if (m) return Math.round(parseFloat(m[1].replace(',', '.')) * 1000000);
+    m = s.match(/(\d+(?:[.,]\d+)?)\s*k\b/i);
+    if (m) return Math.round(parseFloat(m[1].replace(',', '.')) * 1000);
+    m = s.match(/(\d[\d.,]{3,})\s*(?:đ|vnd|đồng)/i);
+    if (m) return parseInt(m[1].replace(/[.,]/g, ''), 10);
+    return null;
+  }
+  window.autoFillFromText = function () {
+    const ta = $('fm-auto-text'), out = $('fm-auto-msg');
+    if (!ta) return;
+    const raw = ta.value || '';
+    if (!out) return;
+    if (!raw.trim()) { out.textContent = 'Dán tin nhắn khách vào ô trên trước đã.'; return; }
+    const f = state.f, allow = new Set(state.tpl.fields), got = [];
+    const setF = (k, v) => { if (allow.has(k) && v && !got.includes(k)) { f[k] = v; got.push(k); } };
+
+    const phoneM = raw.match(/(0|\+84)(\s?\d){8,10}/);
+    if (phoneM) setF('b_sdt', phoneM[0].replace(/\s+/g, ''));
+
+    const dates = [];
+    const dateRe = /\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/g;
+    let dm;
+    while ((dm = dateRe.exec(raw))) {
+      const d = +dm[1], mo = +dm[2];
+      if (d < 1 || d > 31 || mo < 1 || mo > 12) continue;
+      let y = dm[3] ? +dm[3] : new Date().getFullYear();
+      if (y < 100) y += 2000;
+      dates.push(y + '-' + String(mo).padStart(2, '0') + '-' + String(d).padStart(2, '0'));
+    }
+    if (dates[0]) setF('nhan', dates[0]);
+    if (dates[1]) setF('tra', dates[1]);
+    if (dates[0] && !dates[1]) setF('ngay', dates[0]);
+
+    const guestM = raw.match(/(\d{1,2})\s*(người lớn|người|khách)/i);
+    if (guestM) setF('khach', guestM[1]);
+
+    const moneyCtx = raw.match(/(?:tiền|giá|tổng|thanh toán|chuyển khoản)[^0-9]{0,15}([\d.,]+\s*(?:tri[eệ]u|k|đ|vnd|đồng)?)/i);
+    const moneyVal = parseMoneyVi(moneyCtx ? moneyCtx[1] : raw);
+    if (moneyVal) setF('tien', String(moneyVal));
+
+    const codeM = raw.match(/\b([A-Z0-9]{8})\b/);
+    if (codeM) setF('ma', codeM[1]);
+
+    const nameM = raw.match(/(?:tên khách|họ tên|khách tên|^tên)[:\s]+([^\n,;]{2,40})/im);
+    if (nameM) setF('b_ten', nameM[1].trim());
+
+    if (allow.has('phong') && !f.phong && window.SITE_DATA && Array.isArray(window.SITE_DATA.rooms) && window.SITE_DATA.rooms[0] && window.SITE_DATA.rooms[0].name) {
+      f.phong = window.SITE_DATA.rooms[0].name; got.push('phong');
+    }
+
+    drawFields(); render();
+    out.textContent = got.length
+      ? 'Đã thử điền ' + got.length + ' ô — kiểm tra lại từng ô trước khi dùng, ô chưa chắc thì tự gõ tay.'
+      : 'Không nhận ra thông tin nào trong tin nhắn này, tự gõ tay vào các ô bên dưới nhé.';
+  };
+
   /* ===== Xác nhận tạo đơn: lưu phiếu thành đơn thật trong hệ thống (khách mới mở được link phiếu) ===== */
   const fmtT = (iso) => { try { const d = new Date(iso); return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN'); } catch (e) { return ''; } };
   const findBooking = () => {

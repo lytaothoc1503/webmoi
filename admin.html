@@ -11,7 +11,7 @@
     <script src="admin-auth.js?v=20261018a"></script>
     <script src="phieu.js?v=20261019c" defer></script>
     <script src="vendor/html2canvas.min.js" defer></script>
-    <script src="bieu-mau.js?v=20261023b" defer></script>
+    <script src="bieu-mau.js?v=20261023c" defer></script>
     <script src="ai-tro-ly.js?v=20261012a" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
@@ -413,6 +413,14 @@
         <div class="top-bar no-print"><h2>Biểu Mẫu In</h2><button class="btn-add" onclick="printForm()">In / Lưu PDF</button> <button class="btn-export" onclick="exportFormImage()">🖼️ Xuất ảnh (PNG)</button></div>
         <div class="fm-bar no-print"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
         <p class="fin-note no-print" id="fm-note"></p>
+        <div class="fin-note no-print" id="fm-auto-box" style="background:#fff">
+          <label for="fm-auto-text" style="display:block;font-size:12.5px;font-weight:700;color:var(--primary);margin-bottom:6px">⚡ Dán tin nhắn khách gửi, tự động điền ô bên dưới</label>
+          <textarea id="fm-auto-text" rows="3" placeholder="Dán nguyên văn tin nhắn khách (tên, SĐT, ngày nhận/trả phòng, số khách...) rồi bấm Tự động điền" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font:inherit;font-size:13px;resize:vertical"></textarea>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <button type="button" class="btn-add" onclick="autoFillFromText()">⚡ Tự động điền</button>
+            <span id="fm-auto-msg" style="font-size:11.5px;color:#8a6d3b"></span>
+          </div>
+        </div>
         <div class="fm-grid no-print" id="fm-fields"></div>
         <div class="no-print" id="fm-sync"></div>
         <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--primary)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
@@ -475,7 +483,7 @@
 
       <div class="page-section" id="page-partners">
         <div class="top-bar"><h2>Đối Tác / Sale — Fuli8386</h2></div>
-        <p class="fin-note">Trang riêng <code>fuli8386.html</code> (tên chung hợp tác) cho đối tác/Sale dùng Biểu Mẫu — họ chỉ đăng nhập bằng email dưới đây và chỉ thấy đúng đơn bạn giao (ô "Giao cho đối tác" trong Biểu Mẫu), không thấy đơn của khách khác, không có quyền admin. Xóa khỏi danh sách là mất quyền ngay (không cần đổi mật khẩu). Link gửi đối tác: <code id="pt-link"></code> <button class="btn-export" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pt-link').textContent)" style="padding:2px 10px;font-size:11px">Sao chép</button></p>
+        <p class="fin-note">Trang riêng Fuli8386 (tên chung hợp tác, đặt ở địa chỉ GitHub Pages riêng, KHÔNG hiện tên miền nhacuaantaxua.com) cho đối tác/Sale dùng Biểu Mẫu — họ chỉ đăng nhập bằng email dưới đây và chỉ thấy đúng đơn bạn giao (ô "Giao cho đối tác" trong Biểu Mẫu), không thấy đơn của khách khác, không có quyền admin. Xóa khỏi danh sách là mất quyền ngay (không cần đổi mật khẩu). Link gửi đối tác: <code id="pt-link"></code> <button class="btn-export" onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('pt-link').textContent)" style="padding:2px 10px;font-size:11px">Sao chép</button></p>
         <div class="table-box" style="padding:18px;max-width:560px">
           <h3 style="margin-top:0">Thêm / đổi mật khẩu đối tác</h3>
           <label class="fin-note">Email đối tác (họ dùng email này để đăng nhập)</label>
@@ -1378,7 +1386,7 @@
       }
       /* ===== ĐỐI TÁC / SALE (bảng partners + Edge Function partner-invite) ===== */
       async function loadPartners() {
-        const lk = document.getElementById('pt-link'); if (lk) lk.textContent = location.origin + '/fuli8386.html';
+        const lk = document.getElementById('pt-link'); if (lk) lk.textContent = 'https://lytaothoc1503.github.io/fuli8386/';
         const tb = document.getElementById('pt-tbody'); tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Đang tải...</td></tr>';
         const { data, error } = await supabaseClient.from('partners').select('*').order('created_at', { ascending: false });
         if (error || !data) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Chưa tải được (có thể chưa chạy migration 20261023000000_partners.sql).</td></tr>'; return; }
@@ -1406,7 +1414,7 @@
         } catch (e) { msg.textContent = 'Có lỗi kết nối, thử lại.'; }
       }
       async function removePartner(id, email) {
-        if (!confirm('Xóa quyền đối tác "' + email + '"? Họ sẽ không vào được trang fuli8386.html nữa (tài khoản đăng nhập vẫn còn nhưng không còn quyền).')) return;
+        if (!confirm('Xóa quyền đối tác "' + email + '"? Họ sẽ không vào được trang Fuli8386 nữa (tài khoản đăng nhập vẫn còn nhưng không còn quyền).')) return;
         const { error } = await supabaseClient.from('partners').delete().eq('id', id);
         if (error) { alert('Chưa xóa được: ' + error.message); return; }
         loadPartners();
