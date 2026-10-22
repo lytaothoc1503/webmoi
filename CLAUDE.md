@@ -35,7 +35,9 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 | `supabase/functions/notify-booking/` | Báo chủ nhà khi có đơn mới/đã thanh toán (xem mục "Báo chủ nhà khi có đơn mới") |
 | `phieu.html`, `phieu.js` | Trang phiếu xác nhận cho khách (`?ma=MÃ`); `window.NCA_slip()` vẽ phiếu, dùng chung với admin |
 | `admin-auth.js` | Client Supabase của admin (phiên trong `sessionStorage`) |
-| `bieu-mau.js`, `vendor/html2canvas.min.js` | Mục Biểu Mẫu trong admin (mẫu in, xuất PNG) |
+| `bieu-mau.js`, `vendor/html2canvas.min.js` | Mục Biểu Mẫu trong admin (mẫu in, xuất PNG) — dùng chung với `doi-tac.html` |
+| `doi-tac.html` | Trang Biểu Mẫu riêng cho đối tác/Sale (xem mục "Đối Tác / Sale") |
+| `supabase/functions/partner-invite/` | Admin tạo/đổi mật khẩu tài khoản đối tác (service_role, chỉ admin gọi được) |
 | `ai-tro-ly.js` | Mục Trợ Lý AI trong admin (soạn "lời nhờ" để dán vào AI ngoài) |
 | `cloudflare/thong-bao/` | Worker `anhomestay-web`: báo đơn qua Gmail (Queue + Email Routing) + kho ảnh R2 |
 | `scripts/kiem-tra.js`, `scripts/dong-bo.ps1` | Kiểm tra tự động; đồng bộ GitHub cho chủ dự án |
@@ -93,6 +95,14 @@ Chủ dự án là hộ kinh doanh cá thể. Theo Luật Du lịch 2017, kinh d
 ## Cài Đặt Chung (admin sửa trực tiếp, không cần đụng code) — 20/10
 Mục "⚙️ Cài Đặt Chung" trong admin (`page-settings`, `loadSettings`/`saveSettings` trong `admin.html`) cho sửa giờ nhận/trả phòng, địa chỉ, SĐT/hotline, Messenger, Facebook, email — lưu vào bảng `site_settings` (key-value, migration `supabase/migrations/20261020000000_site_settings.sql`, RLS: ai cũng đọc được, chỉ admin sửa). **CHỜ chủ dự án chạy file migration này trong SQL Editor một lần** (đúng quy ước các migration khác) rồi mới lưu được; trước đó trang vẫn hiện nhưng Lưu sẽ báo lỗi. `app.js` có `loadSiteSettings()` (gọi đầu `init()`, trước khi vẽ liên hệ/nhận phòng) đọc bảng này và ghi đè lên mặc định của `config.js` nếu có giá trị (ô trống trong admin = dùng lại mặc định trong code); `phieu.html` (trang phiếu riêng cho khách, không tải `app.js`) cũng tự đọc bảng này trước khi dựng phiếu để đồng bộ SĐT/Messenger/địa chỉ. **Giai đoạn 1 CHƯA gồm thông tin ngân hàng** (STK/chủ TK) — vẫn sửa trong `config.js` như cũ, vì tên chủ tài khoản đang là việc P0 chờ chủ dự án xác nhận (mục "Việc còn lại" #1); sẽ làm tiếp khi mục đó xong để tránh rủi ro nhầm STK hiển thị cho khách.
 
+## Đối Tác / Sale (trang Biểu Mẫu riêng) — 23/10
+Theo yêu cầu "tách Biểu Mẫu ra 1 file thứ 2 để gửi đối tác, tránh lộ thông tin": `doi-tac.html` là trang độc lập (không phải admin), chỉ có mục Biểu Mẫu (dùng chung `bieu-mau.js`/`phieu.js`), đăng nhập riêng bằng **email + mật khẩu** (không PIN/2 bước như admin). Quyền kiểm bằng CSDL, không phải giao diện:
+- Bảng `partners` (migration `supabase/migrations/20261023000000_partners.sql`, **CHỜ chủ dự án chạy 1 lần trong SQL Editor**) + hàm `is_partner()`: chỉ email có trong bảng này mới vào được, admin tự thêm/xóa ở mục "🤝 Đối Tác" trong admin — đúng yêu cầu "thêm quyền phải được duyệt từ tôi, email nào được thêm thì email đó mới thao tác được".
+- Cột `bookings.partner_email` (cùng migration): admin giao từng đơn cho 1 đối tác bằng ô "Giao cho đối tác" trong Biểu Mẫu (admin.html, cạnh "Đã đồng bộ" khi chọn đơn). Policy RLS mới `partner_read_assigned_bookings` cho đối tác CHỈ đọc (SELECT) đúng đơn có `partner_email` khớp email đăng nhập của họ — không thấy đơn của khách khác, không có quyền sửa/xóa/tạo đơn (các nút ghi dữ liệu trong Biểu Mẫu — Lưu ưu đãi, Báo sai booking, Cập nhật đơn, Xác nhận tạo đơn — bị ẩn bằng CSS `.fm-sync-row{display:none}` trong `doi-tac.html`, và dù có bấm được CSDL cũng chặn vì RLS không cấp quyền ghi).
+- Tạo/đổi mật khẩu đối tác qua Edge Function `partner-invite` (ĐÃ deploy lên Supabase thật, `verify_jwt=true`): chỉ gọi được khi người gọi đang đăng nhập admin thật (hàm tự kiểm `is_admin()` bằng JWT của người gọi trước khi dùng `service_role` tạo/sửa tài khoản) — không lộ `service_role` ra client. Gửi mật khẩu tạm cho đối tác qua Messenger/Zalo (nhà chưa có email riêng để gửi).
+- Dữ liệu đối tác thấy được khi chọn mẫu gắn với đơn thật (tên/SĐT khách, mã đơn...) — chủ dự án đã xác nhận muốn vậy để làm đủ loại giấy tờ (xác nhận, hoàn trả, ủy quyền...) cho đơn họ được giao; mỗi đối tác chỉ thấy đơn của chính họ nên không lộ chéo giữa các đối tác. Mẫu "Phiếu xác nhận đặt phòng (đơn vị khác)" vẫn dùng được song song, nhập tay hoàn toàn, không đụng dữ liệu đơn thật.
+- Sửa `bieu-mau.js` thì đổi `?v=` ở **cả** `admin.html` và `doi-tac.html` (2 nơi load chung file này, khác quy tắc 00 chỉ nói 4 file HTML cũ).
+
 ## Khóa đăng nhập quản trị (PIN + mã 2 bước, không lưu phiên)
 `auth.html` đăng nhập 3 lớp: mật khẩu, rồi mã 6 số ứng dụng xác thực (TOTP, nếu admin đã bật ở mục "🔐 Bảo Mật"), rồi mã PIN 6-8 số. PIN và TOTP do **máy chủ** kiểm (`supabase/migrations/20261011030000_admin_pin_mfa.sql`, chủ dự án chạy 1 lần trong SQL Editor): `is_admin()` (dùng trong mọi RLS) chỉ đúng khi phiên đã qua PIN (bảng `admin_pin_sessions`, 12 giờ) và đã aal2 nếu có TOTP; PIN băm bcrypt, sai 5 lần khóa 15 phút tăng dần; chưa đặt PIN thì lần đầu vào được và bị bắt đặt PIN ngay. Nếu chưa chạy file SQL này thì `auth.html` báo lỗi lúc gọi `admin_status` (phải chạy trước khi dùng).
 `admin-auth.js` tạo client Supabase cho admin: phiên chỉ nằm trong `sessionStorage` (khóa `nca-admin-auth`), không dùng localStorage, nên đóng tab/trình duyệt là tự mất; `admin.html` giữ phiên khi tải lại trang hoặc chuyển qua lại trong admin (không bắt đăng nhập lại), chỉ tự đăng xuất sau 1 giờ không thao tác hoặc bấm Đăng xuất (gọi `admin_end_session` + signOut). Ô nhập đặt `autocomplete` để trình duyệt không nhớ. Mất điện thoại 2 bước: xóa yếu tố MFA ở Supabase Authentication > Users. Test: `/home/claude/work/pin_test.py` (cần mock Supabase có các RPC `admin_*`).
@@ -139,6 +149,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 3. Đối chiếu và xác nhận đơn nhận phòng 11/10 đang ở trạng thái "Đã thanh toán - chờ xác nhận" (xem trong admin).
 4. Dán link báo đơn (script đã chép sẵn) vào Supabase `NOTIFY_WEBHOOK_URL`, rồi đặt thử 1 đơn để xác nhận email về Gmail.
 5. Chạy file `supabase/migrations/20261020000000_site_settings.sql` trong SQL Editor (1 lần) để dùng được mục "⚙️ Cài Đặt Chung" trong admin, rồi tự điền giờ nhận/trả phòng, địa chỉ, liên hệ tại đó.
+6. Chạy file `supabase/migrations/20261023000000_partners.sql` trong SQL Editor (1 lần) để dùng được mục "🤝 Đối Tác" và trang `doi-tac.html` cho đối tác/Sale.
 
 **P1: nội dung và chống gian lận**
 5. Giá thật tour/dịch vụ (đang là giá tạm trong `data.js`; giá phòng đã là giá thật). Dịch vụ "Thuê xe máy" và "Hỗ trợ hành lý & đưa đón" tạm ẩn trong `servicesPaused` (data.js), chờ xác nhận đăng ký ngành.

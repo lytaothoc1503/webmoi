@@ -286,6 +286,20 @@
       btn.disabled = false;
     } catch (e) { out.textContent = 'Có lỗi kết nối, thử lại.'; btn.disabled = false; }
   };
+  // Giao/bỏ giao đơn này cho 1 đối tác (họ tự đăng nhập trang doi-tac.html bằng email dưới đây và chỉ thấy đúng đơn được giao).
+  window.assignPartnerEmail = async function (id) {
+    const inp = $('fm-partner-email'), out = $('fm-partner-msg'); if (!inp) return;
+    const email = inp.value.trim().toLowerCase();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { out.textContent = 'Email chưa đúng định dạng.'; return; }
+    out.textContent = 'Đang lưu...';
+    try {
+      const r = await supabaseClient.from('bookings').update({ partner_email: email || null }).eq('id', id).select().single();
+      if (r.error) { out.textContent = 'Chưa lưu được: ' + (r.error.message || 'lỗi'); return; }
+      const b = (typeof allBookings !== 'undefined' ? allBookings : []).find((x) => x.id === id); if (b) Object.assign(b, r.data);
+      out.textContent = email ? 'Đã giao cho ' + email + ' ✓' : 'Đã bỏ giao ✓';
+      render();
+    } catch (e) { out.textContent = 'Có lỗi kết nối, thử lại.'; }
+  };
   function renderSync() {
     const box = $('fm-sync'); if (!box) return;
     if (!state.tpl.fields.includes('phong')) { box.innerHTML = ''; return; }
@@ -295,7 +309,8 @@
       const diff = diffOf(b), miss2 = missing();
       const slipBox = state.tpl.id === 'phieu-xn' ? '<div class="fm-sync-row"><button class="btn-export" id="fm-slip-save" onclick="saveSlipFields(\'' + esc2(b.id) + '\')">💾 Lưu ưu đãi/số phòng/ghi chú/ngân hàng cho đơn này (đồng bộ mọi máy + hiện đúng trên phiếu khách)</button></div><div id="fm-slip-msg"></div>' : '';
       const invBtn = state.tpl.id === 'phieu-xn' ? '<div class="fm-sync-row"><button class="btn-export" id="fm-inv" style="background:' + (state.f.sai_ck ? '#0b3b46' : '#ea580c') + ';color:#fff" onclick="toggleInvalid(\'' + esc2(b.id) + '\')">' + (state.f.sai_ck ? '↩️ Khôi phục phiếu xanh (đã đối chiếu xong)' : '⚠️ Sai nội dung CK → chuyển phiếu sang cam (Chờ tra soát)') + '</button></div><div id="fm-inv-msg"></div>' : '';
-      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.' + invBtn + slipBox + '</div>'
+      const assignBox = '<div class="fm-sync-row fm-assign-row"><input type="email" id="fm-partner-email" value="' + esc2(b.partner_email || '') + '" placeholder="Email đối tác (để trống = không giao)" style="padding:8px;border:1px solid #ccc;border-radius:8px;min-width:220px" /><button class="btn-export" onclick="assignPartnerEmail(\'' + esc2(b.id) + '\')">Giao cho đối tác</button></div><div id="fm-partner-msg"></div>';
+      box.innerHTML = '<div class="fm-sync ok"><b>✅ Đã đồng bộ</b>: đơn <b>' + esc2(b.booking_code) + '</b> có trong hệ thống (tạo lúc ' + esc2(fmtT(b.created_at)) + ', trạng thái: ' + esc2(typeof normStatus === 'function' ? normStatus(b.status) : b.status) + ').' + via + ' Khách mở được link phiếu: <a href="' + esc2(base2 + 'phieu.html?ma=' + b.booking_code) + '" target="_blank" rel="noopener">xem thử phiếu của khách</a>.' + (b.partner_email ? ' Đang giao cho đối tác: <b>' + esc2(b.partner_email) + '</b>.' : '') + invBtn + slipBox + assignBox + '</div>'
         + (diff.length ? '<div class="fm-sync warn"><b>⚠️ Phiếu đang khác hệ thống</b>: ' + esc2(diff.join(', ')) + '. Khách sẽ chỉ thấy dữ liệu trong hệ thống cho đến khi bạn cập nhật.<div class="fm-sync-row"><button class="btn-export" id="fm-upd"' + (miss2.length ? ' disabled' : '') + ' onclick="updateBookingFromForm(\'' + esc2(b.id) + '\')">Cập nhật đơn theo phiếu này</button></div>' + (miss2.length ? '<small>Còn thiếu: ' + esc2(miss2.join(', ')) + '.</small>' : '') + '<div id="fm-sync-msg"></div></div>' : '');
       return;
     }

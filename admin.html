@@ -11,7 +11,7 @@
     <script src="admin-auth.js?v=20261018a"></script>
     <script src="phieu.js?v=20261019c" defer></script>
     <script src="vendor/html2canvas.min.js" defer></script>
-    <script src="bieu-mau.js?v=20261019b" defer></script>
+    <script src="bieu-mau.js?v=20261023a" defer></script>
     <script src="ai-tro-ly.js?v=20261012a" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
 
@@ -217,6 +217,7 @@
       <div class="menu-item" id="menu-audit" onclick="showPage('audit', this)">🕘 Nhật Ký</div>
       <div class="menu-item" id="menu-security" onclick="showPage('security', this)">🔐 Bảo Mật</div>
       <div class="menu-item" id="menu-settings" onclick="showPage('settings', this)">⚙️ Cài Đặt Chung</div>
+      <div class="menu-item" id="menu-partners" onclick="showPage('partners', this)">🤝 Đối Tác</div>
       <div class="menu-item" onclick="logoutAdmin()">🚪 Đăng Xuất</div>
     </aside>
 
@@ -472,6 +473,28 @@
         <div id="st-msg" class="fin-note" style="margin-top:10px"></div>
       </div>
 
+      <div class="page-section" id="page-partners">
+        <div class="top-bar"><h2>Đối Tác / Sale</h2></div>
+        <p class="fin-note">Trang riêng <code>doi-tac.html</code> cho đối tác/Sale dùng Biểu Mẫu — họ chỉ đăng nhập bằng email dưới đây và chỉ thấy đúng đơn bạn giao (ô "Giao cho đối tác" trong Biểu Mẫu), không thấy đơn của khách khác, không có quyền admin. Xóa khỏi danh sách là mất quyền ngay (không cần đổi mật khẩu).</p>
+        <div class="table-box" style="padding:18px;max-width:560px">
+          <h3 style="margin-top:0">Thêm / đổi mật khẩu đối tác</h3>
+          <label class="fin-note">Email đối tác (họ dùng email này để đăng nhập)</label>
+          <input type="email" id="pt-email" placeholder="doitac@gmail.com" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Tên hiển thị (cho bạn dễ nhận, không bắt buộc)</label>
+          <input type="text" id="pt-label" placeholder="VD: Sale Mai - Resort X" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Mật khẩu tạm (từ 8 ký tự, gửi riêng cho đối tác qua Messenger/Zalo)</label>
+          <input type="text" id="pt-pass" placeholder="Mật khẩu tạm" style="width:100%;margin-bottom:10px">
+          <button class="btn-add" onclick="addPartner()">Lưu</button>
+          <div id="pt-msg" class="fin-note" style="margin-top:8px"></div>
+        </div>
+        <div class="table-box" style="margin-top:16px">
+          <table>
+            <thead><tr><th>Email</th><th>Tên hiển thị</th><th>Ngày thêm</th><th>Thao tác</th></tr></thead>
+            <tbody id="pt-tbody"><tr><td colspan="4" style="text-align:center;color:#888">Đang tải...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- ROOMS PAGE -->
       <div class="page-section" id="page-rooms">
         <div class="top-bar">
@@ -569,6 +592,7 @@
         if (page === 'ai' && window.aiInit) window.aiInit();
         if (page === 'security') loadSecurity();
         if (page === 'settings') loadSettings();
+        if (page === 'partners') loadPartners();
       }
 
 
@@ -1351,6 +1375,40 @@
         const rows = Object.keys(ST_KEYS).map((id) => ({ key: ST_KEYS[id], value: document.getElementById(id).value.trim() || null }));
         const { error } = await supabaseClient.from('site_settings').upsert(rows, { onConflict: 'key' });
         msg.textContent = error ? 'Lỗi: chưa lưu được (' + error.message + ')' : 'Đã lưu. Khách tải lại trang web là thấy thay đổi.';
+      }
+      /* ===== ĐỐI TÁC / SALE (bảng partners + Edge Function partner-invite) ===== */
+      async function loadPartners() {
+        const tb = document.getElementById('pt-tbody'); tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Đang tải...</td></tr>';
+        const { data, error } = await supabaseClient.from('partners').select('*').order('created_at', { ascending: false });
+        if (error || !data) { tb.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#888">Chưa tải được (có thể chưa chạy migration 20261023000000_partners.sql).</td></tr>'; return; }
+        tb.innerHTML = data.length ? data.map((p) => `<tr><td>${esc(p.email)}</td><td>${esc(p.label || '—')}</td><td>${new Date(p.created_at).toLocaleDateString('vi-VN')}</td><td><button class="btn-export" onclick="removePartner('${esc(p.id)}','${esc(p.email)}')">Xóa quyền</button></td></tr>`).join('') : '<tr><td colspan="4" style="text-align:center;color:#888">Chưa có đối tác nào.</td></tr>';
+      }
+      async function addPartner() {
+        const email = document.getElementById('pt-email').value.trim().toLowerCase();
+        const label = document.getElementById('pt-label').value.trim();
+        const password = document.getElementById('pt-pass').value;
+        const msg = document.getElementById('pt-msg');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { msg.textContent = 'Email chưa đúng định dạng.'; return; }
+        if (password.length < 8) { msg.textContent = 'Mật khẩu cần từ 8 ký tự.'; return; }
+        msg.textContent = 'Đang lưu...';
+        try {
+          const ses = await supabaseClient.auth.getSession();
+          const r = await fetch(CFG.url + '/functions/v1/partner-invite', {
+            method: 'POST', headers: { 'Content-Type': 'application/json', apikey: CFG.anonKey, Authorization: 'Bearer ' + ses.data.session.access_token },
+            body: JSON.stringify({ email, label, password })
+          });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok || !d.ok) { msg.textContent = 'Chưa lưu được (' + (d.code || r.status) + ').'; return; }
+          document.getElementById('pt-pass').value = '';
+          msg.textContent = 'Đã lưu ✓ — gửi email và mật khẩu tạm này cho đối tác qua Messenger/Zalo (không gửi bằng email vì nhà chưa có hệ thống email riêng). Nhớ vào Biểu Mẫu chọn đơn rồi "Giao cho đối tác" bằng đúng email này.';
+          loadPartners();
+        } catch (e) { msg.textContent = 'Có lỗi kết nối, thử lại.'; }
+      }
+      async function removePartner(id, email) {
+        if (!confirm('Xóa quyền đối tác "' + email + '"? Họ sẽ không vào được trang doi-tac.html nữa (tài khoản đăng nhập vẫn còn nhưng không còn quyền).')) return;
+        const { error } = await supabaseClient.from('partners').delete().eq('id', id);
+        if (error) { alert('Chưa xóa được: ' + error.message); return; }
+        loadPartners();
       }
       const PIN_ERR = { wrong_old: 'PIN hiện tại chưa đúng.', weak: 'PIN mới quá dễ đoán.', format: 'PIN gồm 6 đến 8 chữ số.', locked: 'Đang bị khóa tạm do nhập sai, hãy thử lại sau.' };
       async function changePin() {

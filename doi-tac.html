@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Biểu Mẫu Đối Tác | Nhà của An Homestay Tà Xùa</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
+  <script src="config.js?v=20261016a"></script>
+  <script src="phieu.js?v=20261019c"></script>
+  <script src="bieu-mau.js?v=20261023a" defer></script>
+  <style>
+    :root { --primary: #0b3b46; --accent: #e8890c; --border: #d3e1e4; --text: #2f251e; --muted: #7a6e65; --bg: #eef4f5; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Montserrat', Arial, sans-serif; }
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 20px 16px 60px; }
+    .top-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .top-bar h2 { font-size: 18px; color: var(--primary); margin: 0; }
+    .btn-add, .btn-export { background: var(--primary); color: #fff; border: 0; border-radius: 8px; padding: 9px 14px; font-weight: 700; font-size: 13px; cursor: pointer; }
+    .btn-export { background: #fff; color: var(--primary); border: 1.5px solid var(--primary); }
+    .fin-note { font-size: 12px; color: #8a6d3b; background: #fff7e6; border-radius: 8px; padding: 8px 12px; margin-bottom: 12px; }
+    .fm-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; } .fm-bar select { padding: 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; min-width: 240px; flex: 1; }
+    .fm-sync { border-radius: 10px; padding: 12px 14px; margin: 10px 0; font-size: 13.5px; line-height: 1.55; } .fm-sync.ok { background: #e8f7ee; border: 1px solid #9bd5b0; color: #14532d; } .fm-sync.warn { background: #fff6e5; border: 1px solid #f0cf8a; color: #6b4a06; }
+    .fm-sync-row { display: none !important; } /* đối tác chỉ xem, không có quyền sửa/tạo đơn — ẩn mọi nút ghi dữ liệu */
+    .fm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 8px; margin-bottom: 14px; }
+    .fm-f span { display: block; font-size: 11px; color: var(--muted); margin-bottom: 3px; } .fm-f input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font: inherit; font-size: 13px; }
+    .fm-f input[type="file"] { padding: 6px 4px; } .fm-file-st { display: block; margin-top: 3px; font-size: 11px; color: var(--muted); } .fm-file-st a { color: #b45309; }
+    .dpaper { background: #fff; max-width: 794px; margin: 0 auto 24px; padding: 48px 56px; box-shadow: 0 6px 26px rgba(0,0,0,.12); font-family: 'Times New Roman', Times, serif; font-size: 15px; line-height: 1.6; color: #000; }
+    .dpaper * { font-family: inherit; } .dpaper p { margin: 6px 0; text-align: justify; } .dpaper .dp-c { text-align: center; }
+    .dp-qh { text-align: center; font-size: 14px; line-height: 1.5; margin-bottom: 14px; } .dp-title { text-align: center; font-size: 19px; margin: 10px 0 6px; }
+    .dp-sign { display: flex; justify-content: space-between; text-align: center; margin: 22px 0 70px; gap: 20px; } .dp-sign > div { flex: 1; }
+    .dpaper.is-land { max-width: 1100px; padding: 0; background: none; box-shadow: none; } .dp-page + .dp-page { margin-top: 28px; padding-top: 28px; border-top: 2px dashed #bbb; }
+    .dp-page.dp-land { margin-left: -56px; margin-right: -56px; }
+    .fm-msgs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 18px; } .fm-msg { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 10px; } .fm-msg b { display: block; font-size: 12px; margin-bottom: 6px; color: var(--primary); } .fm-msg textarea { width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 8px; font: inherit; font-size: 12.5px; resize: vertical; margin-bottom: 6px; }
+    @media print { body.print-doc > *:not(.wrap) { display: none !important; } body.print-doc .wrap > *:not(.dpaper) { display: none !important; } .dp-page { break-after: page; } .dp-page:last-child { break-after: auto; } .dp-page + .dp-page { border: 0; margin: 0; padding: 0; } .dp-page.dp-land { margin: 0; } body.print-doc .dpaper.is-land { max-width: none; } }
+    @media (max-width: 768px) { .dp-page.dp-land { margin-left: -16px; margin-right: -16px; } .dpaper { padding: 22px 16px; font-size: 14px; } }
+    [hidden] { display: none !important; }
+    .auth-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .auth-box { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 32px 28px; width: 100%; max-width: 380px; }
+    .auth-box h1 { font-size: 18px; color: var(--primary); margin: 0 0 4px; } .auth-box .sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+    .auth-box label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; } .auth-box input { width: 100%; padding: 11px; border: 1px solid var(--border); border-radius: 8px; font: inherit; margin-bottom: 12px; }
+    .auth-box button { width: 100%; padding: 12px; background: var(--primary); color: #fff; border: 0; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    .auth-msg { font-size: 13px; color: #b91c1c; min-height: 18px; margin-top: 8px; }
+    header.ptop { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fff; border-bottom: 1px solid var(--border); }
+    header.ptop b { color: var(--primary); } header.ptop button { background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font-size: 12.5px; cursor: pointer; }
+  </style>
+</head>
+<body>
+<div class="auth-wrap no-print" id="login-box">
+  <div class="auth-box">
+    <h1>Nhà của An — Biểu Mẫu Đối Tác</h1>
+    <div class="sub">Đăng nhập bằng email được Nhà của An cấp quyền.</div>
+    <form id="login-form" autocomplete="off">
+      <label for="pl-email">Email</label>
+      <input type="email" id="pl-email" required autocomplete="username" placeholder="email@..." />
+      <label for="pl-pass">Mật khẩu</label>
+      <input type="password" id="pl-pass" required autocomplete="current-password" placeholder="mật khẩu" />
+      <button type="submit" id="pl-btn">Đăng nhập</button>
+      <div class="auth-msg" id="pl-msg"></div>
+    </form>
+  </div>
+</div>
+
+<div id="main-box" hidden>
+  <header class="ptop no-print"><div><b>Nhà của An</b> — Biểu Mẫu Đối Tác</div><button id="logout-btn">Đăng xuất</button></header>
+  <div class="wrap">
+    <div class="top-bar no-print"><h2>Biểu Mẫu</h2><div><button class="btn-add" onclick="printForm()">In / Lưu PDF</button> <button class="btn-export" onclick="exportFormImage()">🖼️ Xuất ảnh (PNG)</button></div></div>
+    <p class="fin-note no-print">Chỉ thấy đúng đơn được Nhà của An giao cho email này. Thông tin điền thêm trên mẫu chỉ nằm trong trình duyệt, không lưu lại.</p>
+    <div class="fm-bar no-print"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
+    <p class="fin-note no-print" id="fm-note"></p>
+    <div class="fm-grid no-print" id="fm-fields"></div>
+    <div class="no-print" id="fm-sync"></div>
+    <h3 class="no-print" style="font-size:14px;margin:6px 0 8px;color:var(--primary)">Tin nhắn gửi khách (sao chép, dán vào Messenger/Zalo)</h3>
+    <div class="fm-msgs no-print" id="fm-msg"></div>
+    <div class="dpaper" id="fm-preview"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const CFG = (window.SITE && window.SITE.supabase) || {};
+  const $ = (id) => document.getElementById(id);
+  const msg = $('pl-msg'), btn = $('pl-btn');
+  if (!CFG.url || !CFG.anonKey) { msg.textContent = 'Chưa cấu hình được, báo Nhà của An.'; btn.disabled = true; return; }
+
+  // Phiên chỉ nằm trong tab này (giống admin.html): đóng tab là tự mất, không dùng chung phiên với admin.
+  const KEY = 'nca-partner-auth', mem = {};
+  const store = {
+    getItem: (k) => { try { const v = window.sessionStorage.getItem(k); return v === null ? (k in mem ? mem[k] : null) : v; } catch (e) { return k in mem ? mem[k] : null; } },
+    setItem: (k, v) => { try { window.sessionStorage.setItem(k, v); } catch (e) { mem[k] = v; } },
+    removeItem: (k) => { try { window.sessionStorage.removeItem(k); } catch (e) {} delete mem[k]; }
+  };
+  const client = window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { storage: store, storageKey: KEY, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
+  window.supabaseClient = client; // bieu-mau.js dùng biến toàn cục này để đọc dữ liệu
+
+  window.loadBookings = async function () {
+    const { data } = await client.from('bookings').select('*').order('created_at', { ascending: false });
+    window.allBookings = data || [];
+    if (window.initForms) window.initForms();
+  };
+
+  function fail(t) { msg.textContent = t; btn.disabled = false; }
+
+  async function enterApp() {
+    const { data: isPartner, error } = await client.rpc('is_partner');
+    if (error || isPartner !== true) { await client.auth.signOut(); fail('Tài khoản này chưa được cấp quyền đối tác. Liên hệ Nhà của An để được thêm.'); return; }
+    $('login-box').hidden = true; $('main-box').hidden = false;
+    await loadBookings();
+  }
+
+  (async function () {
+    const { data } = await client.auth.getSession();
+    if (data && data.session) enterApp();
+  })();
+
+  $('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault(); btn.disabled = true; msg.textContent = '';
+    const email = $('pl-email').value.trim(), password = $('pl-pass').value;
+    const { error } = await client.auth.signInWithPassword({ email, password });
+    $('pl-pass').value = '';
+    if (error) return fail('Email hoặc mật khẩu chưa đúng.');
+    enterApp();
+  });
+  $('logout-btn').addEventListener('click', async () => { await client.auth.signOut(); window.location.reload(); });
+})();
+</script>
+</body>
+</html>

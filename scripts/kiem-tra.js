@@ -35,7 +35,7 @@ if (D) {
 }
 
 // 6. Không để khóa bí mật trong file web
-const quet = ['index.html', 'app.js', 'account.js', 'config.js', 'data.js', 'admin.html', 'auth.html', 'phieu.html', 'admin-auth.js', 'chinh-sach.html'];
+const quet = ['index.html', 'app.js', 'account.js', 'config.js', 'data.js', 'admin.html', 'auth.html', 'phieu.html', 'admin-auth.js', 'chinh-sach.html', 'doi-tac.html', 'bieu-mau.js'];
 for (const f of quet) {
   // bỏ các dòng ghi chú (//...) để lời nhắc "đừng dán service_role" không bị coi là lỗi
   const t = fs.readFileSync(path.join(root, f), 'utf8').split('\n').filter((d) => !/^\s*(\/\/|\/\*|\*|<!--)/.test(d)).join('\n');
