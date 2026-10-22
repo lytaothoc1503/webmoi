@@ -46,13 +46,13 @@
 .nca-slip.ns-alert .ns-flow div.on{color:#9a3412}.nca-slip.ns-alert .ns-flow div.cur{border-color:#dc2626;color:#b91c1c}
 .ns-alertbox{grid-column:2/4;border:2px solid #ea580c;background:#fff1e6;border-radius:6px;padding:10px 12px;color:#431407}
 .ns-contactbox{grid-column:2/4;border:2px solid #2563eb;background:#eff6ff;border-radius:6px;padding:10px 12px;color:#172554}.ns-contactbox h5{margin:0 0 6px;color:#1d4ed8;font-size:13.5px}.ns-contactbox p{margin:4px 0}
-@media(max-width:760px){.ns-contactbox{grid-column:auto}}
+@media screen and (max-width:760px){.ns-contactbox{grid-column:auto}}
 .ns-alertbox h5{margin:0 0 6px;color:#c2410c;font-size:13.5px;letter-spacing:.02em}.ns-alertbox ul{margin:0;padding-left:18px}.ns-alertbox li{margin:3px 0}
-@media(max-width:760px){.ns-alertbox{grid-column:auto}}
+@media screen and (max-width:760px){.ns-alertbox{grid-column:auto}}
 @media print{body.print-phieu>*:not(#phieu-modal){display:none!important}body.print-phieu #phieu-modal{position:static!important;background:none!important;display:block!important;padding:0!important;overflow:visible!important}body.print-phieu #phieu-modal .modal-box{box-shadow:none!important;max-width:none!important;padding:0!important}body.print-phieu #phieu-modal .modal-close,body.print-phieu #phieu-modal .oc-btn{display:none!important}}
 @page nca-land{size:A4 landscape;margin:0}
 @media print{.nca-slip{page:nca-land;width:auto;max-width:none;margin:8mm;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-@media(max-width:760px){.nca-slip{flex-direction:column}.ns-side{flex:none;flex-direction:row;gap:12px;padding:12px;text-align:left}.ns-side svg.mark{width:42px;height:42px}.ns-side svg.hill{display:none}.ns-main{margin:8px;padding:14px 12px}.ns-title{font-size:19px}.ns-grid,.ns-pay{grid-template-columns:1fr}.ns-qr{width:100%;max-width:220px;margin:0 auto}.ns-flow{flex-wrap:wrap}.ns-flow div{flex:1 1 45%}}
+@media screen and (max-width:760px){.nca-slip{flex-direction:column}.ns-side{flex:none;flex-direction:row;gap:12px;padding:12px;text-align:left}.ns-side svg.mark{width:42px;height:42px}.ns-side svg.hill{display:none}.ns-main{margin:8px;padding:14px 12px}.ns-title{font-size:19px}.ns-grid,.ns-pay{grid-template-columns:1fr}.ns-qr{width:100%;max-width:220px;margin:0 auto}.ns-flow{flex-wrap:wrap}.ns-flow div{flex:1 1 45%}}
 /* Bố cục 2 "Băng ảnh ngang": thay khung bên trái bằng dải tiêu đề nằm ngang trên cùng (lấy cảm hứng bố cục từ ảnh mẫu khách sạn, KHÔNG dùng ảnh/logo thật của họ — chỉ dùng màu + hoạ tiết núi vẽ bằng SVG của Nhà của An). */
 .nca-slip.ns-cover{display:block;max-width:900px}
 .nca-slip.ns-cover .ns-side{display:none}
@@ -65,7 +65,7 @@
 .nca-slip.ns-cover .ns-banner .ns-sub{position:relative;color:#f0dcae}
 .nca-slip.ns-cover .ns-banner .ns-code{position:relative;margin-top:10px}
 .nca-slip.ns-cover .ns-main{margin:0;border:0;outline:0;padding:20px 26px 16px}
-@media(max-width:760px){.nca-slip.ns-cover .ns-main{padding:16px 14px}.nca-slip.ns-cover .ns-banner{padding:18px 14px 16px}}
+@media screen and (max-width:760px){.nca-slip.ns-cover .ns-main{padding:16px 14px}.nca-slip.ns-cover .ns-banner{padding:18px 14px 16px}}
 /* Bố cục 3 "Thẻ nổi": nền màu kín trang, nội dung nằm trong 1 thẻ trắng bo góc nổi lên giữa nền màu (không ảnh/logo thật, chỉ màu theo tông đang chọn) */
 .nca-slip.ns-float{display:block;max-width:900px}
 .nca-slip.ns-float .ns-side{display:none}
@@ -77,7 +77,7 @@
 .nca-slip.ns-float .ns-fl-head .ns-title{color:#fff}
 .nca-slip.ns-float .ns-fl-head .ns-sub{color:#f0dcae}
 .nca-slip.ns-float .ns-main{margin:0 20px 22px;border:0;outline:0;background:var(--cream);border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.28);padding:20px 24px 16px}
-@media(max-width:760px){.nca-slip.ns-float .ns-fl-head{padding:18px 14px 10px}.nca-slip.ns-float .ns-main{margin:0 10px 16px;padding:14px 12px;border-radius:10px}}
+@media screen and (max-width:760px){.nca-slip.ns-float .ns-fl-head{padding:18px 14px 10px}.nca-slip.ns-float .ns-main{margin:0 10px 16px;padding:14px 12px;border-radius:10px}}
 /* Bố cục 4 "Giản dị": không khung bên, không dải màu — chữ nằm thẳng trên nền giấy, chỉ có hoạ tiết lá góc trang trí nhẹ (vẽ bằng SVG, không dùng ảnh thật) */
 .nca-slip.ns-plain{display:block;max-width:900px;border:1px solid var(--gold)}
 .nca-slip.ns-plain .ns-side{display:none}
@@ -86,7 +86,7 @@
 .nca-slip.ns-plain .ns-plain-head{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px}
 .nca-slip.ns-plain .ns-plain-head img.mark,.nca-slip.ns-plain .ns-plain-head svg.mark{width:30px;height:30px;border-radius:50%;object-fit:cover;background:#fff;border:1px solid var(--gold)}
 .nca-slip.ns-plain .ns-plain-head .cv-brand{font-size:10px;letter-spacing:.22em;color:var(--gold)}
-@media(max-width:760px){.nca-slip.ns-plain .ns-main{padding:16px 14px}.nca-slip.ns-plain svg.ns-leaf{width:44px;height:44px}}`;
+@media screen and (max-width:760px){.nca-slip.ns-plain .ns-main{padding:16px 14px}.nca-slip.ns-plain svg.ns-leaf{width:44px;height:44px}}`;
     document.head.appendChild(st);
   }
 
