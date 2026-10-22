@@ -41,6 +41,7 @@
     nh: ['Ngân hàng nhận', 'text'], stk: ['Số tài khoản nhận', 'text'], ctk: ['Tên chủ tài khoản', 'text'],
     ma_phieu: ['Mã booking trên phiếu khách xuất trình (đối chiếu)', 'text'], khach: ['Số khách', 'text'], sophong: ['Số phòng', 'text'], coc: ['Số tiền cọc (đ)', 'number'], conlai: ['Số tiền cọc còn lại (đ, để trống = web tự tính)', 'number'], uudai: ['Ưu đãi (nếu có)', 'text'], cccd_khach: ['CCCD/hộ chiếu khách (khi nhận phòng)', 'text'], ghichu: ['Ghi chú thêm trên phiếu', 'text'],
     nh_p: ['Ngân hàng hiện trên phiếu (để trống = dùng mặc định config.js)', 'text'], stk_p: ['Số tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], ctk_p: ['Tên chủ tài khoản hiện trên phiếu (để trống = dùng mặc định)', 'text'], qr_img: ['Ảnh QR tự tải lên (thay QR tự tạo)', 'file'],
+    mau_phieu: ['Tông màu phiếu', 'select', [['', 'Mặc định (xanh ngọc)'], ['do', 'Đỏ - vàng'], ['xanh', 'Xanh dương - vàng'], ['la', 'Xanh lá - vàng']]],
     don_vi: ['Tên đơn vị trên phiếu (để trống = Nhà của An)', 'text'], dia_chi_dv: ['Địa chỉ đơn vị (để trống = dùng địa chỉ Nhà của An)', 'text'], hotline_dv: ['Hotline đơn vị (để trống = dùng hotline Nhà của An)', 'text'], logo_dv: ['Logo đơn vị (để trống = dùng logo Nhà của An)', 'file'],
     b_ns: ['Khách: ngày sinh', 'text'], b_cap: ['Khách: CCCD cấp ngày', 'text'], b_noicap: ['Khách: CCCD cấp tại', 'text'], songay: ['Dự kiến hoàn tiền trong (số ngày)', 'text'],
     c_ten: ['Người/đơn vị được ủy quyền: tên (để trống nếu chưa biết)', 'text'], c_cccd: ['Người được ủy quyền: CCCD', 'text'], c_sdt: ['Người được ủy quyền: SĐT', 'text'], c_dc: ['Người được ủy quyền: địa chỉ', 'text'],
@@ -70,15 +71,12 @@
   const bank = (f) => `Chuyển khoản vào tài khoản số ${dots(f.stk, 16)} tại ngân hàng ${dots(f.nh, 14)}, chủ tài khoản ${dots(f.ctk, 18)}`;
 
   const TEMPLATES = [
-    { id: 'phieu-xn', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (gửi khách)', note: 'Khổ ngang A4. Gửi khách sau khi chốt booking; có mã QR khi đã nhập ngân hàng trong config.js.', land: true,
-      fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
-      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, invalid: !!f.sai_ck, invalidReason: f.sai_ly || '' }) },
-    { id: 'phieu-xn-do', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (tông đỏ — bản mẫu để chọn)', note: 'Cùng nội dung với phiếu gốc, chỉ đổi tông màu sang đỏ-vàng (hợp bộ với Fuli8386) để xem thử — CHƯA dùng gửi khách thật, chỉ để chọn mẫu.', land: true,
-      fields: ['ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
-      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, theme: 'do' }) },
-    { id: 'phieu-xn-dv', group: 'Khách đặt phòng', name: 'Phiếu xác nhận đặt phòng (đơn vị khác)', note: 'Giống phiếu xác nhận của Nhà của An, nhưng tên đơn vị và logo tự gõ/tải lên — dùng khi làm sale booking online cho đơn vị khác. Để trống tên/logo thì phiếu vẫn hiện đúng như Nhà của An.', land: true,
-      fields: ['don_vi', 'logo_dv', 'dia_chi_dv', 'hotline_dv', 'ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
-      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, orgName: f.don_vi || undefined, orgAddress: f.dia_chi_dv || undefined, orgPhone: f.hotline_dv || undefined, orgLogo: f.logo_dv || undefined }) },
+    { id: 'phieu-xn', group: 'Phiếu xác nhận đặt phòng', name: 'Phiếu xác nhận đặt phòng (gửi khách)', note: 'Khổ ngang A4. Gửi khách sau khi chốt booking; có mã QR khi đã nhập ngân hàng trong config.js. Chọn được tông màu ở ô "Tông màu phiếu"; để trống thì trên Fuli8386 tự ra tông đỏ-vàng (hợp bộ đối tác), trên admin Nhà của An vẫn tông teal như cũ.', land: true,
+      fields: ['ma', 'mau_phieu', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
+      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, invalid: !!f.sai_ck, invalidReason: f.sai_ly || '', theme: f.mau_phieu || (window.NCA_IS_PARTNER ? 'do' : undefined) }) },
+    { id: 'phieu-xn-dv', group: 'Phiếu xác nhận đặt phòng', name: 'Phiếu xác nhận đặt phòng (đơn vị khác)', note: 'Giống phiếu xác nhận của Nhà của An, nhưng tên đơn vị và logo tự gõ/tải lên — dùng khi làm sale booking online cho đơn vị khác. Để trống tên/logo thì phiếu vẫn hiện đúng như Nhà của An.', land: true,
+      fields: ['don_vi', 'logo_dv', 'dia_chi_dv', 'hotline_dv', 'mau_phieu', 'ma', 'b_ten', 'b_sdt', 'khach', 'phong', 'sophong', 'nhan', 'tra', 'tien', 'uudai', 'coc', 'conlai', 'nh_p', 'stk_p', 'ctk_p', 'qr_img', 'b_cccd', 'ghichu'],
+      body: (f) => window.NCA_slip({ code: f.ma, name: f.b_ten, phone: f.b_sdt, guests: f.khach, room: f.phong, roomNo: f.sophong, checkin: f.nhan, checkout: f.tra, total: f.tien, promo: f.uudai, paid: f.coc === '' || f.coc === undefined ? undefined : f.coc, remainManual: f.conlai === '' || f.conlai === undefined ? undefined : f.conlai, bankName: f.nh_p, accountNo: f.stk_p, accountName: f.ctk_p, qrImage: f.qr_img, cccdLine: true, cccd: f.b_cccd, extra: f.ghichu, nowStep: 2, orgName: f.don_vi || undefined, orgAddress: f.dia_chi_dv || undefined, orgPhone: f.hotline_dv || undefined, orgLogo: f.logo_dv || undefined, theme: f.mau_phieu || (window.NCA_IS_PARTNER ? 'do' : undefined) }) },
     { id: 'phieu-xn-hoan', group: 'Hoàn trả', name: 'Phiếu xác nhận hoàn tiền', note: 'Nhà gửi khách sau khi đã chuyển khoản hoàn tiền, ghi mã giao dịch ngân hàng thật để khách tự đối chiếu với sao kê của mình. Không phải biên bản có chữ ký hai bên.',
       fields: ['ngay', 'diadiem', 'ma', 'b_ten', 'b_sdt', 'tien', 'nh', 'stk', 'ctk', 'ma_gd', 'noidung_ck', 'lydo'],
       body: (f) => `${head(f, 'PHIẾU XÁC NHẬN HOÀN TIỀN')}
@@ -155,7 +153,7 @@
         ${f.lydo ? `<p>Ghi chú thêm: ${dots(f.lydo, 40)}.</p>` : ''}
         <p>Thông báo này lập để lưu hồ sơ và gửi khách tham khảo; không phải văn bản tư vấn pháp lý.</p>${sign1('ĐẠI DIỆN NHÀ CỦA AN', true)}` },
 
-    { id: 'phieu-thu', group: 'Khách đặt phòng', name: 'Phiếu thu tiền đặt cọc / thanh toán', note: 'Xác nhận nhà đã nhận tiền của khách.',
+    { id: 'phieu-thu', group: 'Phiếu thu', name: 'Phiếu thu tiền đặt cọc / thanh toán', note: 'Xác nhận nhà đã nhận tiền của khách.',
       fields: ['ngay', 'diadiem', 'so', 'a_ten', 'b_ten', 'b_sdt', 'ma', 'phong', 'nhan', 'tra', 'tien', 'lydo', 'hinhthuc'],
       body: (f) => `${head(f, 'PHIẾU THU TIỀN')}
         <p><i>${when(f)}</i></p>
@@ -200,14 +198,19 @@
   }
   function drawFields() {
     $('fm-fields').innerHTML = state.tpl.fields.map((k) => {
-      const [label, type] = F[k];
+      const [label, type, opts] = F[k];
       if (type === 'file') {
         const has = !!state.f[k];
         return `<label class="fm-f"><span>${esc2(label)}</span><input data-k="${k}" type="file" accept="image/*" /><small class="fm-file-st">${has ? 'Đã chọn ảnh ✓ — <a href="#" data-clear="' + k + '">xóa ảnh</a>' : 'Chưa chọn ảnh'}</small></label>`;
       }
+      if (type === 'select') {
+        const cur = state.f[k] ?? '';
+        return `<label class="fm-f"><span>${esc2(label)}</span><select data-k="${k}">${(opts || []).map((o) => `<option value="${esc2(o[0])}"${o[0] === cur ? ' selected' : ''}>${esc2(o[1])}</option>`).join('')}</select></label>`;
+      }
       return `<label class="fm-f"><span>${esc2(label)}</span><input data-k="${k}" type="${type}" value="${esc2(state.f[k] ?? '')}" maxlength="120" autocomplete="off" /></label>`;
     }).join('');
     $('fm-fields').querySelectorAll('input[type]:not([type="file"])').forEach((i) => i.addEventListener('input', () => { state.f[i.dataset.k] = i.value.trim(); render(); }));
+    $('fm-fields').querySelectorAll('select[data-k]').forEach((s) => s.addEventListener('change', () => { state.f[s.dataset.k] = s.value; render(); }));
     $('fm-fields').querySelectorAll('input[type="file"]').forEach((i) => i.addEventListener('change', () => {
       const file = i.files && i.files[0]; if (!file) return;
       const rd = new FileReader();

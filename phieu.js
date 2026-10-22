@@ -34,6 +34,12 @@
 .nca-slip.ns-red{--g:#7a0e1c;--gold:#c99a3e;--cream:#fffaf0;border-color:#e3cfa3}
 .nca-slip.ns-red .ns-side{background:linear-gradient(180deg,#7a0e1c,#4a0810);color:#f6e4bd}
 .nca-slip.ns-red .ns-sec td:first-child{background:#fbeedd}.nca-slip.ns-red .ns-note{background:#fbeedd}
+.nca-slip.ns-navy{--g:#0f2a4a;--gold:#c8a24e;--cream:#fdfaf2;border-color:#d8c89a}
+.nca-slip.ns-navy .ns-side{background:linear-gradient(180deg,#0f2a4a,#081a30);color:#f3e6c8}
+.nca-slip.ns-navy .ns-sec td:first-child{background:#f1ecdd}.nca-slip.ns-navy .ns-note{background:#f1ecdd}
+.nca-slip.ns-green{--g:#0f3d2e;--gold:#b98f3e;--cream:#faf8ef;border-color:#d6c99a}
+.nca-slip.ns-green .ns-side{background:linear-gradient(180deg,#0f3d2e,#081f18);color:#ecdfb8}
+.nca-slip.ns-green .ns-sec td:first-child{background:#eef1e5}.nca-slip.ns-green .ns-note{background:#eef1e5}
 .nca-slip.ns-alert{--g:#9a3412;--gold:#ea580c;--cream:#fff7ed;border-color:#fdba74}
 .nca-slip.ns-alert .ns-side{background:linear-gradient(180deg,#c2410c,#7c2d12);color:#ffedd5}
 .nca-slip.ns-alert .ns-sec td:first-child{background:#ffedd5}.nca-slip.ns-alert .ns-note{background:#ffedd5}
@@ -106,7 +112,8 @@
     const ct = !inv && d.contact === true, C2 = (window.SITE || {}).contacts || {};
     const contactBox = `<div class="ns-contactbox"><h4 style="margin:0 0 6px;color:var(--g);font-size:12px">04 TRAO ĐỔI VỚI NHÀ</h4><h5>💬 ĐƠN CẦN LIÊN HỆ NHÀ ĐỂ XỬ LÝ</h5>
       ${d.contactReason ? `<p><b>Nội dung:</b> ${esc(d.contactReason)}</p>` : ''}<p>Quý khách vui lòng nhắn Messenger${C2.phone ? ' hoặc gọi hotline <b>' + esc(C2.phone) + '</b>' : ''} kèm mã đơn <b>${esc(d.code || '')}</b> để nhà hỗ trợ. Quý khách <b>không cần chuyển thêm khoản tiền nào</b> cho đến khi nhà xác nhận lại đơn.</p></div>`;
-    return `<div class="nca-slip${inv ? ' ns-alert' : (d.theme === 'do' ? ' ns-red' : '')}"><div class="ns-side">
+    const themeCls = { do: ' ns-red', xanh: ' ns-navy', la: ' ns-green' }[d.theme] || '';
+    return `<div class="nca-slip${inv ? ' ns-alert' : themeCls}"><div class="ns-side">
       ${orgLogo ? `<img class="mark" src="${esc(orgLogo)}" alt="logo" style="width:64px;height:64px;object-fit:contain;border-radius:12px;background:#fff" />` : `<svg class="mark" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#e8b058"/><path d="M10 23 24 11l14 12v14H10z" fill="#0b3b46"/><path d="m18 28 4 4 8-9" fill="none" stroke="#e8b058" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
       <div><b>${esc(sideName)}</b>${sideTag ? `<small>${esc(sideTag)}</small>` : ''}</div>
       <svg class="hill" viewBox="0 0 190 150" aria-hidden="true"><g fill="none" stroke="#c8902e" stroke-width="1.4" opacity=".85"><path d="M0 120c30-35 55-45 85-20 25-30 55-40 105 0"/><path d="M0 138c40-20 80-25 190 0"/><path d="M40 100l8-34 8 34M30 100h36M95 105l7-28 7 28M86 105h32M140 98l6-24 6 24M132 98h28"/><path d="M20 62c10-8 22-8 30 0M130 40c10-8 24-8 32 0M70 30c8-6 18-6 24 0"/></g></svg></div>
