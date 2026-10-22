@@ -501,6 +501,35 @@
             <tbody id="pt-tbody"><tr><td colspan="4" style="text-align:center;color:#888">Đang tải...</td></tr></tbody>
           </table>
         </div>
+
+        <div class="table-box" style="padding:18px;max-width:560px;margin-top:16px">
+          <h3 style="margin-top:0">🎨 Giao diện trang Fuli8386</h3>
+          <p class="fin-note">Chỉnh chữ/ảnh trên trang Fuli8386 ngay tại đây, không cần sửa code. Ô nào để trống thì trang vẫn dùng chữ/ảnh mặc định có sẵn. Đối tác tải lại trang là thấy thay đổi.</p>
+          <label class="fin-note">Tiêu đề (thay chữ "FULI8386")</label>
+          <input type="text" id="pf-title" placeholder="FULI8386" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Dòng phụ dưới logo (màn đăng nhập)</label>
+          <input type="text" id="pf-tagline" placeholder="Cổng Biểu Mẫu dành riêng cho đối tác hợp tác" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Dòng phụ dưới "Đăng nhập đối tác"</label>
+          <input type="text" id="pf-login-sub" placeholder="Dùng email và mật khẩu đã được cấp để vào xem đơn và làm biểu mẫu." style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Câu chào ở Trang chủ (sau khi đăng nhập)</label>
+          <input type="text" id="pf-home-welcome" placeholder="Đây là nơi bạn xem nhanh các đơn đang được giao..." style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Telegram liên hệ (chỉ gõ tên, không cần @ hay link)</label>
+          <input type="text" id="pf-telegram" placeholder="Xmagic09" style="width:100%;margin-bottom:10px">
+          <label class="fin-note">Logo (vuông, nên dưới 500KB, định dạng .webp/.png)</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <img id="pf-logo-preview" src="" alt="" style="width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid #ddd;display:none">
+            <input type="file" id="pf-logo-file" accept="image/*" style="flex:1">
+            <button type="button" class="btn-export" onclick="pfClearImg('logo')" style="font-size:11px;padding:4px 10px">Dùng mặc định</button>
+          </div>
+          <label class="fin-note">Ảnh nền (ảnh ngang, nên dưới 800KB)</label>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <img id="pf-bg-preview" src="" alt="" style="width:70px;height:46px;object-fit:cover;border:1px solid #ddd;border-radius:4px;display:none">
+            <input type="file" id="pf-bg-file" accept="image/*" style="flex:1">
+            <button type="button" class="btn-export" onclick="pfClearImg('bg')" style="font-size:11px;padding:4px 10px">Dùng mặc định</button>
+          </div>
+          <button class="btn-add" onclick="savePartnerFace()">💾 Lưu giao diện</button>
+          <div id="pf-msg" class="fin-note" style="margin-top:8px"></div>
+        </div>
       </div>
 
       <!-- ROOMS PAGE -->
@@ -600,7 +629,7 @@
         if (page === 'ai' && window.aiInit) window.aiInit();
         if (page === 'security') loadSecurity();
         if (page === 'settings') loadSettings();
-        if (page === 'partners') loadPartners();
+        if (page === 'partners') { loadPartners(); loadPartnerFace(); }
       }
 
 
@@ -1440,6 +1469,50 @@
         const { error } = await supabaseClient.from('partners').delete().eq('id', id);
         if (error) { alert('Chưa xóa được: ' + error.message); return; }
         loadPartners();
+      }
+      /* ===== Giao diện Fuli8386 (các khóa partner_* trong site_settings, trang Fuli8386 đọc công khai) ===== */
+      const PF_KEYS = { 'pf-title': 'partner_title', 'pf-tagline': 'partner_tagline', 'pf-login-sub': 'partner_login_sub', 'pf-home-welcome': 'partner_home_welcome', 'pf-telegram': 'partner_telegram' };
+      let pfImgPending = {}; // ảnh mới chọn nhưng chưa lưu: { logo: dataURL|null-nghĩa-là-xóa, bg: ... }
+      async function loadPartnerFace() {
+        pfImgPending = {};
+        const msg = document.getElementById('pf-msg'); msg.textContent = '';
+        Object.keys(PF_KEYS).forEach((id) => (document.getElementById(id).value = ''));
+        document.getElementById('pf-logo-preview').style.display = 'none';
+        document.getElementById('pf-bg-preview').style.display = 'none';
+        const { data, error } = await supabaseClient.from('site_settings').select('key,value').like('key', 'partner_%');
+        if (error || !data) return;
+        const v = {}; data.forEach((r) => { v[r.key] = r.value; });
+        Object.keys(PF_KEYS).forEach((id) => { if (v[PF_KEYS[id]]) document.getElementById(id).value = v[PF_KEYS[id]]; });
+        if (v.partner_logo_img) { const i = document.getElementById('pf-logo-preview'); i.src = v.partner_logo_img; i.style.display = ''; }
+        if (v.partner_bg_img) { const i = document.getElementById('pf-bg-preview'); i.src = v.partner_bg_img; i.style.display = ''; }
+      }
+      function pfReadFile(which, inputId, previewId, maxKB) {
+        const file = document.getElementById(inputId).files[0]; if (!file) return;
+        if (file.size > maxKB * 1024) { document.getElementById('pf-msg').textContent = 'Ảnh quá nặng (trên ' + maxKB + 'KB), chọn ảnh nhẹ hơn hoặc nén lại.'; document.getElementById(inputId).value = ''; return; }
+        const rd = new FileReader();
+        rd.onload = () => { pfImgPending[which] = rd.result; const i = document.getElementById(previewId); i.src = rd.result; i.style.display = ''; };
+        rd.readAsDataURL(file);
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        const lf = document.getElementById('pf-logo-file'), bf = document.getElementById('pf-bg-file');
+        if (lf) lf.addEventListener('change', () => pfReadFile('logo', 'pf-logo-file', 'pf-logo-preview', 600));
+        if (bf) bf.addEventListener('change', () => pfReadFile('bg', 'pf-bg-file', 'pf-bg-preview', 1000));
+      });
+      function pfClearImg(which) {
+        pfImgPending[which] = null; // null = xóa khi lưu, khác với undefined (= giữ nguyên ảnh cũ)
+        const prev = document.getElementById(which === 'logo' ? 'pf-logo-preview' : 'pf-bg-preview');
+        prev.style.display = 'none'; prev.src = '';
+        document.getElementById(which === 'logo' ? 'pf-logo-file' : 'pf-bg-file').value = '';
+      }
+      async function savePartnerFace() {
+        const msg = document.getElementById('pf-msg'); msg.textContent = 'Đang lưu...';
+        const rows = Object.keys(PF_KEYS).map((id) => ({ key: PF_KEYS[id], value: document.getElementById(id).value.trim() || null }));
+        if ('logo' in pfImgPending) rows.push({ key: 'partner_logo_img', value: pfImgPending.logo });
+        if ('bg' in pfImgPending) rows.push({ key: 'partner_bg_img', value: pfImgPending.bg });
+        const { error } = await supabaseClient.from('site_settings').upsert(rows, { onConflict: 'key' });
+        if (error) { msg.textContent = 'Lỗi: chưa lưu được (' + error.message + (/char_length|value_check/.test(error.message) ? ' — có thể chưa chạy migration 20261023020000_partner_settings_keys.sql' : '') + ')'; return; }
+        pfImgPending = {};
+        msg.textContent = 'Đã lưu. Đối tác tải lại trang Fuli8386 là thấy thay đổi.';
       }
       const PIN_ERR = { wrong_old: 'PIN hiện tại chưa đúng.', weak: 'PIN mới quá dễ đoán.', format: 'PIN gồm 6 đến 8 chữ số.', locked: 'Đang bị khóa tạm do nhập sai, hãy thử lại sau.' };
       async function changePin() {

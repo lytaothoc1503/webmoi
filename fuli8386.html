@@ -106,7 +106,7 @@
 </head>
 <body>
 <div class="bg-art" aria-hidden="true">
-  <img class="bg-photo" src="images/fuli8386-nen.webp" alt="" />
+  <img class="bg-photo" id="fl-bg-img" src="images/fuli8386-nen.webp" alt="" />
   <div class="bg-tint"></div>
   <svg class="leaf tl" viewBox="0 0 120 120"><g fill="none" stroke="#e9c877" stroke-width="2.4"><path d="M10 10c30 4 46 20 50 50-30-4-46-20-50-50Z" fill="#c99a3e" opacity=".55"/><path d="M14 14c24 8 34 22 38 42" stroke="#8a0f1f" stroke-width="1.4" opacity=".6"/><path d="M34 6c22 10 30 26 32 46-20-8-28-24-32-46Z" fill="#e9c877" opacity=".4"/></g></svg>
   <svg class="leaf tr" viewBox="0 0 120 120"><g fill="none" stroke="#e9c877" stroke-width="2.4"><path d="M10 10c30 4 46 20 50 50-30-4-46-20-50-50Z" fill="#c99a3e" opacity=".5"/></g></svg>
@@ -116,13 +116,13 @@
 <div class="auth-wrap no-print" id="login-box">
   <div class="auth-card">
     <div class="auth-visual">
-      <img src="images/fuli8386-logo.webp" alt="" />
-      <div class="av-text"><span class="av-kicker">ĐỐI TÁC &amp; SALE</span><b>FULI8386</b><span>Cổng Biểu Mẫu dành riêng cho đối tác hợp tác</span></div>
+      <img id="fl-logo-1" src="images/fuli8386-logo.webp" alt="" />
+      <div class="av-text"><span class="av-kicker">ĐỐI TÁC &amp; SALE</span><b id="fl-title-1">FULI8386</b><span id="fl-tagline">Cổng Biểu Mẫu dành riêng cho đối tác hợp tác</span></div>
     </div>
     <div class="auth-form">
       <div class="af-eyebrow">XIN CHÀO</div>
       <h1>Đăng nhập đối tác</h1>
-      <div class="sub">Dùng email và mật khẩu đã được cấp để vào xem đơn và làm biểu mẫu.</div>
+      <div class="sub" id="fl-login-sub">Dùng email và mật khẩu đã được cấp để vào xem đơn và làm biểu mẫu.</div>
       <form id="login-form" autocomplete="off">
         <label for="pl-email">Email</label>
         <input type="email" id="pl-email" required autocomplete="username" placeholder="email@..." />
@@ -131,15 +131,15 @@
         <button type="submit" id="pl-btn">Đăng nhập</button>
         <div class="auth-msg" id="pl-msg"></div>
       </form>
-      <div class="auth-foot">Chưa có tài khoản? Nhắn Telegram <a href="https://t.me/Xmagic09" target="_blank" rel="noopener">@Xmagic09</a><span id="af-email-wrap"></span> để được cấp quyền.</div>
+      <div class="auth-foot">Chưa có tài khoản? Nhắn Telegram <a id="fl-telegram-link" href="https://t.me/Xmagic09" target="_blank" rel="noopener">@Xmagic09</a><span id="af-email-wrap"></span> để được cấp quyền.</div>
     </div>
   </div>
 </div>
 
 <div id="main-box" hidden>
   <header class="ptop no-print">
-    <div class="brand"><img src="images/fuli8386-logo.webp" alt="Fuli8386" />
-      <div><b>FULI8386</b><small>BIỂU MẪU ĐỐI TÁC</small></div></div>
+    <div class="brand"><img id="fl-logo-2" src="images/fuli8386-logo.webp" alt="Fuli8386" />
+      <div><b id="fl-title-2">FULI8386</b><small>BIỂU MẪU ĐỐI TÁC</small></div></div>
     <button id="logout-btn">Đăng xuất</button>
   </header>
   <div class="wrap">
@@ -152,7 +152,7 @@
       <div class="home-hero">
         <div class="hh-eyebrow">ĐỐI TÁC &amp; SALE</div>
         <h1 id="hh-title">Xin chào!</h1>
-        <p>Đây là nơi bạn xem nhanh các đơn đang được giao và lập đủ loại giấy tờ (phiếu xác nhận, hoàn trả, ủy quyền...) cho khách của mình. Mọi thông tin điền thêm chỉ nằm trong trình duyệt, không lưu lại.</p>
+        <p id="fl-home-welcome">Đây là nơi bạn xem nhanh các đơn đang được giao và lập đủ loại giấy tờ (phiếu xác nhận, hoàn trả, ủy quyền...) cho khách của mình. Mọi thông tin điền thêm chỉ nằm trong trình duyệt, không lưu lại.</p>
       </div>
       <div class="stat-grid" id="hh-stats"></div>
       <div class="home-actions">
@@ -207,6 +207,22 @@
   };
   const client = window.supabase.createClient(CFG.url, CFG.anonKey, { auth: { storage: store, storageKey: KEY, persistSession: true, autoRefreshToken: true, detectSessionInUrl: false } });
   window.supabaseClient = client; // bieu-mau.js dùng biến toàn cục này để đọc dữ liệu
+
+  // Giao diện Fuli8386 (tiêu đề, dòng phụ, Telegram, câu chào Trang chủ, logo, ảnh nền) admin chỉnh ở
+  // mục "🤝 Đối Tác" trong admin.html, lưu vào bảng site_settings (khóa partner_*), đọc công khai (không cần đăng nhập).
+  // Ô nào admin để trống thì giữ nguyên chữ/ảnh mặc định đang có sẵn trong file này.
+  (async function () {
+    const { data } = await client.from('site_settings').select('key,value').like('key', 'partner_%');
+    if (!data || !data.length) return;
+    const v = {}; data.forEach((r) => { v[r.key] = r.value; });
+    if (v.partner_title) { $('fl-title-1').textContent = v.partner_title; $('fl-title-2').textContent = v.partner_title; document.title = v.partner_title + ' — Biểu Mẫu'; }
+    if (v.partner_tagline) $('fl-tagline').textContent = v.partner_tagline;
+    if (v.partner_login_sub) $('fl-login-sub').textContent = v.partner_login_sub;
+    if (v.partner_home_welcome) $('fl-home-welcome').textContent = v.partner_home_welcome;
+    if (v.partner_telegram) { const t = v.partner_telegram.replace(/^@/, ''); $('fl-telegram-link').href = 'https://t.me/' + t; $('fl-telegram-link').textContent = '@' + t; }
+    if (v.partner_logo_img) { $('fl-logo-1').src = v.partner_logo_img; $('fl-logo-2').src = v.partner_logo_img; }
+    if (v.partner_bg_img) $('fl-bg-img').src = v.partner_bg_img;
+  })();
 
   window.loadBookings = async function () {
     const { data } = await client.from('bookings').select('*').order('created_at', { ascending: false });
