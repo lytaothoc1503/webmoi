@@ -268,7 +268,7 @@
     const codeM = raw.match(/\b([A-Z0-9]{8})\b/);
     if (codeM) setF('ma', codeM[1]);
 
-    const nameM = raw.match(/(?:tên khách|họ tên|khách tên|^tên)[:\s]+([^\n,;]{2,40})/im);
+    const nameM = raw.match(/(?:tên khách|họ tên|khách tên|tôi tên|mình tên|em tên|anh tên|chị tên|tôi là|mình là|em là|anh là|chị là|tên là|^tên)(?:\s+là)?[:\s]+([^\n,;.!?]{2,40})/im);
     if (nameM) setF('b_ten', nameM[1].trim());
 
     if (allow.has('phong') && !f.phong && window.SITE_DATA && Array.isArray(window.SITE_DATA.rooms) && window.SITE_DATA.rooms[0] && window.SITE_DATA.rooms[0].name) {
