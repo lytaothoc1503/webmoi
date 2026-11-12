@@ -533,6 +533,54 @@ function showStep(which) {
 function backToStep1() { showStep(1); }
 const bankOn = () => S.bank.bankId && S.bank.accountNo;
 
+/* ===== THANH TOÁN THẺ QUA 9PAY (tắt cho đến khi máy chủ báo đã bật) ===== */
+let ninepayCfg = { enabled: false, depositPercent: null };
+function ninepayLocalPreview() {
+  const h = location.hostname;
+  if (h !== 'localhost' && h !== '127.0.0.1') return null;
+  const q = new URLSearchParams(location.search);
+  if (q.get('xem-9pay') !== '1') return null;
+  const pct = Number(q.get('coc'));
+  return { enabled: true, depositPercent: Number.isInteger(pct) && pct >= 1 && pct <= 99 ? pct : null };
+}
+async function loadNinepay() {
+  const preview = ninepayLocalPreview();
+  if (preview) { ninepayCfg = preview; return; }
+  ninepayCfg = { enabled: false, depositPercent: null };
+  if (!S.supabase || !S.supabase.url || !S.supabase.anonKey) return;
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 4000);
+  try {
+    const r = await fetch(S.supabase.url.replace(/\/$/, '') + '/functions/v1/ninepay-payment?action=status', {
+      signal: ctrl.signal,
+      headers: { apikey: S.supabase.anonKey, Authorization: 'Bearer ' + S.supabase.anonKey },
+    });
+    if (!r.ok) return;
+    const j = await r.json();
+    const pct = Number(j && j.depositPercent);
+    ninepayCfg = { enabled: !!(j && j.enabled === true), depositPercent: Number.isInteger(pct) && pct >= 1 && pct <= 99 ? pct : null };
+  } catch (e) { /* cổng tắt hoặc chưa triển khai: giữ VietQR */ }
+  finally { clearTimeout(timer); }
+}
+function ninepayPortalUrl(raw) {
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== 'https:') return '';
+    if (u.hostname !== 'payment.9pay.vn' && u.hostname !== 'sand-payment.9pay.vn') return '';
+    if (u.pathname !== '/portal') return '';
+    return u.toString();
+  } catch (e) { return ''; }
+}
+const NINE_ERR = {
+  disabled: 'Nhà chưa bật thanh toán thẻ. Bạn dùng chuyển khoản VietQR giúp nhé.',
+  not_ready: 'Nhà chưa bật thanh toán thẻ. Bạn dùng chuyển khoản VietQR giúp nhé.',
+  deposit: 'Nhà chưa mở đặt cọc bằng thẻ. Bạn có thể thanh toán đủ hoặc chuyển khoản VietQR.',
+  amount: 'Số tiền chưa đủ điều kiện thanh toán thẻ. Bạn chuyển khoản VietQR hoặc nhắn nhà nhé.',
+  not_found: 'Không tìm thấy đơn để thanh toán. Bạn tra lại mã đơn hoặc nhắn nhà nhé.',
+  closed: 'Đơn này không còn chờ thanh toán.',
+  rate: 'Bạn thao tác hơi nhanh. Đợi một lát rồi thử lại nhé.',
+};
+
 /* ===== TRẠNG THÁI ĐƠN: Chờ thanh toán -> Đã thanh toán, chờ xác nhận -> Đặt phòng thành công -> Hoàn thành (hoặc Hủy) ===== */
 const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản', CONTACT: 'Cần liên hệ nhà' };
 const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
@@ -641,21 +689,40 @@ function renderOrderView() {
   const contactOthers = [C.phone ? `<a href="tel:${esc(C.phone)}">📞 ${esc(C.phone)}</a>` : ''].filter(Boolean).join(' · ');
   let body = '';
   if (st === ST.WAIT) {
-    if (hasQR) {
-      const qr = `https://api.vietqr.io/image/${encodeURIComponent(S.bank.bankId)}-${encodeURIComponent(S.bank.accountNo)}-compact2.png?amount=${total}&addInfo=${encodeURIComponent(o.tcode || o.code)}${S.bank.accountName ? '&accountName=' + encodeURIComponent(S.bank.accountName) : ''}`;
-      body = `<h4 class="ov-h">QUÉT MÃ QR ĐỂ HOÀN TẤT ĐẶT PHÒNG</h4><p class="ov-sub">Vui lòng quét mã QR chuyển khoản giữ chỗ qua tài khoản nhà:</p>
+    const paidSoFar = Math.max(0, Number(o.payAmount) || 0);
+    const due = Math.max(0, total - paidSoFar);
+    const cardOn = ninepayCfg.enabled && total > 0 && due >= 10000;
+    const depositPct = cardOn && paidSoFar === 0 ? ninepayCfg.depositPercent : null;
+    const depositAmt = depositPct ? Math.floor(total * depositPct / 100) : 0;
+    const deposited = paidSoFar > 0 ? `<div class="pay-note ok"><span>Đã đặt cọc qua 9Pay: </span><strong>${money2(paidSoFar)}</strong><span>. Còn lại: </span><strong>${money2(due)}</strong></div>` : '';
+    if (hasQR && due > 0) {
+      const qr = `https://api.vietqr.io/image/${encodeURIComponent(S.bank.bankId)}-${encodeURIComponent(S.bank.accountNo)}-compact2.png?amount=${due}&addInfo=${encodeURIComponent(o.tcode || o.code)}${S.bank.accountName ? '&accountName=' + encodeURIComponent(S.bank.accountName) : ''}`;
+      const qrBlock = `<h4 class="ov-h">QUÉT MÃ QR ĐỂ HOÀN TẤT ĐẶT PHÒNG</h4><p class="ov-sub">Vui lòng quét mã QR chuyển khoản giữ chỗ qua tài khoản nhà:</p>
         <div class="qr-container"><img src="${esc(qr)}" alt="VietQR" /></div>
-        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr>${S.bank.accountName ? `<tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr>` : ''}<tr><td>Số tiền:</td><td style="font-weight:bold;color:#059669">${money2(total)}</td></tr><tr><td>Cú pháp:</td><td style="font-family:monospace;font-weight:bold">${esc(o.tcode || o.code)}</td></tr></table>
-        <button type="button" class="btn-submit-booking" data-ov="paid">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
-        <div class="ov-card"><strong>Chưa muốn thanh toán ngay?</strong><p>Đơn đã được lưu vào lịch sử của bạn. Bạn có thể xem lại, thanh toán sau hoặc trao đổi thêm với nhà trước khi chuyển khoản.</p>
+        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr>${S.bank.accountName ? `<tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr>` : ''}<tr><td>Số tiền:</td><td style="font-weight:bold;color:#059669">${money2(due)}</td></tr><tr><td>Cú pháp:</td><td style="font-family:monospace;font-weight:bold">${esc(o.tcode || o.code)}</td></tr></table>
+        <button type="button" class="btn-submit-booking" data-ov="paid">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>`;
+      const later = `<div class="ov-card"><strong>Chưa muốn thanh toán ngay?</strong><p>Đơn đã được lưu vào lịch sử của bạn. Bạn có thể xem lại, thanh toán sau hoặc trao đổi thêm với nhà trước khi chuyển khoản.</p>
           <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử, thanh toán sau</button><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button></div></div>`;
+      if (cardOn) {
+        const kinds = depositAmt >= 10000 && depositAmt < due
+          ? `<div class="pay-choice pay-amounts"><label><input type="radio" name="pay-kind" value="deposit" checked> <span>Đặt cọc ${depositPct}%: <strong>${money2(depositAmt)}</strong></span></label><label><input type="radio" name="pay-kind" value="full"> <span>Thanh toán đủ phần còn lại: <strong>${money2(due)}</strong></span></label></div>`
+          : `<p class="ov-sub">Thanh toán đủ phần còn lại trên trang 9Pay: <strong>${money2(due)}</strong>.</p>`;
+        body = `${deposited}<div class="pay-choice" role="radiogroup" aria-label="Cách thanh toán"><label class="on"><input type="radio" name="pay-method" value="vietqr" checked> <span>Chuyển khoản VietQR</span></label><label><input type="radio" name="pay-method" value="ninepay"> <span>Thẻ Visa/Mastercard, Apple Pay, Google Pay (qua 9Pay)</span></label></div><p class="pay-card-note">Thanh toán thẻ chỉ diễn ra trên trang bảo mật của 9Pay — Nhà của An không thu thập số thẻ.</p><div id="pay-vietqr">${qrBlock}</div><div id="pay-ninepay" hidden>${kinds}<button type="button" class="btn-submit-booking" data-ov="ninepay">THANH TOÁN QUA 9PAY</button></div>${later}`;
+      } else {
+        body = deposited + qrBlock + later;
+      }
+    } else if (cardOn) {
+      body = `${deposited}<p class="pay-card-note">Thanh toán thẻ chỉ diễn ra trên trang bảo mật của 9Pay — Nhà của An không thu thập số thẻ.</p><p class="ov-sub">Thẻ Visa/Mastercard, Apple Pay, Google Pay (qua 9Pay)</p><button type="button" class="btn-submit-booking" data-ov="ninepay">THANH TOÁN QUA 9PAY</button>`;
     } else {
       body = `<div class="pay-note">Mức giá hoặc thông tin thanh toán của dịch vụ này sẽ được nhà gửi cho bạn qua Messenger. Bạn hãy nhắn kèm <strong>mã đơn</strong>.</div>
         <div class="ov-row"><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử</button></div>`;
     }
     body += `<div class="ov-card support"><strong>🕑 Liên hệ homestay 24/7</strong><p>Cần hỏi thêm về phòng, giá, đường đi hay lịch trình? Nhắn nhà ngay, không cần thanh toán trước.</p>${hours}${contactOthers ? `<div class="ov-others">${contactOthers}</div>` : ''}</div>`;
   } else if (st === ST.PAID) {
-    body = `<div class="pay-note ok">Đã ghi nhận bạn chuyển khoản. Nhà đang đối chiếu giao dịch.</div>
+    const paidMsg = o.payState === 'paid'
+      ? '9Pay đã báo thanh toán thành công. Nhà đang xác nhận đơn. Bạn không cần chuyển khoản thêm.'
+      : 'Đã ghi nhận bạn chuyển khoản. Nhà đang đối chiếu giao dịch.';
+    body = `<div class="pay-note ok">${paidMsg}</div>
       <div class="ov-card confirm"><strong>📄 Nhận phiếu xác nhận dịch vụ chính thức</strong><p>Liên hệ homestay qua Messenger kèm <strong>mã đơn ${esc(o.code)}</strong> và ảnh chụp giao dịch. Nhà sẽ gửi phiếu xác nhận dịch vụ chính thức cho bạn.</p>
       <button type="button" class="btn-send-fb" data-ov="fb">LIÊN HỆ HOMESTAY ĐỂ NHẬN PHIẾU XÁC NHẬN</button>${hours}</div>`;
   } else if (st === ST.OK) {
@@ -679,7 +746,43 @@ $('order-view').addEventListener('click', async (e) => {
   else if (act === 'copy') { toast((await copyText(orderText(o))) ? 'Đã sao chép nội dung đơn' : 'Không sao chép được'); }
   else if (act === 'track') { closeBookingModal(); $('tra-cuu-don').scrollIntoView(); refreshHistory(); }
   else if (act === 'paid') await markPaid(o, b);
+  else if (act === 'ninepay') await startNinepay(o, b);
 });
+$('order-view').addEventListener('change', (e) => {
+  if (e.target && e.target.name === 'pay-method') syncPayChoice();
+});
+function syncPayChoice() {
+  const v = (document.querySelector('input[name="pay-method"]:checked') || {}).value || 'vietqr';
+  const q = $('pay-vietqr'), n = $('pay-ninepay');
+  if (q) q.hidden = v !== 'vietqr';
+  if (n) n.hidden = v !== 'ninepay';
+  document.querySelectorAll('.pay-choice label').forEach((lb) => {
+    const inp = lb.querySelector('input[name="pay-method"]');
+    if (inp) lb.classList.toggle('on', inp.checked);
+  });
+}
+async function startNinepay(o, btn) {
+  if (!db || !S.supabase || !S.supabase.url) { toast('Nhà chưa bật thanh toán thẻ. Bạn dùng chuyển khoản VietQR giúp nhé.'); return; }
+  const kindEl = document.querySelector('input[name="pay-kind"]:checked');
+  const kind = kindEl && kindEl.value === 'deposit' ? 'deposit' : 'full';
+  btn.disabled = true;
+  const old = btn.textContent;
+  btn.textContent = 'Đang chuyển sang trang thanh toán 9Pay...';
+  try {
+    const r = await fetch(S.supabase.url.replace(/\/$/, '') + '/functions/v1/ninepay-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: S.supabase.anonKey, Authorization: 'Bearer ' + S.supabase.anonKey },
+      body: JSON.stringify({ action: 'create', code: o.code, kind, lang: window.getLang ? window.getLang() : 'vi' }),
+    });
+    const j = await r.json().catch(() => ({}));
+    const portal = ninepayPortalUrl(j && j.url);
+    if (!r.ok || !portal) { toast(NINE_ERR[j && j.code] || 'Chưa mở được trang thanh toán. Bạn chuyển khoản VietQR hoặc nhắn nhà nhé.'); btn.disabled = false; btn.textContent = old; return; }
+    location.href = portal;
+  } catch (e) {
+    toast('Chưa mở được trang thanh toán. Bạn chuyển khoản VietQR hoặc nhắn nhà nhé.');
+    btn.disabled = false; btn.textContent = old;
+  }
+}
 async function markPaid(o, btn) {
   if (!db) { toast('Chưa kết nối cơ sở dữ liệu. Hãy nhắn Facebook để nhà xác nhận.'); return; }
   btn.disabled = true;
@@ -694,7 +797,8 @@ async function markPaid(o, btn) {
 // Dữ liệu đơn lấy từ hệ thống (track_booking) — luôn là bản admin lưu mới nhất, giống nhau trên mọi máy
 function rowToOrder(r) {
   return { code: r.booking_code, phone: '', room: r.room, name: r.fullname, checkin: r.checkin, checkout: r.checkout, guests: r.guests || '', notes: '', total: r.total_price, tcode: r.transfer_code || r.booking_code, status: r.status, review: r.review_status, note: r.admin_note || '', created: r.created_at, synced: true,
-    roomNo: r.slip_room_no || '', promo: r.slip_promo || '', slipNote: r.slip_note || '', bankName: r.slip_bank_name || '', accountNo: r.slip_bank_account || '', accountName: r.slip_bank_holder || '' };
+    roomNo: r.slip_room_no || '', promo: r.slip_promo || '', slipNote: r.slip_note || '', bankName: r.slip_bank_name || '', accountNo: r.slip_bank_account || '', accountName: r.slip_bank_holder || '',
+    payState: r.pay_state || '', payAmount: Number(r.pay_amount) || 0, payMethod: r.pay_method || '' };
 }
 // Tham số vẽ phiếu: dùng chung cho tra cứu, lịch sử và trang phieu.html để phiếu ở đâu cũng giống nhau
 function slipArgs(o) {
@@ -761,7 +865,7 @@ function orderCard(o, opt) {
   if (!opt.lookup) act.push(`<button class="oc-link" data-act="remove" data-code="${c}">Xóa khỏi lịch sử</button>`);
   const note = o.gone ? 'Không tìm thấy đơn này trên hệ thống của nhà (có thể đã được xóa).' : !o.synced && !db ? 'Đơn lưu trên thiết bị này. Hãy nhắn Facebook của nhà kèm mã đơn để được xác nhận.' : STMSG[st] || '';
   return `<div class="oc ${cancel ? 'is-cancel' : ''}"><div class="oc-head"><div><strong class="oc-code">${c}</strong><small>${esc(vdate(o.created ? localISO(new Date(o.created)) : ''))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div>
-    <div class="oc-body"><strong>${esc(o.room)}</strong><br>${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))}${o.guests ? ' · ' + esc(o.guests) : ''} · ${Number(o.total) > 0 ? Number(o.total).toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}</div>
+    <div class="oc-body"><strong>${esc(o.room)}</strong><br>${esc(vdate(o.checkin))} → ${esc(vdate(o.checkout))}${o.guests ? ' · ' + esc(o.guests) : ''} · ${Number(o.total) > 0 ? Number(o.total).toLocaleString('vi-VN') + ' đ' : 'Chờ báo giá'}${o.payState === 'paid' ? '<br><small>Thanh toán qua 9Pay</small>' : ''}${o.payState === 'partial' ? '<br><small>Đã đặt cọc qua 9Pay: <b>' + Number(o.payAmount).toLocaleString('vi-VN') + ' đ</b></small>' : ''}</div>
     ${cancel ? '' : `<ol class="oc-steps">${steps}</ol>`}
     ${NEXT[st] ? `<p class="oc-note oc-next"><strong>Bước tiếp theo:</strong> ${esc(NEXT[st])}${st === ST.CANCEL ? ' <a href="chinh-sach.html#hoan-huy" target="_blank" rel="noopener">Chính sách hoàn hủy</a>' : ''}</p>` : ''}
     <p class="oc-note">${esc(note)}${o.note ? '<br><em>Nhà nhắn: ' + esc(o.note) + '</em>' : ''}</p>
@@ -801,8 +905,9 @@ async function trackOrder() {
     if (!r) { show('notfound', 'Không tìm thấy đơn với mã này. Vui lòng kiểm tra lại Mã đơn.'); return; }
     const o = rowToOrder(r);
     lookupCache[o.code] = o;
-    show('found', orderCard(o, { lookup: true }) + lookupExtras(o));
+    show('found', npBanner(o) + orderCard(o, { lookup: true }) + lookupExtras(o));
     if (currentUser) { saveOrder(o); renderHistory(); }
+    scheduleNinepayPoll(o.code);
     return;
   }
   let res; try { res = await db.rpc('track_by_phone', { p_phone: phone }); } catch (e) { res = { error: e }; }
@@ -810,6 +915,26 @@ async function trackOrder() {
   const rows = res.data || [];
   if (!rows.length) { show('notfound', 'Không tìm thấy đơn nào với số điện thoại này. Bạn thử nhập Mã đơn nhé.'); return; }
   show('found', '<div class="oc-note">Tìm thấy ' + rows.length + ' đơn với số điện thoại này. Vì lý do riêng tư, chỉ hiện thông tin tối thiểu. Hãy nhập đủ <strong>Mã đơn</strong> để xem chi tiết.</div>' + rows.map((r) => { const st = normStatus(r.status); return `<div class="oc"><div class="oc-head"><div><strong class="oc-code">${esc(r.code_hint)}</strong><small>${esc(vdate((r.created_at || '').slice(0, 10)))}</small></div><span class="oc-badge ${STCLASS[st] || ''}">${esc(st)}</span></div><div class="oc-body">${esc(r.room)}</div></div>`; }).join(''));
+}
+function npBanner(o) {
+  const np = new URLSearchParams(location.search).get('np') || '';
+  if (!np) return '';
+  const st = normStatus(o.status);
+  if (o.payState === 'paid' || st === ST.PAID || st === ST.OK || st === ST.DONE) return '<div class="pay-note ok">9Pay đã báo thanh toán thành công. Nhà đang xác nhận đơn. Bạn không cần chuyển khoản thêm.</div>';
+  if (o.payState === 'partial') return '<div class="pay-note ok">Đã ghi nhận khoản đặt cọc qua 9Pay. Phần còn lại bạn chuyển khoản hoặc thanh toán tiếp bằng thẻ.</div>';
+  if (np === 'failed') return '<div class="pay-note bad">Giao dịch thẻ chưa thành công. Đơn vẫn chờ thanh toán. Bạn thử lại hoặc chuyển khoản VietQR.</div>';
+  return '<div class="pay-note">9Pay đang gửi kết quả thanh toán. Bạn bấm Tra cứu lại sau một lát nếu trạng thái chưa đổi.</div>';
+}
+let npTries = 0;
+function scheduleNinepayPoll(code) {
+  const np = new URLSearchParams(location.search).get('np') || '';
+  if (!np || npTries >= 4) return;
+  const o = lookupCache[code];
+  if (!o) return;
+  const st = normStatus(o.status);
+  if (o.payState === 'paid' || o.payState === 'partial' || st === ST.PAID || st === ST.OK || st === ST.DONE || st === ST.CANCEL) return;
+  npTries += 1;
+  setTimeout(() => { if ($('track-code') && $('track-code').value.trim().toUpperCase() === code) trackOrder(); }, 2000);
 }
 function onOrderAction(e) {
   const b = e.target.closest('[data-act]'); if (!b) return;
@@ -866,7 +991,7 @@ async function submitReview() {
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
   setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); loadCoffee(); $('ask-cloud').addEventListener('click', askCloud);
-  await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
+  await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ(), loadNinepay()]);
   syncLodgingPrice(); populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
   const ma = (new URLSearchParams(location.search).get('ma') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
