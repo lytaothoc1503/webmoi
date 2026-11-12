@@ -605,6 +605,7 @@
       const normStatus = (s) => ({ 'Chờ duyệt tiền cọc': ST.WAIT, 'Đã duyệt phòng': ST.OK }[s] || s || ST.WAIT);
       // Số tiền ĐÃ THU thật: admin nhập khi xác nhận (received_amount); đơn cũ chưa có thì dùng giá đơn.
       const paidOf = (b) => Number(b.received_amount != null ? b.received_amount : b.total_price) || 0;
+      const payHint = (b) => !b || !b.pay_state ? '' : b.pay_state === 'paid' ? '<br><small>9Pay: đã thanh toán đủ</small>' : b.pay_state === 'partial' ? '<br><small>9Pay: đã đặt cọc ' + esc(vnd(b.pay_amount || 0)) + '</small>' : '';
 
       let allBookings = [];
       let revenueChart = null;
@@ -655,7 +656,7 @@
           const st = normStatus(b.status);
           const act = st === ST.PAID ? `<button class="btn-add" onclick="reconOk('${esc(b.id)}')">Đã nhận tiền</button>` : st === ST.WAIT ? '<small>Chờ khách chuyển</small>' : '✓';
           const slipBtn = st === ST.PAID || st === ST.OK || st === ST.DONE ? ` <button class="btn-export" onclick="openFormsFor('${esc(b.id)}')">Phiếu / Gửi khách</button>` : '';
-          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}${b.received_amount != null && Number(b.received_amount) !== Number(b.total_price) ? `<br><small>Thực nhận: ${esc(vnd(b.received_amount))}</small>` : ''}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
+          return `<tr><td>${esc(b.booking_code || '')}</td><td>${esc(b.fullname)}<br><small>${esc(b.phone)}</small></td><td>${esc(vnd(b.total_price))}${b.received_amount != null && Number(b.received_amount) !== Number(b.total_price) ? `<br><small>Thực nhận: ${esc(vnd(b.received_amount))}</small>` : ''}${payHint(b)}</td><td>${esc(b.transfer_code || '')}</td><td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span></td><td>${act}${slipBtn}</td></tr>`;
         }).join('') || '<tr><td colspan="6" style="text-align:center;color:#888">Chưa có đơn</td></tr>';
       }
       async function reconOk(id) {
@@ -965,7 +966,7 @@
             <td style="font-weight:700; color:#10b981;">${Number(item.total_price || 0).toLocaleString('vi-VN')} đ</td>
             <td><span style="font-family:monospace; background:#eee; padding:3px 6px; border-radius:4px; font-weight:bold; font-size:11px;">${esc(item.transfer_code || 'N/A')}</span></td>
             <td><small>${esc(item.checkin)} → ${esc(item.checkout)}<br>(${esc(item.guests || '2 khách')})</small></td>
-            <td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span>${item.paid_at ? '<br><small>Báo CK: ' + esc(new Date(item.paid_at).toLocaleString('vi-VN')) + '</small>' : ''}${item.admin_note ? '<br><small><em>Ghi chú: ' + esc(item.admin_note) + '</em></small>' : ''}</td>
+            <td><span class="status-badge ${badgeClass(st)}">${esc(st)}</span>${payHint(item)}${item.paid_at && item.pay_state !== 'paid' ? '<br><small>Báo CK: ' + esc(new Date(item.paid_at).toLocaleString('vi-VN')) + '</small>' : ''}${item.admin_note ? '<br><small><em>Ghi chú: ' + esc(item.admin_note) + '</em></small>' : ''}</td>
             <td>${acts.join('')}</td>
           </tr>`;
         }).join('');

@@ -45,5 +45,14 @@ for (const f of quet) {
 }
 if (S && S.socialLogin && (S.socialLogin.facebook || S.socialLogin.google)) console.log('Lưu ý: socialLogin đang bật. Hãy chắc nhà cung cấp đã cấu hình trong Supabase.');
 
+// 7. Cổng 9Pay: không hard-code khóa, và chữ ký khớp mẫu
+for (const f of ['supabase/functions/ninepay-payment/index.ts', 'supabase/functions/ninepay-payment/sign.js']) {
+  const t = fs.readFileSync(path.join(root, f), 'utf8');
+  if (/NINEPAY_(SECRET|CHECKSUM|MERCHANT)_KEY\s*=\s*['"][^'"]+['"]/.test(t)) bao(`${f}: có khóa 9Pay ghi cứng`);
+  if (/secretKey\s*=\s*['"][^'"]+['"]/.test(t)) bao(`${f}: có secretKey ghi cứng`);
+}
+try { cp.execFileSync(process.execPath, [path.join(root, 'scripts/test-ninepay.mjs')], { stdio: 'pipe' }); }
+catch (e) { bao('test-ninepay: ' + String(e.stdout || e.stderr || e.message).split('\n').slice(0, 8).join(' ')); }
+
 if (loi.length) { console.error('KIỂM TRA THẤT BẠI (' + loi.length + ' lỗi):\n- ' + loi.join('\n- ')); process.exit(1); }
 console.log('Kiểm tra đạt: cú pháp, ảnh, cờ "mẫu", dữ liệu, khóa bí mật đều ổn.');
