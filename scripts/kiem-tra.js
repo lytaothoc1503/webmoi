@@ -45,6 +45,26 @@ for (const f of quet) {
 }
 if (S && S.socialLogin && (S.socialLogin.facebook || S.socialLogin.google)) console.log('Lưu ý: socialLogin đang bật. Hãy chắc nhà cung cấp đã cấu hình trong Supabase.');
 
+// 7. Cổng 9Pay: không hard-code khóa, và chữ ký khớp mẫu
+for (const f of ['supabase/functions/ninepay-payment/index.ts', 'supabase/functions/ninepay-payment/sign.js']) {
+  const t = fs.readFileSync(path.join(root, f), 'utf8');
+  if (/NINEPAY_(SECRET|CHECKSUM|MERCHANT)_KEY\s*=\s*['"][^'"]+['"]/.test(t)) bao(`${f}: có khóa 9Pay ghi cứng`);
+  if (/secretKey\s*=\s*['"][^'"]+['"]/.test(t)) bao(`${f}: có secretKey ghi cứng`);
+}
+{
+  const t = fs.readFileSync(path.join(root, 'supabase/functions/ninepay-payment/index.ts'), 'utf8');
+  if (!t.includes('corsFor') || !t.includes('../_shared/cors.ts')) bao('ninepay-payment: thiếu corsFor từ _shared/cors.ts');
+  if (/Access-Control-Allow-Origin["'\s:]*\*/.test(t)) bao('ninepay-payment: còn CORS *');
+  const m120 = fs.readFileSync(path.join(root, 'supabase/migrations/20261112000000_ninepay_payments.sql'), 'utf8');
+  if (/DROP\s+FUNCTION\s+IF\s+EXISTS\s+public\.track_booking/i.test(m120) || /CREATE\s+FUNCTION\s+public\.track_booking/i.test(m120)) {
+    bao('20261112000000: không được DROP/CREATE track_booking (giữ lớp che PII ở 20261116010000)');
+  }
+  const m200 = fs.readFileSync(path.join(root, 'supabase/migrations/20261116020000_track_booking_ninepay.sql'), 'utf8');
+  if (!m200.includes('mask_person_name') || !m200.includes('pay_state')) bao('20261116020000: thiếu che PII hoặc cột pay_*');
+}
+try { cp.execFileSync(process.execPath, [path.join(root, 'scripts/test-ninepay.mjs')], { stdio: 'pipe' }); }
+catch (e) { bao('test-ninepay: ' + String(e.stdout || e.stderr || e.message).split('\n').slice(0, 8).join(' ')); }
+
 if (loi.length) { console.error('KIỂM TRA THẤT BẠI (' + loi.length + ' lỗi):\n- ' + loi.join('\n- ')); process.exit(1); }
 if (!require('./kiem-tra-gia.js').run()) process.exit(1);
 console.log('Kiểm tra đạt: cú pháp, ảnh, cờ "mẫu", dữ liệu, khóa bí mật đều ổn.');
