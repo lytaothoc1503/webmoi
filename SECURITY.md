@@ -1,21 +1,23 @@
-# Security Policy
+# Báo lỗi bảo mật
 
-## Supported Versions
+Website **Nhà của An Homestay Tà Xùa** (repo `lytaothoc1503/webmoi`, tên miền nhacuaantaxua.com).
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+## Phạm vi
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Bản đang chạy trên nhánh `main`. Báo lỗi về đặt phòng, tài khoản, trang quản trị, cơ sở dữ liệu và các hàm máy chủ trong repo này.
 
-## Reporting a Vulnerability
+## Cách báo
 
-Use this section to tell people how to report a vulnerability.
+Dùng **báo cáo lỗ hổng riêng tư** trên GitHub, không mở issue công khai:
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+1. Mở repo [lytaothoc1503/webmoi](https://github.com/lytaothoc1503/webmoi).
+2. Vào tab **Security**.
+3. Chọn **Report a vulnerability** (báo cáo riêng tư) và gửi mô tả.
+
+Đường dẫn trực tiếp: https://github.com/lytaothoc1503/webmoi/security/advisories/new
+
+Không đính kèm mật khẩu, khóa bí mật, mã đơn hay số điện thoại của khách. Repo này không dùng email hay số điện thoại riêng để nhận báo cáo bảo mật.
+
+## Sau khi nhận
+
+Người phụ trách repo xem báo cáo riêng tư và trả lời trên chính cuộc trao đổi đó. Lỗi được xác nhận thì sửa trên `main` rồi báo lại trong cuộc trao đổi. Báo cáo không thuộc phạm vi thì được trả lời và đóng, không công khai chi tiết khai thác.
