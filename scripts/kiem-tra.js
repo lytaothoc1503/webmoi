@@ -46,4 +46,5 @@ for (const f of quet) {
 if (S && S.socialLogin && (S.socialLogin.facebook || S.socialLogin.google)) console.log('Lưu ý: socialLogin đang bật. Hãy chắc nhà cung cấp đã cấu hình trong Supabase.');
 
 if (loi.length) { console.error('KIỂM TRA THẤT BẠI (' + loi.length + ' lỗi):\n- ' + loi.join('\n- ')); process.exit(1); }
+if (!require('./kiem-tra-gia.js').run()) process.exit(1);
 console.log('Kiểm tra đạt: cú pháp, ảnh, cờ "mẫu", dữ liệu, khóa bí mật đều ổn.');

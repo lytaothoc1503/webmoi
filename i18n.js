@@ -411,6 +411,7 @@
 "Theo Dõi Đặt Phòng": "Follow Your Booking",
 "Tra Cứu Đơn Đặt Phòng": "Track Your Booking",
 "Xem tình trạng đơn, thanh toán và đánh giá. Chỉ cần nhập": "See your order status, payment and review. Just enter your",
+"Tra bằng mã đơn vẫn xem được tình trạng. Nhập thêm số điện thoại (chỉ cần 4 số cuối) để phiếu hiện đủ họ tên, lời nhắn của nhà và tài khoản ghi trên đơn.": "You can still see the booking status with just the code. Add the phone number (the last 4 digits are enough) to show the full name, our note and the account written on that booking.",
 "Mã đơn đặt phòng (khuyên dùng):": "Booking code (recommended):",
 "Hoặc Số điện thoại đã đặt:": "Or the phone number used to book:",
 "(nhập đúng mã là xem được, trên mọi thiết bị) hoặc": "(enter the correct code to view it, on any device) or",

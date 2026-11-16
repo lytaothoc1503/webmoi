@@ -597,11 +597,15 @@ function updateLocal(code, patch) { const a = getLocal(); const o = a.find((x) =
 async function createOrder(o) {
   if (!db) return { ok: true, offline: true };
   for (let i = 0; i < 3; i++) {
-    let error = null;
+    let error = null, data = null;
     try {
-      ({ error } = await db.from('bookings').insert({ booking_code: o.code, room: o.room, fullname: o.name, phone: o.phone, checkin: o.checkin, checkout: o.checkout, guests: o.guests, notes: o.notes, total_price: o.total, transfer_code: o.tcode, status: ST.WAIT, user_id: currentUser ? currentUser.id : null }));
+      // Vẫn gửi total_price để bản CSDL chưa chạy migration giá vẫn nhận đơn. Sau khi có trigger, máy chủ ghi đè và select trả số đã tính.
+      ({ data, error } = await db.from('bookings').insert({ booking_code: o.code, room: o.room, fullname: o.name, phone: o.phone, checkin: o.checkin, checkout: o.checkout, guests: o.guests, notes: o.notes, total_price: o.total, transfer_code: o.tcode, status: ST.WAIT, user_id: currentUser ? currentUser.id : null }).select('total_price').maybeSingle());
     } catch (e) { error = { message: String(e && e.message || e) }; }
-    if (!error) return { ok: true };
+    if (!error) {
+      if (data && data.total_price != null && Number.isFinite(Number(data.total_price))) o.total = Number(data.total_price);
+      return { ok: true };
+    }
     if (error.code === '23505') { o.code = newCode(); o.tcode = o.code; continue; }
     return { ok: false, msg: error.message };
   }
@@ -773,12 +777,13 @@ function renderHistory() {
   box.innerHTML = list.length ? list.map(orderCard).join('') : '<div class="oh-empty">Tài khoản của bạn chưa có đơn nào. Sau khi đặt phòng, đơn sẽ hiện ở đây trên mọi thiết bị bạn đăng nhập. Có mã đơn từ nhà? Nhập vào ô tra cứu phía trên.</div>';
 }
 let refreshing = false;
+const phoneTail = (p) => { const d = String(p || '').replace(/\D/g, ''); return d.length >= 4 ? d.slice(-4) : null; };
 async function refreshHistory() {
   if (!db || refreshing) return; refreshing = true;
   try {
     const list = getLocal(); const updates = {};
     await Promise.all(list.map(async (o) => {
-      let res; try { res = await db.rpc('track_booking', { p_code: o.code, p_phone: o.phone }); } catch (e) { return; }
+      let res; try { res = await db.rpc('track_booking', { p_code: o.code, p_phone: phoneTail(o.phone) }); } catch (e) { return; }
       if (res.error) return;
       const r = res.data && res.data[0];
       updates[o.code] = r ? Object.assign(rowToOrder(r), { gone: false, phone: o.phone, notes: o.notes }) : { gone: true };
@@ -795,11 +800,16 @@ async function trackOrder() {
   if (code && !/^[A-Z0-9]{6,20}$/.test(code)) { show('notfound', 'Mã đơn chưa đúng định dạng. Bạn kiểm tra lại giúp nhé.'); return; }
   if (!db) { show('notfound', 'Tra cứu trực tuyến chưa được bật. Bạn hãy nhắn Facebook của nhà kèm mã đơn để được kiểm tra.'); return; }
   if (code) {
-    let res; try { res = await db.rpc('track_booking', { p_code: code, p_phone: null }); } catch (e) { res = { error: e }; }
+    const prev = getLocal().find((x) => x.code === code);
+    const tail = phoneTail(digits) || phoneTail(prev && prev.phone);
+    let res; try { res = await db.rpc('track_booking', { p_code: code, p_phone: tail }); } catch (e) { res = { error: e }; }
     if (res.error) { show('notfound', 'Chưa tra cứu được lúc này, bạn vui lòng thử lại sau.'); return; }
     const r = res.data && res.data[0];
     if (!r) { show('notfound', 'Không tìm thấy đơn với mã này. Vui lòng kiểm tra lại Mã đơn.'); return; }
     const o = rowToOrder(r);
+    if (digits.length >= 9) o.phone = digits;
+    else if (prev && prev.phone) o.phone = prev.phone;
+    else if (tail) o.phone = tail;
     lookupCache[o.code] = o;
     show('found', orderCard(o, { lookup: true }) + lookupExtras(o));
     if (currentUser) { saveOrder(o); renderHistory(); }

@@ -7,7 +7,7 @@ const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&
 window.SITE_DATA = {
   rooms: [
     { name: 'Phòng Gỗ Ngắm Biển Mây', price: 700000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
-      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp
+      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp. Đổi số này thì sửa luôn bảng booking_rate_rules (migration 20261116000000), không thì máy chủ tính theo bảng đó.
       image_url: 'images/phong-an-1.webp', images: ['images/phong-an-2.webp', 'images/phong-an-3.webp', 'images/phong-an-4.webp', 'images/phong-an-5.webp', 'images/phong-an-6.webp', 'images/phong-an-7.webp', 'images/phong-an-8.webp', 'images/phong-an-9.webp'],
       description: 'Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.',
       guests: '2 khách (tối đa 3)', bed: '1 giường đôi', view: 'Biển mây, thung lũng',
