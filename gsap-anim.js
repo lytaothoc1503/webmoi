@@ -29,14 +29,20 @@
     document.querySelectorAll('.section-header, .room-card, .tour-arch-card, .review-card, .duo-card, .kp-card, .gallery-item, .faq-item').forEach(arm);
   }
 
+  var refreshTimer = 0;
+  function scheduleRefresh() {
+    clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(function () { ScrollTrigger.refresh(); }, 150);
+  }
+
   scan();
   ['rooms-grid', 'tours-grid', 'reviews-grid', 'kp-grid', 'gallery-grid', 'faq-list'].forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
     new MutationObserver(function () {
       scan();
-      ScrollTrigger.refresh();
+      scheduleRefresh();
     }).observe(el, { childList: true });
   });
-  window.addEventListener('load', function () { ScrollTrigger.refresh(); });
+  window.addEventListener('load', scheduleRefresh);
 })();

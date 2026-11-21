@@ -21,7 +21,7 @@ html.gsap-on .hero-tagline,
 html.gsap-on .hero-actions { animation: none; }
 .hero-tagline { animation-delay: .12s; }
 .hero-actions { animation-delay: .22s; }
-.hero { background-position: center 30%; will-change: background-position; }
+.hero { background-position: center 30%; }
 
 html.ux-on .ux-prep { opacity: 0; transform: translateY(22px); }
 html.ux-on .ux-prep.ux-in { opacity: 1; transform: none; transition: opacity .55s ease, transform .55s ease; }
@@ -297,6 +297,16 @@ html.ux-on .ux-prep.ux-in { opacity: 1; transform: none; transition: opacity .55
   background: linear-gradient(115deg, #3d2314 0%, #8a4b24 32%, #d4a574 50%, #8a4b24 68%, #3d2314 100%);
   background-size: 220% 100%;
   animation: ux-flow 16s ease-in-out infinite;
+}
+#gioi-thieu::before,
+#khach-noi::before,
+#hang-phong::before,
+#coffee::before,
+#kham-pha::before,
+#tour-ta-xua::before,
+#thu-vien::before,
+#cta-band::before {
+  animation-play-state: var(--ux-play, running);
 }
 @keyframes ux-drift {
   from { transform: translate3d(-3%, -2%, 0); }

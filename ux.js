@@ -368,6 +368,13 @@
   dock();
   lightboxNav();
   bookingExtras();
+  if (!reduce) {
+    const scenes = document.querySelectorAll('#gioi-thieu, #khach-noi, #hang-phong, #coffee, #kham-pha, #tour-ta-xua, #thu-vien, #cta-band');
+    const play = new IntersectionObserver((ents) => {
+      ents.forEach((en) => en.target.style.setProperty('--ux-play', en.isIntersecting ? 'running' : 'paused'));
+    }, { rootMargin: '120px' });
+    scenes.forEach((el) => { el.style.setProperty('--ux-play', 'paused'); play.observe(el); });
+  }
   const modal = $('booking-modal');
   if (modal) new MutationObserver(bookingExtras).observe(modal, { attributes: true, attributeFilter: ['class'] });
   ['gallery-grid', 'kp-grid', 'cf-menu', 'rooms-grid', 'tours-grid', 'reviews-grid', 'faq-list', 'info-body'].forEach((id) => {

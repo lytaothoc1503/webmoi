@@ -118,8 +118,10 @@
       if (mx !== null && my !== null) {
         var mdx = pr.x - mx;
         var mdy = pr.y - my;
-        var mDist = Math.sqrt(mdx * mdx + mdy * mdy);
-        if (mDist < omniRadius && mDist > 1) {
+        var mDistSq = mdx * mdx + mdy * mdy;
+        var omniSq = omniRadius * omniRadius;
+        if (mDistSq < omniSq && mDistSq > 1) {
+          var mDist = Math.sqrt(mDistSq);
           var pull = (1 - mDist / omniRadius) * 0.22 * mult;
           p.x -= (mdx / Math.max(pr.s, 0.35)) * pull * 0.08;
           p.y -= (mdy / Math.max(pr.s, 0.35)) * pull * 0.08;
@@ -147,8 +149,9 @@
         b = projected[j];
         var dx = a.x - b.x;
         var dy = a.y - b.y;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist >= linkDist) continue;
+        var distSq = dx * dx + dy * dy;
+        if (distSq >= linkDist * linkDist) continue;
+        var dist = Math.sqrt(distSq);
         var near = 1 - ((a.depth + b.depth) * 0.5 - 280) / 900;
         if (near < 0.08) near = 0.08;
         var lineAlpha = (1 - dist / linkDist) * (isHero ? 0.34 : 0.2) * mult * near;
@@ -208,7 +211,7 @@
     if (!force && w === viewW && h === viewH && canvas.width) return;
     viewW = w;
     viewH = h;
-    var dpr = Math.min(window.devicePixelRatio || 1, isMobile() ? 1.25 : 1.75);
+    var dpr = Math.min(window.devicePixelRatio || 1, isMobile() ? 1 : 1.25);
     canvas.width = Math.max(1, Math.round(w * dpr));
     canvas.height = Math.max(1, Math.round(h * dpr));
     canvas.style.width = w + 'px';
@@ -230,7 +233,7 @@
 
   function frame(now) {
     if (!running) return;
-    var cap = isMobile() ? 34 : 16;
+    var cap = 32;
     if (now - lastFrame < cap) {
       requestAnimationFrame(frame);
       return;
@@ -247,13 +250,14 @@
     ctx.clearRect(0, 0, viewW, viewH);
     drawField(particles, false, mx, my);
     var band = heroBand();
-    ctx.save();
-    ctx.beginPath();
-    if (band) ctx.rect(0, band.top, viewW, Math.max(0, band.bottom - band.top));
-    else ctx.rect(0, 0, 0, 0);
-    ctx.clip();
-    drawField(heroParticles, true, mx, my);
-    ctx.restore();
+    if (band) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, band.top, viewW, Math.max(0, band.bottom - band.top));
+      ctx.clip();
+      drawField(heroParticles, true, mx, my);
+      ctx.restore();
+    }
     tick += 1;
     if (running) requestAnimationFrame(frame);
   }
