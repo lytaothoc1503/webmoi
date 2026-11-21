@@ -12,6 +12,7 @@
 
   function rise(el, i) {
     if (!el || el.dataset.ux) return;
+    if (document.documentElement.classList.contains('gsap-on')) return;
     el.dataset.ux = '1';
     if (reduce) return;
     el.classList.add('ux-prep');
@@ -83,17 +84,28 @@
       b.addEventListener('click', () => go(n, true));
       dots.appendChild(b);
     });
-    function paint() {
-      hero.style.backgroundImage = "linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.45)), url('" + SLIDES[i].img + "')";
-      hero.style.backgroundSize = "cover";
-      hero.style.backgroundPosition = "center";
-      hero.style.backgroundRepeat = "no-repeat";
+    function paint(instant) {
+      const incoming = layers[shown ^ 1];
+      const current = layers[shown];
+      incoming.style.backgroundImage = "linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.45)), url('" + SLIDES[i].img + "')";
+      if (instant || reduce) {
+        layers.forEach((el) => { el.style.transition = 'none'; el.style.opacity = '0'; });
+        incoming.style.opacity = '1';
+      } else {
+        incoming.style.transition = '';
+        current.style.transition = '';
+        incoming.style.opacity = '1';
+        current.style.opacity = '0';
+        cap.style.opacity = '0';
+        setTimeout(() => { cap.style.opacity = '1'; }, 280);
+      }
+      shown ^= 1;
       cap.textContent = SLIDES[i].cap;
       dots.querySelectorAll('button').forEach((b, n) => b.classList.toggle('on', n === i));
     }
     function go(n, manual) {
       i = (n + SLIDES.length) % SLIDES.length;
-      paint();
+      paint(false);
       if (manual) arm();
     }
     function arm() {
@@ -101,13 +113,20 @@
       if (reduce) return;
       timer = setInterval(() => go(i + 1), 5200);
     }
+    const layers = [document.createElement('div'), document.createElement('div')];
+    layers.forEach((el) => { el.className = 'ux-hero-bg'; el.setAttribute('aria-hidden', 'true'); });
+    hero.prepend(layers[1]);
+    hero.prepend(layers[0]);
+    let shown = 0;
     ui.children[0].addEventListener('click', () => go(i - 1, true));
     ui.children[2].addEventListener('click', () => go(i + 1, true));
-    paint(); arm();
+    paint(true);
+    arm();
     if (!reduce) {
       window.addEventListener('scroll', () => {
         if (window.innerWidth < 760) return;
-        hero.style.backgroundPosition = 'center ' + Math.round(window.scrollY * 0.28) + 'px';
+        const pos = 'center ' + Math.round(window.scrollY * 0.28) + 'px';
+        layers.forEach((el) => { el.style.backgroundPosition = pos; });
       }, { passive: true });
     }
   }
