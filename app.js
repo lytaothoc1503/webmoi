@@ -2,7 +2,7 @@
 const S = window.SITE, D = window.SITE_DATA, C = S.contacts;
 
 // Đo lượt xem bằng Cloudflare Web Analytics (không cookie). Chỉ chạy khi config.js có analyticsToken.
-(function () { const t = S.analyticsToken; if (!t || !/^[a-f0-9]{32}$/i.test(t)) return; const s = document.createElement('script'); s.type = 'module'; s.src = 'https://static.cloudflareinsights.com/beacon.min.js'; s.setAttribute('data-cf-beacon', JSON.stringify({ token: t })); document.head.appendChild(s); })();
+(function () { const t = S.analyticsToken; if (!t || !/^[a-f0-9]{32}$/i.test(t)) return; if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return; const s = document.createElement('script'); s.type = 'module'; s.src = 'https://static.cloudflareinsights.com/beacon.min.js'; s.setAttribute('data-cf-beacon', JSON.stringify({ token: t })); document.head.appendChild(s); })();
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const safeUrl = (u) => (/^(https?:\/\/|images\/|\.\/)/.test(u || '') ? u : '');
@@ -151,7 +151,7 @@ const arg = (s) => esc(String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 async function loadRooms() {
   roomsData = await getList('rooms', D.rooms, 'is_active');
   $('rooms-grid').innerHTML = roomsData.map((r) => `
-    <div class="room-card" onclick="openRoom(${roomsData.indexOf(r)})" style="cursor:pointer">${img(r.image_url, r.name, 'room-thumb')}
+    <div class="room-card" data-price="${Number(r.price) || 0}" onclick="openRoom(${roomsData.indexOf(r)})" style="cursor:pointer">${img(r.image_url, r.name, 'room-thumb')}
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${r.rates ? 'Từ ' : ''}${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}

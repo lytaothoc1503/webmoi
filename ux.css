@@ -1,0 +1,144 @@
+/* Lớp nâng UX — không thay thế CSS gốc */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-title, .hero-tagline, .hero-actions, .ux-prep, .ux-ripple, .room-card, .ux-skel-card { animation: none !important; transition: none !important; }
+  html.ux-on .ux-prep { opacity: 1; transform: none; }
+}
+
+@keyframes ux-rise {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: none; }
+}
+.hero-title, .hero-tagline, .hero-actions { animation: ux-rise .7s ease both; }
+.hero-tagline { animation-delay: .12s; }
+.hero-actions { animation-delay: .22s; }
+.hero { background-position: center 30%; will-change: background-position; }
+
+html.ux-on .ux-prep { opacity: 0; transform: translateY(22px); }
+html.ux-on .ux-prep.ux-in { opacity: 1; transform: none; transition: opacity .55s ease, transform .55s ease; }
+
+.room-card, .tour-arch-card, .review-card, .kp-card, .svc-card, .combo-card {
+  transition: transform .28s ease, box-shadow .28s ease;
+}
+.room-card:hover, .review-card:hover, .kp-card:hover, .svc-card:hover, .combo-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 36px rgba(61, 35, 20, .16);
+}
+
+.btn-hero, .btn-book-room, .btn-submit-booking, .sb-book, .btn-nav-book {
+  position: relative;
+  overflow: hidden;
+}
+.ux-ripple {
+  position: absolute;
+  width: 12px; height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.55);
+  transform: scale(1);
+  animation: ux-rip .55s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes ux-rip { to { transform: scale(18); opacity: 0; } }
+
+.ux-skel { min-height: 180px; }
+.ux-skel-card {
+  height: 280px;
+  border-radius: 16px;
+  background: linear-gradient(100deg, #f3e7da 30%, #fff 50%, #f3e7da 70%);
+  background-size: 200% 100%;
+  animation: ux-shimmer 1.2s ease-in-out infinite;
+}
+.rooms-grid.ux-skel, .reviews-grid.ux-skel { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+.tour-grid.ux-skel, .gallery-grid.ux-skel { display: grid; column-count: unset; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.faq-list.ux-skel .ux-skel-card { height: 54px; margin-bottom: 10px; }
+@keyframes ux-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+.gallery-grid.ux-swipe, #kp-grid.ux-row, .rd-thumbs.ux-row, #cf-menu.ux-row {
+  display: flex;
+  column-count: unset;
+  overflow-x: auto;
+  gap: 14px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  cursor: grab;
+}
+.gallery-grid.ux-swipe:active, #kp-grid.ux-row:active { cursor: grabbing; }
+.gallery-grid.ux-swipe .gallery-item { flex: 0 0 min(78%, 320px); scroll-snap-align: center; margin: 0; }
+#kp-grid.ux-row .kp-card { flex: 0 0 min(78%, 280px); scroll-snap-align: start; }
+.rd-thumbs.ux-row { margin-top: 8px; }
+.rd-thumbs.ux-row button, .rd-thumbs.ux-row img { flex: 0 0 92px; scroll-snap-align: start; }
+.ux-hint { font-size: 12.5px; color: var(--text-muted, #7a6758); margin: 0 0 10px; }
+
+.gallery-lightbox { transition: opacity .28s ease, visibility .28s ease; }
+.gallery-lightbox img { transition: opacity .22s ease, transform .22s ease; max-width: min(92vw, 1100px); }
+.gallery-lightbox img.ux-fade { opacity: 0; transform: scale(.98); }
+.ux-lb-nav {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 46px; height: 46px; border: 0; border-radius: 50%;
+  background: rgba(255,255,255,.92); color: #3d2314; font-size: 26px; cursor: pointer; z-index: 2;
+}
+.ux-lb-prev { left: 16px; }
+.ux-lb-next { right: 16px; }
+.ux-spin-note { font-size: 12.5px; color: #7a6758; margin: 6px 0 0; }
+
+.ux-dock {
+  position: fixed; left: 50%; bottom: 18px; z-index: 1100;
+  transform: translateX(-50%) translateY(140%);
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+  width: min(980px, calc(100% - 20px));
+  background: rgba(61, 35, 20, .96); color: #fff;
+  border-radius: 16px; padding: 10px 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.28);
+  transition: transform .35s ease;
+}
+.ux-dock.on { transform: translateX(-50%); }
+.ux-dock label { display: flex; flex-direction: column; gap: 4px; font-size: 11px; letter-spacing: .04em; min-width: 120px; }
+.ux-dock input[type="date"], .ux-dock input[type="range"] { width: 100%; accent-color: #e8893a; }
+.ux-dock input[type="date"] { background: #fff; color: #3d2314; border: 0; border-radius: 8px; height: 36px; padding: 0 8px; }
+.ux-dock button {
+  background: #e8893a; color: #fff; border: 0; border-radius: 10px;
+  font-weight: 700; padding: 10px 16px; cursor: pointer; white-space: nowrap;
+}
+@media (max-width: 768px) {
+  .ux-dock { display: none; }
+  .sticky-book { display: flex; }
+}
+
+.ux-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+.ux-chips button, .ux-stay {
+  border: 1px solid #e0d0c0; background: #fff; color: #3d2314;
+  border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;
+}
+.ux-chips button.on, .ux-stay.on { background: #3d2314; color: #fff; border-color: #3d2314; }
+.ux-range { display: flex; align-items: center; gap: 10px; }
+.ux-range input { flex: 1; accent-color: #d96b27; }
+.ux-range output { min-width: 92px; font-weight: 700; color: #d96b27; font-size: 13px; }
+
+.ux-hero-ui {
+  position: absolute; right: 6%; bottom: 28px; z-index: 3;
+  display: flex; align-items: center; gap: 8px;
+}
+.ux-hero-ui button {
+  width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.7);
+  background: rgba(0,0,0,.28); color: #fff; cursor: pointer; font-size: 18px;
+}
+.ux-dots { display: flex; gap: 6px; }
+.ux-dots button { width: 9px; height: 9px; padding: 0; border-radius: 50%; border: 0; background: rgba(255,255,255,.45); }
+.ux-dots button.on { background: #fff; width: 22px; border-radius: 9px; }
+.ux-promo {
+  margin-top: 14px; font-size: 13px; letter-spacing: .02em;
+  background: rgba(0,0,0,.28); display: inline-block; padding: 6px 10px; border-radius: 999px;
+}
+
+.ux-filters { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: center; margin: 0 auto 22px; max-width: 720px; }
+.ux-filters label { font-size: 13px; color: #5c4636; display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.ux-filters input[type="range"] { accent-color: #d96b27; width: 100%; }
+
+@media (min-width: 769px) {
+  body.scrolled .sticky-book {
+    display: none;
+  }
+}
