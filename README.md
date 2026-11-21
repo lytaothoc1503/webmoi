@@ -34,6 +34,7 @@ npm install
 npm start                  # servor, tự tải lại khi sửa file
 node scripts/kiem-tra.js   # kiểm tra cú pháp JS, ảnh, cờ dữ liệu mẫu, khóa bí mật
 ```
+`npm install` trỏ Git vào `.githooks`. Lúc commit chỉ kiểm tra file vừa sửa (cú pháp và khóa bí mật). Lúc đẩy lên, nếu có file web thì chạy `kiem-tra.js`. Bỏ qua một lần: `SKIP_HOOKS=1`.
 Kiểm tra giao diện bằng trình duyệt ở 390px (điện thoại) và 1366px (máy tính).
 
 ## Sửa nội dung

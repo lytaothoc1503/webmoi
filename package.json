@@ -2,6 +2,7 @@
   "scripts": {
     "start": "servor --reload",
     "build": "echo \"Static site, no build step required\"",
+    "prepare": "node scripts/bat-hook.js",
     "thong-bao": "wrangler deploy --config cloudflare/thong-bao/wrangler.jsonc",
     "thong-bao:khoa": "powershell -ExecutionPolicy Bypass -File cloudflare/thong-bao/cai-khoa.ps1"
   },
