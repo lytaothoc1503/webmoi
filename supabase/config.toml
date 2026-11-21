@@ -1,0 +1,12 @@
+# Cấu hình backend Supabase của Nhà của An.
+# project đang chạy: hkfprewiprdztmdcoxzz
+project_id = "hkfprewiprdztmdcoxzz"
+
+[functions.customer-signup]
+verify_jwt = false
+
+[functions.notify-booking]
+verify_jwt = false
+
+[functions.partner-invite]
+verify_jwt = true
