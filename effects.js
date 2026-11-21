@@ -23,6 +23,8 @@
   var particles = [];
   var heroParticles = [];
   var running = true;
+  var scrolling = false;
+  var scrollTimer = 0;
   var canvas, ctx, control, output;
   var viewW = 0;
   var viewH = 0;
@@ -43,8 +45,8 @@
 
   function budget(hero) {
     var mobile = isMobile();
-    if (hero) return mobile ? 20 : 44;
-    return mobile ? 32 : 78;
+    if (hero) return mobile ? 0 : 44;
+    return mobile ? 18 : 78;
   }
 
   function spawn(w, h, hero) {
@@ -104,6 +106,7 @@
   }
 
   function drawField(list, isHero, mx, my) {
+    if (!list.length) return;
     var linkDist = (isHero ? 118 : 132) * (0.75 + mult * 0.28);
     var zLimit = isHero ? 110 : 150;
     var omniRadius = mouse.radius * (0.8 + mult * 0.25);
@@ -233,7 +236,11 @@
 
   function frame(now) {
     if (!running) return;
-    var cap = 32;
+    if (scrolling) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    var cap = isMobile() ? 48 : 32;
     if (now - lastFrame < cap) {
       requestAnimationFrame(frame);
       return;
@@ -296,6 +303,12 @@
       try { localStorage.setItem(STORE, String(mult)); } catch (e) { /* bỏ qua nếu trình duyệt chặn */ }
     });
 
+    window.addEventListener('scroll', function () {
+      if (!isMobile()) return;
+      scrolling = true;
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(function () { scrolling = false; }, 160);
+    }, { passive: true });
     window.addEventListener('pointermove', function (e) {
       if (e.pointerType && e.pointerType !== 'mouse') return;
       mouse.x = e.clientX;

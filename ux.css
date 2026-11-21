@@ -346,3 +346,21 @@ html.ux-on .ux-prep.ux-in { opacity: 1; transform: none; transition: opacity .55
   mask-image: linear-gradient(180deg, transparent 0, #000 56px);
 }
 
+@media (max-width: 768px) {
+  #gioi-thieu::before,
+  #khach-noi::before,
+  #hang-phong::before,
+  #coffee::before,
+  #kham-pha::before,
+  #tour-ta-xua::before,
+  #thu-vien::before,
+  #cta-band::before { animation: none; }
+  #thu-vien,
+  #faq,
+  #lien-he,
+  #tra-cuu-don {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+}
+
