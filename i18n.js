@@ -876,6 +876,66 @@
 "Chính sách quyền riêng tư & Điều khoản – Nhà của An Homestay Tà Xùa": "Privacy Policy & Terms – Nhà của An Homestay Tà Xùa",
 "Áp dụng cho website của Nhà của An Homestay Tà Xùa (Tà Xùa, Bắc Yên, Sơn La).": "Applies to the website of Nhà của An Homestay Tà Xùa (Tà Xùa, Bắc Yên, Sơn La).",
 "Khi bạn đặt phòng hoặc dịch vụ: họ tên, số điện thoại, ngày nhận – trả phòng, số khách, ghi chú. Khi bạn tạo tài khoản: họ tên, số điện thoại, năm sinh (không bắt buộc), hoặc tài khoản Google/Facebook nếu bạn chọn đăng nhập bằng các tài khoản đó (chúng tôi chỉ nhận thông tin cơ bản như tên và email mà họ cho phép).": "When you book a room or service: full name, phone number, check-in and check-out dates, number of guests, notes. When you create an account: full name, phone number, year of birth (optional), or your Google/Facebook account if you choose to sign in with them (we only receive basic details such as name and email that they allow).",
+"Xem giá & đặt phòng": "See prices & book",
+"Hai lối vào nhà": "Two ways into the house",
+"Homestay và cà phê, cùng một nơi": "Homestay and coffee, in one place",
+"Phòng gỗ nhìn biển mây, và quán cà phê trên Đỉnh Gió. Bạn có thể ở lại đêm hoặc ghé uống một ly.": "A wooden room facing the sea of clouds, and a café on Dinh Gio. Stay the night, or just stop for a cup.",
+"Giá niêm yết": "Listed prices",
+"Bảng giá phòng": "Room rates",
+"Bảng Giá": "Rates",
+"Một hạng phòng, các căn giống nhau. Giá cho 2 khách một đêm, chưa gồm ăn sáng. Trẻ dưới 6 tuổi miễn phí. Cuối tuần là đêm thứ Sáu và đêm thứ Bảy.": "One room type; the rooms are the same. The rate is for 2 guests per night and does not include breakfast. Children under 6 stay free. Weekend means Friday night and Saturday night.",
+"Combo": "Combo",
+"Cộng thêm vào tiền phòng, tính theo từng khách, từng đêm. Không gồm xe.": "Added to the room rate, per guest, per night. Transport is not included.",
+"Gói ở nhiều ngày": "Multi-night package",
+"AN - COMBO 3 ngày 2 đêm": "AN combo, 3 days 2 nights",
+"Ở 2 đêm, phòng gỗ ngắm biển mây": "2 nights in the wooden room with a sea-of-clouds view",
+"Bữa sáng trong những ngày ở": "Breakfast on the days you stay",
+"Nhà chưa công bố giá niêm yết cho gói 3 ngày 2 đêm. Nhắn nhà để được báo theo lịch. Gói không gồm xe đưa đón.": "We have not published a listed price for the 3-day, 2-night package. Message us for a quote for your dates. The package does not include transfers.",
+"Đặt phòng và hỏi gói này": "Book a room and ask about this package",
+"Ngày thường": "Weekday",
+"Đêm thứ Hai đến thứ Năm": "Monday to Thursday nights",
+"Đêm thứ Sáu và Chủ nhật": "Friday night and Sunday night",
+"Đêm thứ Bảy": "Saturday night",
+"Cuối tuần gồm đêm thứ Sáu và đêm thứ Bảy, hai đêm không cùng giá": "The weekend is Friday night and Saturday night; those two nights are not the same price",
+"Ngày lễ": "Public holidays",
+"Nhà chưa niêm yết giá ngày lễ": "Holiday rates are not listed yet",
+"Mỗi đêm, từ khách thứ 3": "Per night, from the 3rd guest",
+"T6 và CN": "Fri & Sun",
+"Báo đã viết về Tà Xùa": "What the press has written about Ta Xua",
+"Tin du lịch Tà Xùa": "Ta Xua travel notes",
+"Tin Tà Xùa": "Ta Xua notes",
+"Nhà tóm tắt ngắn từ báo, có ngày và đường dẫn bài gốc. Ảnh là của Nhà của An.": "Short summaries from newspapers, with the date and a link to the original. The photos are Nhà của An's.",
+"Nhà không bán tour có hướng dẫn viên. Ba gợi ý dưới đây là lộ trình nhà tư vấn: chỉ đường, cho mượn đèn hoặc áo ấm, và bữa sáng nếu bạn đặt trước.": "We do not sell guided tours. The three ideas below are routes we can talk you through: directions, a loan of a lamp or a warm layer, and breakfast if you order it ahead.",
+"Chọn một nhóm, bấm ảnh để xem lớn.": "Pick a group, then tap a photo to enlarge it.",
+"Tất cả": "All",
+"Săn mây": "Cloud hunting",
+"Phòng": "Rooms",
+"Nhà gỗ": "Wooden house",
+"Đêm Tà Xùa": "Ta Xua at night",
+"Phong cảnh": "Scenery",
+"Khách nói về Nhà của An": "What guests say about Nhà của An",
+"Hai nhận xét khách đã đăng công khai trên Google Maps. Nhà chưa có thêm ảnh chân dung khách được phép dùng.": "Two comments guests posted publicly on Google Maps. We do not yet have more guest portraits we are allowed to use.",
+"Ảnh khách đã chụp tại nhà": "Photos guests took at the house",
+"Đây là ảnh góc nhà, không phải chân dung khách.": "These are photos of the house, not portraits of guests.",
+"Mấy điều khách hay hỏi trước khi lên Tà Xùa. Bấm câu hỏi để xem câu trả lời.": "A few things guests ask before coming up to Ta Xua. Tap a question to read the answer.",
+"Ở 20–22/8/2025": "Stayed 20–22 Aug 2025",
+"Mùa nào dễ gặp biển mây ở Tà Xùa?": "When is a sea of clouds most likely in Ta Xua?",
+"VnExpress giới thiệu Tà Xùa, Bắc Yên, Sơn La, là một điểm săn mây của miền Bắc. Mây dày thường dễ gặp từ khoảng tháng 10 đến tháng 4. Không phải sáng nào cũng có mây: bài khuyên xem dự báo, chọn ngày đêm lạnh và ban ngày có nắng, rồi nhìn hướng mặt trời mọc trước khi ra điểm ngắm.": "VnExpress describes Ta Xua, Bac Yen, Son La, as a cloud-hunting spot in northern Vietnam. Thick cloud is most common from about October to April. Not every morning has cloud: the article suggests checking the forecast, choosing a day that is cold at night and sunny by day, and noting where the sun rises before you head to a viewpoint.",
+"Đường lên Tà Xùa từ Hà Nội": "The road to Ta Xua from Hanoi",
+"Bài trên VnExpress mô tả hướng đi phổ biến: từ Hà Nội theo quốc lộ 32 qua Sơn Tây, cầu Trung Hà tới ngã ba Thu Cúc, rồi rẽ Phù Yên – Bắc Yên theo quốc lộ 37. Đường chính lên trung tâm Tà Xùa đã được trải bê tông, dễ hơn trước; xe khoảng 16 chỗ có thể lên. Đường đèo vẫn nhiều cua, nên đi ban ngày.": "The VnExpress article describes a common route: from Hanoi along Highway 32 through Son Tay and Trung Ha bridge to the Thu Cuc junction, then towards Phu Yen and Bac Yen on Highway 37. The main road up to central Ta Xua is now concrete and easier than before; a 16-seat vehicle can make it. The pass still has many bends, so travel in daylight.",
+"Sống lưng khủng long ở Háng Đồng": "The Dinosaur Spine ridge in Hang Dong",
+"VTV mô tả sống lưng khủng long là lối mòn trên đỉnh, hai bên dốc, ở xã Háng Đồng. Mây Tà Xùa hay đẹp sau mưa phùn, khi trời hửng nắng. Bài nói khu vực đã có chỉ dẫn an toàn hơn, nhưng vẫn phải đi chậm. Nhà không tổ chức tour: muốn đi thì nhắn nhà hỏi đường và mây hôm đó.": "VTV describes the Dinosaur Spine as a path along the summit, steep on both sides, in Hang Dong commune. Cloud at Ta Xua is often best after drizzle, when the sun comes out. The article says the area now has clearer safety signs, but you still need to go slowly. We do not run tours: message us to ask about the path and that day's cloud.",
+"Cung trekking lên đỉnh, khác với điểm ngắm gần nhà": "The trek to the summit is not the short walk from the house",
+"VnExpress kể cung đi từ Trạm Tấu, Yên Bái, lên đỉnh Tà Xùa dài khoảng 12 km. Đoạn sống lưng khoảng 2 km có dây hỗ trợ, hai bên là vực. Đây không phải quãng đi bộ ngắn từ homestay. Muốn đi cung này cần sức khỏe và người quen đường. Nhà chỉ gợi ý, không bán tour.": "VnExpress describes a route from Tram Tau, Yen Bai, up to the Ta Xua summit of about 12 km. Roughly 2 km of the ridge has a support cable, with a drop on both sides. That is not the short walk from the homestay. This route needs fitness and someone who knows the way. We only suggest it; we do not sell tours.",
+"Mùa mưa, một số lối đi có thể bị sạt": "In the rainy season some paths can slip",
+"Dân trí đưa tin đầu tháng 9/2024: sau mưa lớn, người làm du lịch tại Tà Xùa cho biết một số lối ra sống lưng khủng long, mỏm Cá Heo, cây cô đơn và thảo nguyên bị sạt. Đường núi đổi theo từng trận mưa. Trước khi lên, nhắn nhà hỏi đường.": "Dan Tri reported in early September 2024 that after heavy rain, people working in tourism at Ta Xua said some paths out to the Dinosaur Spine, Dolphin Rock, the lone tree and the grassland had slipped. Mountain roads change with each storm. Message us about the road before you come up.",
+"Dậy sớm đón mây, đêm lạnh có thể ngắm sao": "Rise early for the clouds; cold clear nights can show the stars",
+"Báo Nhân Dân ghi mùa mây ở Tà Xùa từ tháng 10 đến tháng 4, và từ trung tâm xã ra sống lưng khoảng 10 km nên cần xuất phát khoảng 4–5 giờ sáng nếu muốn kịp bình minh. Đêm núi có thể xuống khoảng 17°C. Trời quang, ít đèn, có thể ngắm sao. Nhà sẽ báo đêm nào trời đẹp.": "Nhan Dan wrote that cloud season in Ta Xua runs from October to April, and that it is about 10 km from the commune centre to the ridge, so leave around 4–5 am if you want sunrise. Mountain nights can fall to about 17°C. On a clear night with little light you may see the stars. We will tell you which nights look clear.",
+"VnExpress": "VnExpress",
+"VTV": "VTV",
+"Dân trí": "Dan Tri",
+"Báo Nhân Dân": "Nhan Dan",
+"Đêm trời quang trên núi Tà Xùa": "A clear night in the mountains of Ta Xua",
 }/*END*/;
   const KEY = 'na_lang';
   let lang = 'vi';
@@ -928,6 +988,7 @@
   }
   function txt(n) {
     if (!n.parentElement || SKIP[n.parentElement.tagName]) return;
+    if (n.parentElement.closest && n.parentElement.closest('[data-i18n-lock]')) return;
     const v = n.nodeValue, r = tr(v);
     if (r !== v) { orig.set(n, v); n.nodeValue = r; }
   }
@@ -976,6 +1037,7 @@
     if (lang === 'en') walk(document.documentElement); else revert();
     paintSwitch();
     if (lang === 'en') start();
+    if (typeof window.NCA_onLang === 'function') window.NCA_onLang(lang);
   }
   function ensureSwitch() {
     if (!document.querySelector('.lang-switch')) {

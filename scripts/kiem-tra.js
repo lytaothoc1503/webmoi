@@ -20,7 +20,7 @@ const D = sb.window.SITE_DATA, S = sb.window.SITE;
 if (D) {
   // 3. Ảnh trong data.js phải có file thật
   const anh = [];
-  for (const k of ['rooms', 'tours', 'services', 'gallery']) for (const it of D[k] || []) if (it.image_url) anh.push([k, it.name || it.caption, it.image_url]);
+  for (const k of ['rooms', 'tours', 'services', 'gallery', 'hero', 'news']) for (const it of D[k] || []) if (it.image_url) anh.push([k, it.name || it.caption || it.title, it.image_url]);
   for (const [k, ten, u] of anh) if (!/^https?:/.test(u) && !fs.existsSync(path.join(root, u))) bao(`data.js (${k} - ${ten}): thiếu file ảnh ${u}`);
   // 4. Cờ "mẫu" phải tắt, và không có chữ "mẫu" trong nội dung hiển thị
   for (const c of ['catalogIsSample', 'storyIsSample', 'policyIsSample']) if (D[c] !== false) bao(`data.js: ${c} phải là false`);
