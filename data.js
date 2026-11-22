@@ -16,8 +16,8 @@ window.SITE_DATA = {
   // Ưu đãi đang chạy. Trống = ẩn dải ưu đãi. Mẫu: { title, detail, until: 'YYYY-MM-DD' }
   offers: [],
   rooms: [
-    { name: 'Phòng Gỗ Ngắm Biển Mây', price: 700000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
-      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, holiday: null, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp. holiday null = chưa có giá ngày lễ. Đổi số này thì sửa luôn bảng booking_rate_rules (migration 20261116000000), không thì máy chủ tính theo bảng đó.
+    { name: 'Phòng Gỗ Ngắm Biển Mây', price: 600000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
+      rates: { weekday: 600000, friSun: 700000, sat: null }, holiday: null, extraGuestFee: 200000, maxGuests: 3, // T2-T5 600k, T6 và CN 700k, cho 2 khách; người thứ 3 phụ thu 200k. sat null = chủ nhà chưa gửi giá đêm thứ Bảy. holiday null = chưa có giá ngày lễ. Đổi số này thì chạy migration giá mới, không thì máy chủ còn giữ giá cũ.
       image_url: 'images/phong-an-1.webp', images: ['images/phong-an-2.webp', 'images/phong-an-3.webp', 'images/phong-an-4.webp', 'images/phong-an-5.webp', 'images/phong-an-6.webp', 'images/phong-an-7.webp', 'images/phong-an-8.webp', 'images/phong-an-9.webp'],
       description: 'Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.',
       guests: '2 khách (tối đa 3)', bed: '1 giường đôi', view: 'Biển mây, thung lũng',
@@ -169,8 +169,11 @@ window.SITE_DATA = {
   // Giá combo = tổng giá các dịch vụ trong `items` (lấy từ services) x số khách x số đêm; nước uống tặng kèm.
   combo: { name: 'Combo Săn Mây', items: ['Bữa sáng trên mây', 'Trà chiều ngắm hoàng hôn'], waterNote: 'tặng kèm nước uống' },
   // Gói chủ nhắc tên nhưng chưa niêm yết giá. price: 0 = Liên hệ. Không gồm xe.
+  // Gói chủ nhà đang báo khách (22/11). Giá đã gồm xe giường nằm của nhà xe, không phải tour có hướng dẫn viên. Không cộng vào đơn phòng tự động.
   comboMore: [
-    { name: 'AN - COMBO 3 ngày 2 đêm', price: 0, lines: ['Ở 2 đêm, phòng gỗ ngắm biển mây', 'Bữa sáng trong những ngày ở'], note: 'Nhà chưa công bố giá niêm yết cho gói 3 ngày 2 đêm. Nhắn nhà để được báo theo lịch. Gói không gồm xe đưa đón.' },
+    { name: 'Combo 2 ngày 1 đêm', price: 600000, unit: '/ người', weekendPrice: 750000, weekendLabel: 'Đêm thứ Sáu và thứ Bảy',
+      lines: ['Phòng nghỉ 2 ngày 1 đêm', 'Xe giường nằm cabin đôi, khứ hồi', 'Bữa sáng', 'Trà chiều tại quán cà phê'],
+      note: 'Điểm đón: Trường THCS Nam Trung Yên. Xe giường nằm chỉ có chuyến 22h tối. Có thêm giờ đón 7h sáng (không phải xe giường nằm). Giờ về: 12h30 tại homestay. Chuyến 22h tới thị trấn Bắc Yên thì nghỉ tại phòng của nhà xe đến 5h sáng, rồi lên Tà Xùa, đến khoảng 6h sáng. Có thể gửi đồ tại nhà và nhận phòng lúc 14:00. Đây là xe của nhà xe, không phải tour có hướng dẫn viên.' },
   ],
   gallery: [
     { image_url: 'images/hero-san-may.webp', caption: 'Biển mây Tà Xùa', category: 'Săn mây' },

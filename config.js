@@ -18,7 +18,7 @@ window.SITE = {
   contacts: {
     facebook: 'https://www.facebook.com/share/1dCcJYWvU1/',
     messenger: 'https://m.me/104705621935809', // m.me + mã Trang Facebook của nhà
-    phone: '0352554863',
+    phone: '0358314934',
     email: '', // ví dụ: 'ten@gmail.com'
   },
   hideEmptyContacts: true, // true = ẩn hẳn nút chưa có thông tin (hiện chưa dùng Zalo, Gmail)

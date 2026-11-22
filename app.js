@@ -160,6 +160,7 @@ function heroFromSettings(map) {
   return out;
 }
 const img = (u, alt, cls = '') => `<img ${cls ? `class="${cls}"` : ''} src="${esc(safeUrl(u))}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="imgFail(this)" />`;
+const rateMoney = (n) => (Number(n) > 0 ? money(n) : 'Liên hệ');
 const priceHtml = (n, unit) => (Number(n) > 0 ? `${money(n)} <span style="font-size:12px;color:var(--text-muted);font-weight:normal">${unit}</span>` : '<span style="font-size:15px">Liên hệ báo giá</span>');
 const arg = (s) => esc(String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 
@@ -170,7 +171,7 @@ async function loadRooms() {
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${r.rates ? 'Từ ' : ''}${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
-        ${r.rates ? `<div class="room-rates"><span>Ngày thường <b>${esc(money(r.rates.weekday))}</b></span><span>T6 và CN <b>${esc(money(r.rates.friSun))}</b></span><span>Thứ Bảy <b>${esc(money(r.rates.sat))}</b></span></div>` : ''}
+        ${r.rates ? `<div class="room-rates"><span>Thứ 2–5 <b>${esc(rateMoney(r.rates.weekday))}</b></span><span>Thứ 6 và CN <b>${esc(rateMoney(r.rates.friSun))}</b></span><span>Thứ 7 <b>${esc(rateMoney(r.rates.sat))}</b></span></div>` : ''}
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         ${comboPerPerson() > 0 ? `<a class="room-combo-hint" href="#combo" onclick="event.stopPropagation(); event.preventDefault(); scrollToCombo()"><span>Giá chỉ gồm tiền phòng. Muốn kèm ăn sáng và trà chiều: xem</span> <b>${esc(D.combo.name || 'Combo')}</b></a>` : ''}
         <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
@@ -191,12 +192,14 @@ function renderComboCard() {
       <button type="button" class="btn-book-room combo-btn" onclick="openBookingWithCombo()">Chọn phòng + combo</button></div></article>`);
   }
   (D.comboMore || []).forEach((x) => {
-    const price = Number(x.price) > 0 ? esc(money(x.price)) : 'Liên hệ';
-    blocks.push(`<article class="combo-card"><div class="combo-head"><span class="combo-badge">Gói ở nhiều ngày</span><h3 class="combo-name">${esc(x.name || '')}</h3></div>
+    const unit = x.unit ? ' <span>' + esc(x.unit) + '</span>' : '';
+    const price = Number(x.price) > 0 ? esc(money(x.price)) + unit : 'Liên hệ';
+    const wk = Number(x.weekendPrice) > 0 ? `<p class="price-miss">${esc(x.weekendLabel || 'Đêm thứ Sáu và thứ Bảy')}: <b>${esc(money(x.weekendPrice))}</b>${unit}</p>` : '';
+    blocks.push(`<article class="combo-card combo-wide"><div class="combo-head"><span class="combo-badge">Gói nhà đang nhận</span><h3 class="combo-name">${esc(x.name || '')}</h3></div>
       <ul class="combo-list">${(x.lines || []).map((l) => `<li>✓ <span>${esc(l)}</span></li>`).join('')}</ul>
-      ${x.note ? `<p class="price-miss">${esc(x.note)}</p>` : ''}
+      ${wk}${x.note ? `<p class="price-miss">${esc(x.note)}</p>` : ''}
       <div class="combo-foot"><div class="combo-price"><b>${price}</b></div>
-      <button type="button" class="btn-book-room combo-btn" onclick="openBookingModal('', 0)">Đặt phòng và hỏi gói này</button></div></article>`);
+      <button type="button" class="btn-book-room combo-btn" onclick="askCombo()">Nhắn nhà về gói này</button></div></article>`);
   });
   if (!blocks.length) { el.hidden = true; el.innerHTML = ''; return; }
   el.innerHTML = blocks.join('');
@@ -210,9 +213,9 @@ function renderPriceBoard() {
     const rates = r.rates || null;
     const rows = [];
     if (rates) {
-      rows.push(['Ngày thường', money(rates.weekday), 'Đêm thứ Hai đến thứ Năm']);
-      rows.push(['Đêm thứ Sáu và Chủ nhật', money(rates.friSun), '']);
-      rows.push(['Đêm thứ Bảy', money(rates.sat), 'Cuối tuần gồm đêm thứ Sáu và đêm thứ Bảy, hai đêm không cùng giá']);
+      rows.push(['Thứ 2 – thứ 5', rateMoney(rates.weekday), 'Mỗi đêm, cho 2 khách']);
+      rows.push(['Thứ 6 và Chủ nhật', rateMoney(rates.friSun), 'Mỗi đêm, cho 2 khách']);
+      rows.push(['Thứ 7', rateMoney(rates.sat), Number(rates.sat) > 0 ? '' : 'Nhà chưa gửi giá đêm thứ Bảy']);
       rows.push(['Ngày lễ', rates.holiday > 0 ? money(rates.holiday) : 'Liên hệ', 'Nhà chưa niêm yết giá ngày lễ']);
     } else rows.push(['Giá phòng', Number(r.price) > 0 ? money(r.price) : 'Liên hệ', '']);
     if (Number(r.extraGuestFee) > 0) rows.push(['Khách thứ 3', '+' + money(r.extraGuestFee), 'Mỗi đêm, từ khách thứ 3']);
@@ -274,7 +277,7 @@ function openRoom(i) {
   const r = roomsData[i]; if (!r) return;
   const imgs = [r.image_url].concat(r.images || []).filter(Boolean);
   const rows = [['👥', 'Sức chứa', r.guests], ['🛏️', 'Giường', r.bed], ['🏔️', 'View', r.view], ['⏰', 'Nhận phòng', S.checkin], ['🚪', 'Trả phòng', S.checkout]].filter((x) => x[2]);
-  if (r.rates) rows.push(['📅', 'Thứ 2 - Thứ 5', money(r.rates.weekday)], ['📅', 'Thứ 6 và Chủ nhật', money(r.rates.friSun)], ['📅', 'Thứ 7', money(r.rates.sat)], ['👤', 'Khách thứ 3', '+' + money(r.extraGuestFee) + ' / đêm'], ['🧒', 'Trẻ dưới 6 tuổi', 'Miễn phí'], ['🍳', 'Giá phòng', 'Chưa gồm bữa sáng']);
+  if (r.rates) rows.push(['📅', 'Thứ 2 - Thứ 5', rateMoney(r.rates.weekday)], ['📅', 'Thứ 6 và Chủ nhật', rateMoney(r.rates.friSun)], ['📅', 'Thứ 7', rateMoney(r.rates.sat)], ['👤', 'Khách thứ 3', '+' + money(r.extraGuestFee) + ' / đêm'], ['🧒', 'Trẻ dưới 6 tuổi', 'Miễn phí'], ['🍳', 'Giá phòng', 'Chưa gồm bữa sáng']);
   const fb = messengerHref(), tel = C.phone;
   $('info-box').style.maxWidth = '900px';
   $('info-body').innerHTML = `<div class="rd-wrap"><div class="rd-grid">
@@ -438,6 +441,13 @@ function setupStoryAndHero() {
     hero.prepend(v);
   }
 }
+function askCombo() {
+  const msg = 'Chào nhà, mình muốn hỏi Combo 2 ngày 1 đêm (phòng + xe giường nằm khứ hồi + bữa sáng + trà chiều).';
+  const h = messengerHref();
+  if (!h) { toast('Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi combo nhé.'); return; }
+  const pr = copyText(msg); window.open(h, '_blank', 'noopener');
+  pr.then((ok) => toast(ok ? 'Đã sao chép câu hỏi. Hãy dán vào tin nhắn gửi nhà.' : 'Hãy nhắn nhà để hỏi combo.'));
+}
 function askCloud() {
   const msg = 'Chào nhà, sáng mai ở Tà Xùa có săn mây được không ạ?', h = messengerHref();
   if (!h) { toast('Facebook của nhà đang được cập nhật. Bạn gọi ' + (C.phone || 'nhà') + ' để hỏi nhé.'); return; }
@@ -600,14 +610,30 @@ function comboPerPerson() {
   return sum;
 }
 const guestCount = () => { const m = String(($('bk-guests') || {}).value || '').match(/\d+/); return m ? Math.max(1, Math.min(99, parseInt(m[0], 10))) : 2; };
+let priceHold = false;
+function nightAmount(rates, day) {
+  if (!rates) return null;
+  const n = day === 6 ? rates.sat : (day === 5 || day === 0) ? rates.friSun : rates.weekday;
+  return Number(n) > 0 ? Number(n) : null;
+}
 function calculateTotal() {
+  priceHold = false;
   let n = Math.ceil((new Date($('bk-checkout').value) - new Date($('bk-checkin').value)) / 864e5);
   if (isNaN(n) || n < 1) n = 1;
   if (currentItem.rates) {
-    // Giá theo từng đêm: T2-T5, T6 và CN, T7 (tính từ ngày nhận phòng); khách thứ 3 phụ thu; combo tính theo đầu người
+    // Giá theo từng đêm: T2-T5, T6 và CN; T7 chỉ tính khi đã có giá. Khách thứ 3 phụ thu; combo ăn uống tính theo đầu người.
     const a = new Date($('bk-checkin').value + 'T00:00:00'), R = currentItem.rates, valid = !isNaN(a.getTime());
-    let base = 0;
-    for (let i = 0; i < n; i++) { const d = valid ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + i).getDay() : 1; base += d === 6 ? R.sat : (d === 5 || d === 0) ? R.friSun : R.weekday; }
+    let base = 0, missing = false;
+    for (let i = 0; i < n; i++) {
+      const d = valid ? new Date(a.getFullYear(), a.getMonth(), a.getDate() + i).getDay() : 1;
+      const amt = nightAmount(R, d);
+      if (amt == null) missing = true; else base += amt;
+    }
+    if (missing) {
+      priceHold = true;
+      $('bk-total-display').textContent = 'Kỳ này có đêm thứ Bảy. Nhà chưa niêm yết giá đêm thứ Bảy. Bạn nhắn nhà để được báo trước khi đặt.';
+      return 0;
+    }
     const g = Math.min(guestCount(), currentItem.maxGuests || 99);
     const extra = Math.max(0, g - 2) * currentItem.extraGuestFee * n;
     const cb = $('bk-combo'), combo = cb && cb.checked ? comboPerPerson() * g * n : 0;
@@ -717,6 +743,7 @@ $('booking-form-step1').addEventListener('submit', async (e) => {
   if (db && !currentUser) { pendingBooking = true; openAuthModal('Vui lòng đăng nhập hoặc đăng ký để đặt dịch vụ. Thông tin bạn vừa điền được giữ nguyên.'); return; }
   if (!currentItem.name) { alert(D.toursBookable ? 'Vui lòng chọn hạng phòng hoặc tour.' : 'Vui lòng chọn hạng phòng.'); return; }
   if (!/\d/.test($('bk-guests').value)) { alert('Vui lòng ghi số khách bằng chữ số, ví dụ: 2 người lớn.'); return; }
+  if (priceHold || (currentItem.rates && calculateTotal() === 0 && priceHold)) { alert('Kỳ ở này có đêm thứ Bảy. Nhà chưa niêm yết giá đêm thứ Bảy, bạn nhắn nhà để được báo trước khi đặt.'); return; }
   if (currentItem.rates && currentItem.maxGuests && guestCount() > currentItem.maxGuests) { alert('Mỗi phòng ở tối đa ' + currentItem.maxGuests + ' khách. Bạn đặt thêm phòng hoặc nhắn nhà để được hỗ trợ nhé.'); return; }
   const phone = $('bk-phone').value.trim();
   if (phone.replace(/\D/g, '').length < 9) { alert('Số điện thoại chưa hợp lệ.'); return; }
