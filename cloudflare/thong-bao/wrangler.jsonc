@@ -22,5 +22,7 @@
   },
   "routes": [
     { "pattern": "nhacuaantaxua.com/webmoi/*", "zone_name": "nhacuaantaxua.com" }
-  ]
+  ],
+  // Bản xem trước trên pull request không nhận route, queue hay email của production.
+  "previews": {}
 }

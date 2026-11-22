@@ -7,5 +7,7 @@
   },
   "assets": {
     "directory": "."
-  }
+  },
+  // Bắt buộc để lệnh CI `npx wrangler preview` chạy được trên pull request. Khối trống: bản xem trước không gắn route hay queue của production.
+  "previews": {}
 }
