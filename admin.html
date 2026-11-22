@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3" integrity="sha384-dl/4LkSyQ4uEucc48NM6VDZLAjLLq9yMzZ5JLXumBq7Ld33XBof73hseOqPhO89+" crossorigin="anonymous"></script>
     <script src="config.js?v=20261016a"></script>
+    <script src="data.js?v=20261122a"></script>
     <script src="admin-auth.js?v=20261018a"></script>
     <script src="phieu.js?v=20261023h" defer></script>
     <script src="vendor/html2canvas.min.js" defer></script>
@@ -204,6 +205,7 @@
       <div class="menu-item active" id="menu-home" onclick="showPage('home', this)">🏠 Trang Chủ</div>
       <div class="menu-group">🏡 Homestay & Coffee</div>
       <div class="menu-item" id="menu-bookings" onclick="showPage('bookings', this)">📋 Đơn Đặt Phòng</div>
+      <div class="menu-item" id="menu-hero" onclick="showPage('hero', this)">🖼️ Hero</div>
       <div class="menu-item" id="menu-rooms" onclick="showPage('rooms', this)">🏠 Hạng Phòng</div>
       <div class="menu-item" id="menu-tours" onclick="showPage('tours', this)">🧭 Trải Nghiệm</div>
       <div class="menu-item" id="menu-reviews" onclick="showPage('reviews', this)">⭐ Đánh Giá <span id="rv-badge" class="menu-badge" style="display:none"></span></div>
@@ -533,6 +535,20 @@
         </div>
       </div>
 
+      <div class="page-section" id="page-hero">
+        <div class="top-bar">
+          <h2>Hero trang chủ</h2>
+          <button class="btn-add" type="button" onclick="addHeroRow()">+ Thêm slide</button>
+        </div>
+        <p style="background:#e8f6f4;border:1px solid #9ed0c8;border-radius:8px;padding:10px 12px;font-size:13px;margin:0 0 14px">Ảnh và câu chữ slide lưu ở Cài đặt chung (khóa hero_1 đến hero_8). <b>Chưa lưu slide nào thì trang chủ vẫn dùng ảnh mặc định trong code</b>, không bị trắng. Lưu Hero không xóa phòng, đánh giá, ảnh hay FAQ.</p>
+        <div id="hero-rows"></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+          <button class="btn-add" type="button" onclick="saveHeroAdmin()">Lưu Hero</button>
+          <button class="btn-export" type="button" onclick="clearHeroAdmin()">Xóa bản lưu, dùng mặc định</button>
+        </div>
+        <div id="hero-msg" class="fin-note" style="margin-top:8px"></div>
+      </div>
+
       <!-- ROOMS PAGE -->
       <div class="page-section" id="page-rooms">
         <div class="top-bar">
@@ -559,6 +575,7 @@
           <h2>Quản Lý Đánh Giá Khách</h2>
           <button class="btn-add" onclick="openReviewModal()">+ Thêm Đánh Giá</button>
         </div>
+        <p style="background:#fff7e0;border:1px solid #e6c36a;border-radius:8px;padding:10px 12px;font-size:13px;margin:0 0 14px">⚠️ Đánh giá trên web đang lấy từ <b>data.js</b> khi danh sách này trống. Thêm một mục ở đây thì web chỉ hiện các mục trong danh sách này.</p>
         <div class="card-grid" id="reviews-manage-grid"></div>
       </div>
 
@@ -568,6 +585,7 @@
           <h2>Quản Lý Thư Viện Ảnh</h2>
           <button class="btn-add" onclick="openGalleryModal()">+ Thêm Ảnh</button>
         </div>
+        <p style="background:#fff7e0;border:1px solid #e6c36a;border-radius:8px;padding:10px 12px;font-size:13px;margin:0 0 14px">⚠️ Thư viện trên web đang lấy từ <b>data.js</b> khi danh sách này trống. Thêm một ảnh ở đây thì web chỉ hiện các ảnh trong danh sách này. Ô Danh mục nên ghi đúng: Săn mây, Phòng, Coffee, Nhà gỗ, Đêm Tà Xùa, Phong cảnh.</p>
         <div class="card-grid" id="gallery-manage-grid"></div>
       </div>
 
@@ -577,6 +595,7 @@
           <h2>Quản Lý Câu Hỏi Thường Gặp</h2>
           <button class="btn-add" onclick="openFaqModal()">+ Thêm Câu Hỏi</button>
         </div>
+        <p style="background:#fff7e0;border:1px solid #e6c36a;border-radius:8px;padding:10px 12px;font-size:13px;margin:0 0 14px">⚠️ Câu hỏi trên web đang lấy từ <b>data.js</b> khi danh sách này trống. Thêm một câu ở đây thì web chỉ hiện các câu trong danh sách này.</p>
         <div class="card-grid" id="faq-manage-grid"></div>
       </div>
     </main>
@@ -617,6 +636,7 @@
         document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
         document.getElementById('page-' + page).classList.add('active');
         el.classList.add('active');
+        if (page === 'hero') loadHeroAdmin();
         if (page === 'rooms') loadRoomsManage();
         if (page === 'tours') loadToursManage();
         if (page === 'reviews') loadReviewsManage();
@@ -1421,6 +1441,88 @@
       }
 
       // ===== Bảo mật đăng nhập =====
+      /* ===== HERO (site_settings hero_1…hero_8). Trống thì trang dùng data.js ===== */
+      function heroDefaults() { return ((window.SITE_DATA && SITE_DATA.hero) || []).map((s) => ({ i: s.image_url, c: s.caption || '', e: s.caption_en || '', on: 1 })); }
+      function addHeroRow(o) {
+        const box = document.getElementById('hero-rows');
+        if (box.children.length >= 8) { document.getElementById('hero-msg').textContent = 'Tối đa 8 slide.'; return; }
+        const row = document.createElement('div');
+        row.className = 'hero-row';
+        row.style.cssText = 'display:grid;grid-template-columns:1fr;gap:6px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:10px';
+        const d = o || { i: '', c: '', e: '', on: 1 };
+        row.innerHTML = `<label class="fin-note">Ảnh (images/... hoặc https://)</label>
+          <input class="h-img" type="text" maxlength="120" value="${esc(d.i || '')}" placeholder="images/hero-san-may.webp" style="width:100%">
+          <label class="fin-note">Câu tiếng Việt</label>
+          <input class="h-cap" type="text" maxlength="80" value="${esc(d.c || '')}" style="width:100%">
+          <label class="fin-note">Câu tiếng Anh</label>
+          <input class="h-en" type="text" maxlength="90" value="${esc(d.e || '')}" style="width:100%">
+          <label class="fin-note"><input class="h-on" type="checkbox" ${d.on === 0 ? '' : 'checked'}> Hiện slide này</label>
+          <div style="display:flex;gap:6px"><button type="button" class="btn-export" onclick="moveHeroRow(this,-1)">Lên</button><button type="button" class="btn-export" onclick="moveHeroRow(this,1)">Xuống</button><button type="button" class="btn-export" onclick="this.closest('.hero-row').remove()">Bỏ dòng</button></div>`;
+        box.appendChild(row);
+      }
+      function moveHeroRow(btn, dir) {
+        const row = btn.closest('.hero-row'), box = row.parentElement;
+        const sib = dir < 0 ? row.previousElementSibling : row.nextElementSibling;
+        if (!sib) return;
+        if (dir < 0) box.insertBefore(row, sib); else box.insertBefore(sib, row);
+      }
+      function readHeroRows() {
+        const rows = [];
+        let err = '';
+        document.querySelectorAll('#hero-rows .hero-row').forEach((row) => {
+          const img = row.querySelector('.h-img').value.trim();
+          const cap = row.querySelector('.h-cap').value.trim();
+          const en = row.querySelector('.h-en').value.trim();
+          const on = row.querySelector('.h-on').checked ? 1 : 0;
+          if (!img && !cap && !en) return;
+          if (!/^(images\/[A-Za-z0-9._/-]+|https:\/\/[^\s"'<>]+)$/.test(img)) err = 'Mỗi slide cần đường dẫn ảnh dạng images/... hoặc https://';
+          const packed = JSON.stringify({ i: img, c: cap, e: en, on: on });
+          if (packed.length > 280) err = 'Câu chữ một slide đang quá dài.';
+          rows.push({ key: 'hero_' + (rows.length + 1), value: packed });
+        });
+        return { rows, err };
+      }
+      async function loadHeroAdmin() {
+        const msg = document.getElementById('hero-msg');
+        msg.textContent = 'Đang tải...';
+        const box = document.getElementById('hero-rows');
+        box.innerHTML = '';
+        const { data, error } = await supabaseClient.from('site_settings').select('key,value').like('key', 'hero_%');
+        const map = {};
+        if (!error && data) data.forEach((r) => { map[r.key] = r.value; });
+        const saved = [];
+        for (let n = 1; n <= 8; n++) {
+          if (!map['hero_' + n]) continue;
+          try { const o = JSON.parse(map['hero_' + n]); if (o && o.i) saved.push(o); } catch (e) {}
+        }
+        const fromCode = !saved.length;
+        (fromCode ? heroDefaults() : saved).forEach((r) => addHeroRow(r));
+        if (!box.children.length) addHeroRow();
+        msg.textContent = error
+          ? 'Chưa đọc được cài đặt. Trang chủ vẫn dùng slide trong code.'
+          : (fromCode ? 'Chưa có bản lưu. Form đang hiện slide mặc định. Bấm Lưu thì web dùng đúng các dòng này.' : 'Đang dùng bản đã lưu. Xóa bản lưu nếu muốn quay lại slide trong code.');
+      }
+      async function saveHeroAdmin() {
+        const msg = document.getElementById('hero-msg');
+        const read = readHeroRows();
+        if (read.err) { msg.textContent = read.err; return; }
+        if (!read.rows.length) { msg.textContent = 'Chưa có slide để lưu. Muốn dùng mặc định thì bấm Xóa bản lưu.'; return; }
+        msg.textContent = 'Đang lưu...';
+        const drop = [];
+        for (let n = read.rows.length + 1; n <= 8; n++) drop.push('hero_' + n);
+        const up = await supabaseClient.from('site_settings').upsert(read.rows, { onConflict: 'key' });
+        if (up.error) { msg.textContent = 'Chưa lưu được (' + up.error.message + ')'; return; }
+        if (drop.length) await supabaseClient.from('site_settings').delete().in('key', drop);
+        msg.textContent = 'Đã lưu. Khách tải lại trang chủ là thấy slide mới.';
+      }
+      async function clearHeroAdmin() {
+        if (!confirm('Xóa slide đã lưu? Trang chủ sẽ hiện lại ảnh mặc định trong code.')) return;
+        const keys = [];
+        for (let n = 1; n <= 8; n++) keys.push('hero_' + n);
+        const { error } = await supabaseClient.from('site_settings').delete().in('key', keys);
+        document.getElementById('hero-msg').textContent = error ? 'Chưa xóa được (' + error.message + ')' : 'Đã xóa bản lưu. Trang chủ dùng slide mặc định.';
+        if (!error) loadHeroAdmin();
+      }
       /* ===== CÀI ĐẶT CHUNG (bảng site_settings) ===== */
       const ST_KEYS = { 'st-checkin': 'checkin', 'st-checkout': 'checkout', 'st-address': 'address', 'st-phone': 'contact_phone', 'st-messenger': 'contact_messenger', 'st-facebook': 'contact_facebook', 'st-email': 'contact_email' };
       async function loadSettings() {

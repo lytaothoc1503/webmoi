@@ -8,9 +8,9 @@
   document.documentElement.classList.add('gsap-on');
 
   var ease = 'power3.out';
-  gsap.from('.hero-title', { y: 32, autoAlpha: 0, duration: 0.85, ease: ease });
-  gsap.from('.hero-tagline', { y: 22, autoAlpha: 0, duration: 0.7, delay: 0.12, ease: ease });
-  gsap.from('.hero-actions', { y: 16, autoAlpha: 0, duration: 0.65, delay: 0.22, ease: ease });
+  gsap.from('.hero-title', { y: 24, duration: 0.7, ease: ease, clearProps: 'transform' });
+  gsap.from('.hero-tagline', { y: 16, duration: 0.6, delay: 0.08, ease: ease, clearProps: 'transform' });
+  gsap.from('.hero-actions', { y: 12, duration: 0.55, delay: 0.14, ease: ease, clearProps: 'transform' });
 
   var mobile = window.matchMedia('(max-width: 768px)').matches;
   if (mobile) return;
@@ -20,16 +20,17 @@
     if (!el || el.dataset.gsap) return;
     el.dataset.gsap = '1';
     gsap.from(el, {
-      y: 24,
-      autoAlpha: 0,
-      duration: 0.65,
+      y: 18,
+      duration: 0.55,
       ease: 'power2.out',
-      scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+      immediateRender: false,
+      clearProps: 'transform',
+      scrollTrigger: { trigger: el, start: 'top 92%', once: true },
     });
   }
 
   function scan() {
-    document.querySelectorAll('.section-header, .room-card, .tour-arch-card, .review-card, .duo-card, .kp-card, .gallery-item, .faq-item').forEach(arm);
+    document.querySelectorAll('.section-header, .room-card, .tour-arch-card, .review-card, .duo-card, .kp-card, .gallery-item, .faq-item, .price-card, .news-card, .combo-card').forEach(arm);
   }
 
   var refreshTimer = 0;
@@ -39,7 +40,7 @@
   }
 
   scan();
-  ['rooms-grid', 'tours-grid', 'reviews-grid', 'kp-grid', 'gallery-grid', 'faq-list'].forEach(function (id) {
+  ['rooms-grid', 'tours-grid', 'reviews-grid', 'kp-grid', 'gallery-grid', 'faq-list', 'price-board', 'news-grid', 'combo'].forEach(function (id) {
     var el = document.getElementById(id);
     if (!el) return;
     new MutationObserver(function () {

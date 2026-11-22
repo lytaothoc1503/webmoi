@@ -4,11 +4,14 @@
   if (!reduce) document.documentElement.classList.add('ux-on');
 
   const $ = (id) => document.getElementById(id);
-  const SLIDES = [
-    { img: 'images/hero-san-may.webp', cap: 'Bình minh trên biển mây Tà Xùa' },
-    { img: 'images/phong-view-may.webp', cap: 'Phòng gỗ nhìn thẳng ra thung lũng' },
-    { img: 'images/hoang-hon-quan-cafe.webp', cap: 'Cà phê trên Đỉnh Gió lúc hoàng hôn' },
-  ];
+  function heroList() {
+    const raw = (window.NCA_HERO && window.NCA_HERO.length) ? window.NCA_HERO : ((window.SITE_DATA && window.SITE_DATA.hero) || []);
+    const en = window.getLang && window.getLang() === 'en';
+    return raw.map((s) => ({
+      img: s.image_url || s.img,
+      cap: en && s.caption_en ? s.caption_en : (s.caption || s.cap || ''),
+    })).filter((s) => s.img);
+  }
 
   function rise(el, i) {
     if (!el || el.dataset.ux) return;
@@ -66,10 +69,13 @@
     const hero = $('trang-chu');
     if (!hero || hero.dataset.slider) return;
     hero.dataset.slider = '1';
+    let slides = heroList();
+    if (!slides.length) return;
     const content = hero.querySelector('.hero-content');
     const cap = document.createElement('div');
     cap.className = 'ux-promo';
-    cap.textContent = SLIDES[0].cap;
+    cap.setAttribute('data-i18n-lock', '1');
+    cap.textContent = slides[0].cap;
     if (content) content.appendChild(cap);
     const ui = document.createElement('div');
     ui.className = 'ux-hero-ui';
@@ -77,17 +83,22 @@
     hero.appendChild(ui);
     const dots = ui.querySelector('.ux-dots');
     let i = 0, timer;
-    SLIDES.forEach((_, n) => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.setAttribute('aria-label', 'Banner ' + (n + 1));
-      b.addEventListener('click', () => go(n, true));
-      dots.appendChild(b);
-    });
+    function fillDots() {
+      dots.innerHTML = '';
+      slides.forEach((_, n) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.setAttribute('aria-label', 'Banner ' + (n + 1));
+        b.addEventListener('click', () => go(n, true));
+        dots.appendChild(b);
+      });
+    }
     function paint(instant) {
+      if (!slides.length) return;
       const incoming = layers[shown ^ 1];
       const current = layers[shown];
-      incoming.style.backgroundImage = "linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.45)), url('" + SLIDES[i].img + "')";
+      const safe = String(slides[i].img).replace(/'/g, '');
+      incoming.style.backgroundImage = "linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.45)), url('" + safe + "')";
       if (instant || reduce) {
         layers.forEach((el) => { el.style.transition = 'none'; el.style.opacity = '0'; });
         incoming.style.opacity = '1';
@@ -100,11 +111,12 @@
         setTimeout(() => { cap.style.opacity = '1'; }, 280);
       }
       shown ^= 1;
-      cap.textContent = SLIDES[i].cap;
+      cap.textContent = slides[i].cap;
       dots.querySelectorAll('button').forEach((b, n) => b.classList.toggle('on', n === i));
     }
     function go(n, manual) {
-      i = (n + SLIDES.length) % SLIDES.length;
+      if (!slides.length) return;
+      i = (n + slides.length) % slides.length;
       paint(false);
       if (manual) arm();
     }
@@ -120,8 +132,18 @@
     let shown = 0;
     ui.children[0].addEventListener('click', () => go(i - 1, true));
     ui.children[2].addEventListener('click', () => go(i + 1, true));
+    fillDots();
     paint(true);
     arm();
+    window.NCA_refreshHero = function () {
+      const next = heroList();
+      if (!next.length) return;
+      slides = next;
+      i = 0;
+      fillDots();
+      paint(true);
+      arm();
+    };
     if (!reduce) {
       window.addEventListener('scroll', () => {
         if (window.innerWidth < 760) return;
@@ -377,11 +399,12 @@
   }
   const modal = $('booking-modal');
   if (modal) new MutationObserver(bookingExtras).observe(modal, { attributes: true, attributeFilter: ['class'] });
-  ['gallery-grid', 'kp-grid', 'cf-menu', 'rooms-grid', 'tours-grid', 'reviews-grid', 'faq-list', 'info-body'].forEach((id) => {
+  ['gallery-grid', 'kp-grid', 'cf-menu', 'rooms-grid', 'tours-grid', 'reviews-grid', 'faq-list', 'info-body', 'price-board', 'news-grid', 'combo', 'review-photos'].forEach((id) => {
     const el = $(id);
     if (!el) return;
     new MutationObserver(() => { markRails(); spinRoom(); }).observe(el, { childList: true, subtree: true });
   });
   markRails();
   watch('.section-wrap, .trust-strip, .duo-card, .cta-band');
+  window.NCA_onLang = function () { if (window.NCA_refreshHero) window.NCA_refreshHero(); };
 })();

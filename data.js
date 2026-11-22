@@ -1,13 +1,23 @@
 /* ====== DỮ LIỆU CỦA WEB (nguồn chính hiện nay) ======
    Mọi nội dung hiển thị cho khách nằm ở file này. Muốn sửa giá, ảnh, mô tả: sửa tại đây rồi đẩy lên GitHub.
    Đơn vị giá: VNĐ. price: 0 nghĩa là "Liên hệ báo giá".
-   Giá phòng, tour, dịch vụ hiện là giá tạm, chờ nhà cập nhật giá thật. Ảnh nằm trong thư mục images/ (đổi thành 'images/ten-anh.jpg').
+   Giá phòng (rates) do chủ nhà cung cấp. Ngày lễ và ưu đãi đang chạy chưa có số niêm yết thì để trống / hiện "Liên hệ". Ảnh nằm trong thư mục images/.
    Các bảng phòng/tour/ảnh/hỏi đáp trong Supabase hiện để trống: nếu có dữ liệu thì web sẽ dùng dữ liệu đó THAY CHO file này. */
 const U = (id, w = 900) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 window.SITE_DATA = {
+  // Slide đầu trang. Admin (mục Hero) lưu đè bằng site_settings hero_1…hero_8; chưa lưu thì web dùng mảng này.
+  hero: [
+    { image_url: 'images/hero-san-may.webp', caption: 'Thức dậy giữa biển mây Tà Xùa', caption_en: 'Wake up above the sea of clouds in Ta Xua' },
+    { image_url: 'images/vay-tay-bien-may.webp', caption: 'Bình minh trên biển mây, ngay gần nhà', caption_en: 'Sunrise on the sea of clouds, close to the house' },
+    { image_url: 'images/nha-go-den-long.webp', caption: 'Nhà gỗ giữa đồi, nhìn ra thung lũng', caption_en: 'A wooden house on the hill, facing the valley' },
+    { image_url: 'images/hoang-hon-quan-cafe.webp', caption: 'Cà phê Đỉnh Gió lúc hoàng hôn', caption_en: 'Coffee at Dinh Gio at sunset' },
+    { image_url: 'images/ngam-sao-ta-xua.webp', caption: 'Đêm quang, trời đầy sao trên núi', caption_en: 'A clear night, full of stars over the mountain' },
+  ],
+  // Ưu đãi đang chạy. Trống = ẩn dải ưu đãi. Mẫu: { title, detail, until: 'YYYY-MM-DD' }
+  offers: [],
   rooms: [
     { name: 'Phòng Gỗ Ngắm Biển Mây', price: 700000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
-      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp. Đổi số này thì sửa luôn bảng booking_rate_rules (migration 20261116000000), không thì máy chủ tính theo bảng đó.
+      rates: { weekday: 700000, friSun: 900000, sat: 1100000 }, holiday: null, extraGuestFee: 200000, maxGuests: 3, // giá/đêm cho 2 khách; người thứ 3 phụ thu; do chủ nhà cung cấp. holiday null = chưa có giá ngày lễ. Đổi số này thì sửa luôn bảng booking_rate_rules (migration 20261116000000), không thì máy chủ tính theo bảng đó.
       image_url: 'images/phong-an-1.webp', images: ['images/phong-an-2.webp', 'images/phong-an-3.webp', 'images/phong-an-4.webp', 'images/phong-an-5.webp', 'images/phong-an-6.webp', 'images/phong-an-7.webp', 'images/phong-an-8.webp', 'images/phong-an-9.webp'],
       description: 'Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.',
       guests: '2 khách (tối đa 3)', bed: '1 giường đôi', view: 'Biển mây, thung lũng',
@@ -112,7 +122,7 @@ window.SITE_DATA = {
         { name: 'Combo bữa tối (mỗi người)', price: 150000, desc: 'Cơm kèm các món bản địa ăn tối tại nhà' },
         // { name: 'Tên món', price: 0, desc: 'Mô tả ngắn', image_url: '' },
       ] },
-      { title: 'Đồ uống', note: 'Giá đề xuất, chủ nhà xem lại và chỉnh trước khi dùng.', image_url: 'images/hoang-hon-quan-cafe.webp', items: [
+      { title: 'Đồ uống', note: '', image_url: 'images/hoang-hon-quan-cafe.webp', items: [
         { name: 'Cà phê đen / nâu (nóng hoặc đá)', price: 30000, desc: 'Cà phê pha ngay tại quán', image_url: 'images/ban-ghe-ngam-may.webp' },
         { name: 'Cà phê sữa', price: 30000, desc: 'Cà phê sữa đá truyền thống' },
         { name: 'Cà phê muối', price: 35000, desc: 'Cà phê muối béo nhẹ' },
@@ -158,31 +168,51 @@ window.SITE_DATA = {
   // Combo (chủ nhà đồng ý): chọn phòng rồi thêm bữa sáng + trà chiều + nước. KHÔNG kèm xe/vận chuyển (web không bán vận chuyển).
   // Giá combo = tổng giá các dịch vụ trong `items` (lấy từ services) x số khách x số đêm; nước uống tặng kèm.
   combo: { name: 'Combo Săn Mây', items: ['Bữa sáng trên mây', 'Trà chiều ngắm hoàng hôn'], waterNote: 'tặng kèm nước uống' },
+  // Gói chủ nhắc tên nhưng chưa niêm yết giá. price: 0 = Liên hệ. Không gồm xe.
+  comboMore: [
+    { name: 'AN - COMBO 3 ngày 2 đêm', price: 0, lines: ['Ở 2 đêm, phòng gỗ ngắm biển mây', 'Bữa sáng trong những ngày ở'], note: 'Nhà chưa công bố giá niêm yết cho gói 3 ngày 2 đêm. Nhắn nhà để được báo theo lịch. Gói không gồm xe đưa đón.' },
+  ],
   gallery: [
-    { image_url: 'images/phong-an-1.webp', caption: 'Giường nhìn thẳng ra biển mây' },
-    { image_url: 'images/phong-an-5.webp', caption: 'Mây bồng bềnh ngay cửa sổ' },
-    { image_url: 'images/phong-an-6.webp', caption: 'Hoàng hôn qua khung cửa phòng' },
-    { image_url: 'images/phong-an-4.webp', caption: 'Cửa kính lớn mở ra biển mây' },
-    { image_url: 'images/hero-san-may.webp', caption: 'Biển mây Tà Xùa' },
-    { image_url: 'images/hoang-hon-fisheye.webp', caption: 'Hoàng hôn rực lửa' },
-    { image_url: 'images/tram-mam-xoi.webp', caption: 'Trạm Mầm Xôi cà phê' },
-    { image_url: 'images/ruong-bac-thang.webp', caption: 'Ruộng bậc thang mùa chín' },
-    { image_url: 'images/bap-treo-cua-so.webp', caption: 'Bắp treo bên khung cửa' },
-    { image_url: 'images/bang-hay-lay-toi-di.webp', caption: 'Bữa sáng "Hãy lấy tôi đi"' },
-    { image_url: 'images/hay-lay-toi-di-cabin.webp', caption: 'Góc check-in ở nhà gỗ' },
-    { image_url: 'images/den-long-hoang-hon.webp', caption: 'Đèn lồng lên đèn trên biển mây' },
-    { image_url: 'images/phong-view-may.webp', caption: 'Giường cạnh khung cửa ngắm mây' },
-    { image_url: 'images/nha-go-den-long.webp', caption: 'Nhà gỗ giữa đồi xanh' },
-    { image_url: 'images/ngam-bien-may.webp', caption: 'Nằm trong phòng ngắm biển mây' },
-    { image_url: 'images/ban-ghe-ngam-may.webp', caption: 'Góc ban công ngắm mây' },
-    { image_url: 'images/hoang-hon-quan-cafe.webp', caption: 'Hoàng hôn từ quán cà phê' },
-    { image_url: 'images/bac-da-nha-go.webp', caption: 'Bậc đá dẫn lối đến nhà gỗ' },
-    { image_url: 'images/vay-tay-bien-may.webp', caption: 'Chào buổi sáng trên mây' },
-    { image_url: 'images/bua-sang-tren-may.webp', caption: 'Bữa sáng nóng giữa trời mây' },
+    { image_url: 'images/hero-san-may.webp', caption: 'Biển mây Tà Xùa', category: 'Săn mây' },
+    { image_url: 'images/vay-tay-bien-may.webp', caption: 'Chào buổi sáng trên mây', category: 'Săn mây' },
+    { image_url: 'images/ngam-bien-may.webp', caption: 'Nằm trong phòng ngắm biển mây', category: 'Săn mây' },
+    { image_url: 'images/hoang-hon-fisheye.webp', caption: 'Hoàng hôn rực lửa', category: 'Săn mây' },
+    { image_url: 'images/phong-an-1.webp', caption: 'Giường nhìn thẳng ra biển mây', category: 'Phòng' },
+    { image_url: 'images/phong-an-4.webp', caption: 'Cửa kính lớn mở ra biển mây', category: 'Phòng' },
+    { image_url: 'images/phong-an-5.webp', caption: 'Mây bồng bềnh ngay cửa sổ', category: 'Phòng' },
+    { image_url: 'images/phong-an-6.webp', caption: 'Hoàng hôn qua khung cửa phòng', category: 'Phòng' },
+    { image_url: 'images/phong-view-may.webp', caption: 'Giường cạnh khung cửa ngắm mây', category: 'Phòng' },
+    { image_url: 'images/tram-mam-xoi.webp', caption: 'Trạm Mầm Xôi cà phê', category: 'Coffee' },
+    { image_url: 'images/ban-ghe-ngam-may.webp', caption: 'Góc ban công ngắm mây', category: 'Coffee' },
+    { image_url: 'images/hoang-hon-quan-cafe.webp', caption: 'Hoàng hôn từ quán cà phê', category: 'Coffee' },
+    { image_url: 'images/bua-sang-tren-may.webp', caption: 'Bữa sáng nóng giữa trời mây', category: 'Coffee' },
+    { image_url: 'images/bap-treo-cua-so.webp', caption: 'Bắp treo bên khung cửa', category: 'Coffee' },
+    { image_url: 'images/bang-hay-lay-toi-di.webp', caption: 'Bữa sáng "Hãy lấy tôi đi"', category: 'Coffee' },
+    { image_url: 'images/nha-go-den-long.webp', caption: 'Nhà gỗ giữa đồi xanh', category: 'Nhà gỗ' },
+    { image_url: 'images/bac-da-nha-go.webp', caption: 'Bậc đá dẫn lối đến nhà gỗ', category: 'Nhà gỗ' },
+    { image_url: 'images/hay-lay-toi-di-cabin.webp', caption: 'Góc check-in ở nhà gỗ', category: 'Nhà gỗ' },
+    { image_url: 'images/den-long-hoang-hon.webp', caption: 'Đèn lồng lên đèn trên biển mây', category: 'Đêm Tà Xùa' },
+    { image_url: 'images/ngam-sao-ta-xua.webp', caption: 'Đêm trời quang trên núi Tà Xùa', category: 'Đêm Tà Xùa' },
+    { image_url: 'images/ruong-bac-thang.webp', caption: 'Ruộng bậc thang mùa chín', category: 'Phong cảnh' },
+  ],
+  // Tin viết lại từ báo, không chép nguyên bài, ảnh dùng của nhà.
+  news: [
+    { title: 'Mùa nào dễ gặp biển mây ở Tà Xùa?', date: '2023-09-27', source: 'VnExpress', url: 'https://vnexpress.net/cam-nang-du-lich-ta-xua-4656282.html', image_url: 'images/hero-san-may.webp',
+      summary: 'VnExpress giới thiệu Tà Xùa, Bắc Yên, Sơn La, là một điểm săn mây của miền Bắc. Mây dày thường dễ gặp từ khoảng tháng 10 đến tháng 4. Không phải sáng nào cũng có mây: bài khuyên xem dự báo, chọn ngày đêm lạnh và ban ngày có nắng, rồi nhìn hướng mặt trời mọc trước khi ra điểm ngắm.' },
+    { title: 'Đường lên Tà Xùa từ Hà Nội', date: '2023-09-27', source: 'VnExpress', url: 'https://vnexpress.net/cam-nang-du-lich-ta-xua-4656282.html', image_url: 'images/bac-da-nha-go.webp',
+      summary: 'Bài trên VnExpress mô tả hướng đi phổ biến: từ Hà Nội theo quốc lộ 32 qua Sơn Tây, cầu Trung Hà tới ngã ba Thu Cúc, rồi rẽ Phù Yên – Bắc Yên theo quốc lộ 37. Đường chính lên trung tâm Tà Xùa đã được trải bê tông, dễ hơn trước; xe khoảng 16 chỗ có thể lên. Đường đèo vẫn nhiều cua, nên đi ban ngày.' },
+    { title: 'Sống lưng khủng long ở Háng Đồng', date: '2025-12-30', source: 'VTV', url: 'https://vtv8.vtv.vn/ta-xua-mua-dong-hanh-trinh-san-may-va-cham-vao-linh-hon-ban-lang-107251229211712547.htm', image_url: 'images/vay-tay-bien-may.webp',
+      summary: 'VTV mô tả sống lưng khủng long là lối mòn trên đỉnh, hai bên dốc, ở xã Háng Đồng. Mây Tà Xùa hay đẹp sau mưa phùn, khi trời hửng nắng. Bài nói khu vực đã có chỉ dẫn an toàn hơn, nhưng vẫn phải đi chậm. Nhà không tổ chức tour: muốn đi thì nhắn nhà hỏi đường và mây hôm đó.' },
+    { title: 'Cung trekking lên đỉnh, khác với điểm ngắm gần nhà', date: '2025-04-23', source: 'VnExpress', url: 'https://vnexpress.net/kinh-nghiem-chinh-phuc-dinh-ta-xua-4876172.html', image_url: 'images/nha-go-den-long.webp',
+      summary: 'VnExpress kể cung đi từ Trạm Tấu, Yên Bái, lên đỉnh Tà Xùa dài khoảng 12 km. Đoạn sống lưng khoảng 2 km có dây hỗ trợ, hai bên là vực. Đây không phải quãng đi bộ ngắn từ homestay. Muốn đi cung này cần sức khỏe và người quen đường. Nhà chỉ gợi ý, không bán tour.' },
+    { title: 'Mùa mưa, một số lối đi có thể bị sạt', date: '2024-09-11', source: 'Dân trí', url: 'https://dantri.com.vn/du-lich/du-khach-huy-tour-mu-cang-chai-ta-xua-vi-so-lu-lut-sat-lo-kinh-hoang-20240910181544178.htm', image_url: 'images/ban-ghe-ngam-may.webp',
+      summary: 'Dân trí đưa tin đầu tháng 9/2024: sau mưa lớn, người làm du lịch tại Tà Xùa cho biết một số lối ra sống lưng khủng long, mỏm Cá Heo, cây cô đơn và thảo nguyên bị sạt. Đường núi đổi theo từng trận mưa. Trước khi lên, nhắn nhà hỏi đường.' },
+    { title: 'Dậy sớm đón mây, đêm lạnh có thể ngắm sao', date: '2019-05-12', source: 'Báo Nhân Dân', url: 'https://nhandan.vn/san-may-tren-dinh-ta-xua-post358351.html', image_url: 'images/ngam-sao-ta-xua.webp',
+      summary: 'Báo Nhân Dân ghi mùa mây ở Tà Xùa từ tháng 10 đến tháng 4, và từ trung tâm xã ra sống lưng khoảng 10 km nên cần xuất phát khoảng 4–5 giờ sáng nếu muốn kịp bình minh. Đêm núi có thể xuống khoảng 17°C. Trời quang, ít đèn, có thể ngắm sao. Nhà sẽ báo đêm nào trời đẹp.' },
   ],
   // Đánh giá thật từ Google Maps (khách đã đăng công khai). Thêm mới theo mẫu: { author_name, rating, content }
   reviews: [
-    { author_name: 'Thu Vu', rating: 5, content: 'Phòng ốc sạch sẽ, ấm cúng. Mình lên thời điểm 20-22/8/25 thời tiết đẹp, sáng sớm mưa lất phất, tầm 9h sáng trở đi mây phủ giăng khắp cả ngọn đồi trông rất chill. Dù vậy nhiệt độ chỉ tầm 19-20° nên rất đã. Các bạn nhân viên nhiệt tình dễ thương. Dù đi bộ lên khá mệt nhưng suy nghĩ như đi tập thể dục thì cũng vui. Đừng lo về hành lí vì đã có các bạn nhân viên hỗ trợ mang lên xuống.' },
+    { author_name: 'Thu Vu', rating: 5, stayed: '20–22/8/2025', content: 'Phòng ốc sạch sẽ, ấm cúng. Mình lên thời điểm 20-22/8/25 thời tiết đẹp, sáng sớm mưa lất phất, tầm 9h sáng trở đi mây phủ giăng khắp cả ngọn đồi trông rất chill. Dù vậy nhiệt độ chỉ tầm 19-20° nên rất đã. Các bạn nhân viên nhiệt tình dễ thương. Dù đi bộ lên khá mệt nhưng suy nghĩ như đi tập thể dục thì cũng vui. Đừng lo về hành lí vì đã có các bạn nhân viên hỗ trợ mang lên xuống.' },
     { author_name: 'Vy Anh Trần', rating: 5, content: 'Chị chủ nhiệt tình, dễ thương. Nhân viên phục vụ chu đáo nhiệt tình. Phòng và cafe view đẹppp, dễ săn mây, giá cả hợp lí. Đặt combo 3n2d bao gồm ăn sáng (mì thập cẩm), phòng và xe khứ hồi 1tr2 + mua nước ở cafe đc giảm 15% và home cũng có dv cho thuê xe máy nên rất tiện, gần trung tâm. Phòng mình ở là An 9, giường ở 3 người vẫn rộng rãi thoải mái. Mỗi tội từ phòng leo lên mệt muốn đứt hơi.' },
   ],
   // Câu chuyện chủ nhà (chờ chủ nhà gửi bản thật).

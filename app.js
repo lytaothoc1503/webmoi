@@ -43,10 +43,10 @@ function toast(msg) {
 }
 
 /* ===== MENU + TÊN MỤC TRÊN TAB/THANH ĐỊA CHỈ ===== */
-const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tour-ta-xua', 'Trải Nghiệm'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ Thêm'], ['lien-he', 'Liên Hệ']];
+const SECTIONS = [['trang-chu', 'Trang Chủ'], ['gioi-thieu', 'Giới Thiệu'], ['kham-pha', 'Khám Phá'], ['bang-gia', 'Bảng Giá'], ['hang-phong', 'Homestay'], ['coffee', 'Coffee'], ['tin-du-lich', 'Tin Tà Xùa'], ['tour-ta-xua', 'Trải Nghiệm'], ['thu-vien', 'Thư Viện'], ['khach-noi', 'Khách Nói'], ['faq', 'FAQ'], ['tra-cuu-don', 'Tra Cứu Đơn'], ['dich-vu', 'Dịch Vụ Thêm'], ['lien-he', 'Liên Hệ']];
 const LEGACY = { home: 'trang-chu', about: 'gioi-thieu', rooms: 'hang-phong', tours: 'tour-ta-xua', gallery: 'thu-vien', reviews: 'khach-noi', track: 'tra-cuu-don', services: 'dich-vu' };
 let currentSec = '';
-const NAV_MORE = ['gioi-thieu', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Khám Phá Thêm" trên máy tính
+const NAV_MORE = ['gioi-thieu', 'tin-du-lich', 'thu-vien', 'dich-vu', 'khach-noi', 'faq', 'tra-cuu-don', 'lien-he']; // gom vào menu "Thêm" trên máy tính
 function closeNavMore(except) { document.querySelectorAll('.nav-more.open').forEach((li) => { if (li === except) return; li.classList.remove('open'); li.querySelector('.nav-more-btn').setAttribute('aria-expanded', 'false'); }); }
 function toggleNavMore(e) { e.stopPropagation(); const li = e.currentTarget.parentElement; closeNavMore(li); const o = li.classList.toggle('open'); e.currentTarget.setAttribute('aria-expanded', o); }
 document.addEventListener('click', () => closeNavMore());
@@ -141,10 +141,25 @@ async function loadSiteSettings() {
     if (v.contact_messenger) C.messenger = v.contact_messenger;
     if (v.contact_facebook) C.facebook = v.contact_facebook;
     if (v.contact_email) C.email = v.contact_email;
+    const hero = heroFromSettings(v);
+    if (hero.length) window.NCA_HERO = hero;
     document.querySelectorAll('[data-site]').forEach((el) => (el.textContent = S[el.dataset.site] || ''));
+    if (window.NCA_refreshHero) window.NCA_refreshHero();
   } catch (e) { /* lỗi mạng thì dùng config.js có sẵn */ }
 }
-const img = (u, alt, cls = '') => `<img ${cls ? `class="${cls}"` : ''} src="${esc(safeUrl(u))}" alt="${esc(alt)}" loading="lazy" onerror="imgFail(this)" />`;
+// Slide Hero do admin lưu ở site_settings (hero_1…hero_8). Không có slide đang bật thì web giữ mảng hero trong data.js.
+function heroFromSettings(map) {
+  const out = [];
+  for (let n = 1; n <= 8; n++) {
+    const raw = map['hero_' + n];
+    if (!raw) continue;
+    let o; try { o = JSON.parse(raw); } catch (e) { continue; }
+    if (!o || o.on === 0 || !o.i || !/^(images\/|https:\/\/)/.test(o.i)) continue;
+    out.push({ image_url: String(o.i), caption: String(o.c || ''), caption_en: String(o.e || '') });
+  }
+  return out;
+}
+const img = (u, alt, cls = '') => `<img ${cls ? `class="${cls}"` : ''} src="${esc(safeUrl(u))}" alt="${esc(alt)}" loading="lazy" decoding="async" onerror="imgFail(this)" />`;
 const priceHtml = (n, unit) => (Number(n) > 0 ? `${money(n)} <span style="font-size:12px;color:var(--text-muted);font-weight:normal">${unit}</span>` : '<span style="font-size:15px">Liên hệ báo giá</span>');
 const arg = (s) => esc(String(s).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
 
@@ -155,23 +170,72 @@ async function loadRooms() {
       <div class="room-info"><h3 class="room-name">${esc(r.name)}</h3>
         <div class="room-price">${r.rates ? 'Từ ' : ''}${priceHtml(r.price, '/ đêm')}</div>
         ${(r.guests || r.bed || r.view) ? `<div class="room-specs">${[['👥', r.guests], ['🛏️', r.bed], ['🏔️', r.view]].filter((x) => x[1]).map((x) => `<span>${x[0]} ${esc(x[1])}</span>`).join('')}</div>` : ''}
+        ${r.rates ? `<div class="room-rates"><span>Ngày thường <b>${esc(money(r.rates.weekday))}</b></span><span>T6 và CN <b>${esc(money(r.rates.friSun))}</b></span><span>Thứ Bảy <b>${esc(money(r.rates.sat))}</b></span></div>` : ''}
         <ul class="room-perks">${(r.perks || []).slice(0, 2).map((p) => `<li>✓ ${esc(p)}</li>`).join('')}</ul>
         ${comboPerPerson() > 0 ? `<a class="room-combo-hint" href="#combo" onclick="event.stopPropagation(); event.preventDefault(); scrollToCombo()"><span>Giá chỉ gồm tiền phòng. Muốn kèm ăn sáng và trà chiều: xem</span> <b>${esc(D.combo.name || 'Combo')}</b></a>` : ''}
         <button class="btn-book-room" onclick="event.stopPropagation(); openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt Hạng Phòng Này</button><span class="room-more">Xem chi tiết →</span></div></div>`).join('');
   renderComboCard();
+  renderPriceBoard();
 }
 // Thẻ nổi bật Combo: đọc hoàn toàn từ D.combo + D.services; ẩn hẳn nếu không có combo hoặc giá = 0
 function renderComboCard() {
   const el = $('combo'); if (!el) return;
+  const blocks = [];
   const per = comboPerPerson(), c = D.combo;
-  if (!c || per <= 0) { el.hidden = true; el.innerHTML = ''; return; }
-  const items = (c.items || []).map((nm) => (D.services || []).find((x) => x.name === nm)).filter(Boolean);
-  el.innerHTML = `<div class="combo-card"><div class="combo-head"><span class="combo-badge">☁️ Gói nổi bật</span><h3 class="combo-name">${esc(c.name || 'Combo')}</h3></div>
-    <ul class="combo-list">${items.map((s) => `<li>✓ <span>${esc(s.name)}</span></li>`).join('')}${c.waterNote ? `<li>✓ <span>${esc(c.waterNote.charAt(0).toUpperCase() + c.waterNote.slice(1))}</span></li>` : ''}</ul>
-    <div class="combo-foot"><div class="combo-price"><span>Từ</span> <b>${esc(money(per))}</b> <span>/ người / đêm</span></div>
-    <button type="button" class="btn-book-room combo-btn" onclick="openBookingWithCombo()">Chọn phòng + combo</button></div></div>`;
+  if (c && per > 0) {
+    const items = (c.items || []).map((nm) => (D.services || []).find((x) => x.name === nm)).filter(Boolean);
+    blocks.push(`<article class="combo-card"><div class="combo-head"><span class="combo-badge">☁️ Gói nổi bật</span><h3 class="combo-name">${esc(c.name || 'Combo')}</h3></div>
+      <ul class="combo-list">${items.map((s) => `<li>✓ <span>${esc(s.name)}</span></li>`).join('')}${c.waterNote ? `<li>✓ <span>${esc(c.waterNote.charAt(0).toUpperCase() + c.waterNote.slice(1))}</span></li>` : ''}</ul>
+      <p class="price-miss">Cộng thêm vào tiền phòng, tính theo từng khách, từng đêm. Không gồm xe.</p>
+      <div class="combo-foot"><div class="combo-price"><span>Từ</span> <b>${esc(money(per))}</b> <span>/ người / đêm</span></div>
+      <button type="button" class="btn-book-room combo-btn" onclick="openBookingWithCombo()">Chọn phòng + combo</button></div></article>`);
+  }
+  (D.comboMore || []).forEach((x) => {
+    const price = Number(x.price) > 0 ? esc(money(x.price)) : 'Liên hệ';
+    blocks.push(`<article class="combo-card"><div class="combo-head"><span class="combo-badge">Gói ở nhiều ngày</span><h3 class="combo-name">${esc(x.name || '')}</h3></div>
+      <ul class="combo-list">${(x.lines || []).map((l) => `<li>✓ <span>${esc(l)}</span></li>`).join('')}</ul>
+      ${x.note ? `<p class="price-miss">${esc(x.note)}</p>` : ''}
+      <div class="combo-foot"><div class="combo-price"><b>${price}</b></div>
+      <button type="button" class="btn-book-room combo-btn" onclick="openBookingModal('', 0)">Đặt phòng và hỏi gói này</button></div></article>`);
+  });
+  if (!blocks.length) { el.hidden = true; el.innerHTML = ''; return; }
+  el.innerHTML = blocks.join('');
   el.hidden = false;
-  if (location.hash === '#combo') scrollToCombo();
+  if (location.hash === '#combo' || location.hash === '#bang-gia') scrollToCombo();
+}
+function renderPriceBoard() {
+  const board = $('price-board'); if (!board) return;
+  const rooms = (roomsData && roomsData.length) ? roomsData : (D.rooms || []);
+  board.innerHTML = rooms.map((r) => {
+    const rates = r.rates || null;
+    const rows = [];
+    if (rates) {
+      rows.push(['Ngày thường', money(rates.weekday), 'Đêm thứ Hai đến thứ Năm']);
+      rows.push(['Đêm thứ Sáu và Chủ nhật', money(rates.friSun), '']);
+      rows.push(['Đêm thứ Bảy', money(rates.sat), 'Cuối tuần gồm đêm thứ Sáu và đêm thứ Bảy, hai đêm không cùng giá']);
+      rows.push(['Ngày lễ', rates.holiday > 0 ? money(rates.holiday) : 'Liên hệ', 'Nhà chưa niêm yết giá ngày lễ']);
+    } else rows.push(['Giá phòng', Number(r.price) > 0 ? money(r.price) : 'Liên hệ', '']);
+    if (Number(r.extraGuestFee) > 0) rows.push(['Khách thứ 3', '+' + money(r.extraGuestFee), 'Mỗi đêm, từ khách thứ 3']);
+    return `<article class="price-card">${img(r.image_url, r.name)}<div class="price-body"><h3>${esc(r.name)}</h3>
+      <p class="price-guests">${esc(r.guests || '')}${r.bed ? ' · ' + esc(r.bed) : ''}</p>
+      <dl class="price-rates">${rows.map((x) => `<div><dt>${esc(x[0])}</dt><dd>${esc(x[1])}</dd>${x[2] ? `<small>${esc(x[2])}</small>` : ''}</div>`).join('')}</dl>
+      <button type="button" class="btn-book-room" onclick="openBookingModal('${arg(r.name)}', ${Number(r.price) || 0})">Đặt phòng</button></div></article>`;
+  }).join('');
+}
+function renderOffers() {
+  const el = $('uu-dai'); if (!el) return;
+  const today = todayISO();
+  const list = (D.offers || []).filter((o) => o && o.title && (!o.until || o.until >= today));
+  if (!list.length) { el.hidden = true; el.innerHTML = ''; return; }
+  el.hidden = false;
+  el.innerHTML = `<div class="offer-strip">${list.map((o) => `<div><strong>${esc(o.title)}</strong><p>${esc(o.detail || '')}</p>${o.until ? `<small>Dùng đến hết ${esc(o.until.split('-').reverse().join('/'))}</small>` : ''}</div>`).join('')}</div>`;
+}
+function renderNews() {
+  const sec = $('tin-du-lich'); if (!sec) return;
+  const list = (D.news || []).filter((n) => n && n.title && n.summary && /^https:\/\//.test(n.url || ''));
+  if (!list.length) { sec.hidden = true; return; }
+  const when = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; };
+  $('news-grid').innerHTML = list.map((n) => `<article class="news-card">${n.image_url ? img(n.image_url, n.title) : ''}<div><h3>${esc(n.title)}</h3><p>${esc(n.summary)}</p><p class="news-src"><a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.source || 'Nguồn')}</a>${n.date ? ' · ' + esc(when(n.date)) : ''}</p></div></article>`).join('');
 }
 function scrollToCombo() { const el = $('combo'); if (el && !el.hidden) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 function openBookingWithCombo() {
@@ -428,20 +492,55 @@ function loadExplore() {
   $('kp-plan-box').hidden = !(D.itinerary || []).length;
   $('kp-note').textContent = D.attractionsNote || '';
 }
+function bindGalleryClicks() {
+  $('gallery-grid').querySelectorAll('.gallery-item').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full, el.dataset.alt)));
+}
 async function loadGallery() {
   const list = await getList('gallery', D.gallery, 'is_active');
-  $('gallery-grid').innerHTML = list.map((g) => `<div class="gallery-item" role="button" tabindex="0" aria-label="${esc('Xem ảnh lớn: ' + (g.caption || 'Ảnh'))}" data-full="${esc(safeUrl(g.image_url))}" data-alt="${esc(g.caption || '')}">${img(g.image_url, g.caption || 'Ảnh')}<div class="gallery-caption">${esc(g.caption || '')}</div></div>`).join('');
-  $('gallery-grid').querySelectorAll('.gallery-item').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full, el.dataset.alt)));
+  const sec = $('thu-vien');
+  if (!list.length) { if (sec) sec.hidden = true; return; }
+  const cats = [];
+  list.forEach((g) => { const c = String(g.category || 'Khác').trim() || 'Khác'; if (!cats.includes(c)) cats.push(c); });
+  const tabs = $('gallery-tabs');
+  const paint = (cat) => {
+    const rows = cat === 'Tất cả' ? list : list.filter((g) => (String(g.category || 'Khác').trim() || 'Khác') === cat);
+    $('gallery-grid').innerHTML = rows.map((g) => `<div class="gallery-item" role="button" tabindex="0" aria-label="${esc('Xem ảnh lớn: ' + (g.caption || 'Ảnh'))}" data-full="${esc(safeUrl(g.image_url))}" data-alt="${esc(g.caption || '')}">${img(g.image_url, g.caption || 'Ảnh')}<div class="gallery-caption">${esc(g.caption || '')}</div></div>`).join('');
+    bindGalleryClicks();
+  };
+  if (tabs) {
+    tabs.innerHTML = ['Tất cả'].concat(cats).map((c, i) => `<button type="button" class="gal-tab${i === 0 ? ' on' : ''}" data-cat="${esc(c)}">${esc(c)}</button>`).join('');
+    tabs.onclick = (e) => {
+      const b = e.target.closest('button'); if (!b) return;
+      tabs.querySelectorAll('button').forEach((x) => x.classList.toggle('on', x === b));
+      paint(b.dataset.cat);
+    };
+  }
+  paint('Tất cả');
+}
+function reviewAvatar(r) {
+  const u = safeUrl(r.author_avatar);
+  if (u && !/ui-avatars\.com/i.test(u)) return `<img src="${esc(u)}" class="review-avatar" alt="${esc(r.author_name)}" width="48" height="48" loading="lazy" decoding="async" />`;
+  const parts = String(r.author_name || '').trim().split(/\s+/).filter(Boolean);
+  const letters = ((parts[0] || '?').charAt(0) + (parts.length > 1 ? parts[parts.length - 1].charAt(0) : '')).toUpperCase();
+  return `<span class="review-avatar review-initial" aria-hidden="true">${esc(letters)}</span>`;
 }
 async function loadReviews() {
   const list = await getList('reviews', D.reviews, 'is_published');
   if (!list.length) { $('khach-noi').hidden = true; $('trust-reviews').hidden = true; return; }
-  if (list.length >= 3 && $('hang-phong')) $('hang-phong').before($('khach-noi')); // đủ đánh giá thì đưa lên trước Hạng phòng
   $('reviews-grid').innerHTML = list.map((r) => {
     const n = Math.min(5, Math.max(1, Number(r.rating) || 5));
-    const av = safeUrl(r.author_avatar) || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.author_name) + '&background=3d2314&color=fff';
-    return `<div class="review-card"><div class="review-header"><img src="${esc(av)}" class="review-avatar" alt="${esc(r.author_name)}" width="48" height="48" loading="lazy" decoding="async" /><div><div class="review-name">${esc(r.author_name)}</div><div class="review-stars">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</div></div></div><p class="review-content">"${esc(r.content)}"</p></div>`;
+    return `<div class="review-card"><div class="review-header">${reviewAvatar(r)}<div><div class="review-name">${esc(r.author_name)}</div>${r.stayed ? `<div class="review-stay">Ở ${esc(r.stayed)}</div>` : ''}<div class="review-stars">${'★'.repeat(n)}${'☆'.repeat(5 - n)}</div></div></div><p class="review-content">"${esc(r.content)}"</p></div>`;
   }).join('');
+  const box = $('review-photos');
+  const gp = (D.coffee && D.coffee.guestPhotos) || [];
+  if (box) {
+    if (!gp.length) box.hidden = true;
+    else {
+      box.hidden = false;
+      box.innerHTML = `<h3 class="cf-h">Ảnh khách đã chụp tại nhà</h3><p class="sec-lead">Đây là ảnh góc nhà, không phải chân dung khách.</p><div class="cf-photos">${gp.map((g) => `<figure data-full="${esc(safeUrl(g.image_url))}" data-alt="${esc(g.caption || '')}">${img(g.image_url, g.caption || 'Ảnh khách')}${g.caption ? `<figcaption>${esc(g.caption)}</figcaption>` : ''}</figure>`).join('')}</div>`;
+      box.querySelectorAll('figure').forEach((el) => el.addEventListener('click', () => openLightbox(el.dataset.full, el.dataset.alt)));
+    }
+  }
 }
 async function loadFAQ() {
   const list = await getList('faq', D.faq, 'is_active');
@@ -875,8 +974,9 @@ async function submitReview() {
   $('map-frame').src = 'https://www.google.com/maps?q=' + encodeURIComponent(S.mapQuery) + '&output=embed';
   $('map-link').href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(S.mapQuery);
   buildNav();
-  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); loadCoffee(); $('ask-cloud').addEventListener('click', askCloud);
+  setupIntroVideo(); setupStoryAndHero(); loadServices(); loadExplore(); loadCoffee(); renderNews(); $('ask-cloud').addEventListener('click', askCloud);
   await Promise.all([loadRooms(), loadTours(), loadGallery(), loadReviews(), loadFAQ()]);
+  renderOffers();
   syncLodgingPrice(); populateRoomSelect(); buildNav(); renderHistory(); refreshHistory(); goHash();
   setTimeout(() => { if (!userMoved) goHash(); }, 700);
   const ma = (new URLSearchParams(location.search).get('ma') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');

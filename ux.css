@@ -355,12 +355,5 @@ html.ux-on .ux-prep.ux-in { opacity: 1; transform: none; transition: opacity .55
   #tour-ta-xua::before,
   #thu-vien::before,
   #cta-band::before { animation: none; }
-  #thu-vien,
-  #faq,
-  #lien-he,
-  #tra-cuu-don {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 720px;
-  }
 }
 
