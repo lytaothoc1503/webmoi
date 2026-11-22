@@ -936,6 +936,22 @@
 "Dân trí": "Dan Tri",
 "Báo Nhân Dân": "Nhan Dan",
 "Đêm trời quang trên núi Tà Xùa": "A clear night in the mountains of Ta Xua",
+"Một hạng phòng, các căn giống nhau. Giá cho 2 khách một đêm, chưa gồm ăn sáng. Trẻ dưới 6 tuổi miễn phí. Thứ 2 đến thứ 5 một giá, thứ 6 và Chủ nhật một giá.": "One room type; the rooms are the same. The rate is for 2 guests per night and does not include breakfast. Children under 6 stay free. Monday to Thursday is one rate, Friday and Sunday another.",
+"Thứ 2–5": "Mon–Thu",
+"Thứ 6 và CN": "Fri & Sun",
+"Thứ 2 – thứ 5": "Monday–Thursday",
+"Mỗi đêm, cho 2 khách": "Per night, for 2 guests",
+"Nhà chưa gửi giá đêm thứ Bảy": "The Saturday-night rate has not been given yet",
+"Gói nhà đang nhận": "Package we are taking",
+"Combo 2 ngày 1 đêm": "2-day 1-night package",
+"Phòng nghỉ 2 ngày 1 đêm": "Room for 2 days and 1 night",
+"Xe giường nằm cabin đôi, khứ hồi": "Round-trip double-cabin sleeper bus",
+"Trà chiều tại quán cà phê": "Afternoon tea at the café",
+"Đêm thứ Sáu và thứ Bảy": "Friday night and Saturday night",
+"Điểm đón: Trường THCS Nam Trung Yên. Xe giường nằm chỉ có chuyến 22h tối. Có thêm giờ đón 7h sáng (không phải xe giường nằm). Giờ về: 12h30 tại homestay. Chuyến 22h tới thị trấn Bắc Yên thì nghỉ tại phòng của nhà xe đến 5h sáng, rồi lên Tà Xùa, đến khoảng 6h sáng. Có thể gửi đồ tại nhà và nhận phòng lúc 14:00. Đây là xe của nhà xe, không phải tour có hướng dẫn viên.": "Pickup: Nam Trung Yen secondary school. The sleeper bus only runs at 10 pm. There is also a 7 am pickup (not the sleeper). Return: 12:30 from the homestay. The 10 pm bus stops in Bac Yen town; you rest in the bus company's room until 5 am, then go up to Ta Xua and arrive around 6 am. You can leave your bags at the house and check in at 2 pm. This is the bus company's coach, not a guided tour.",
+"Nhắn nhà về gói này": "Message us about this package",
+"Kỳ này có đêm thứ Bảy. Nhà chưa niêm yết giá đêm thứ Bảy. Bạn nhắn nhà để được báo trước khi đặt.": "This stay includes a Saturday night. We have not listed a Saturday-night rate. Message us for a quote before booking.",
+"Kỳ ở này có đêm thứ Bảy. Nhà chưa niêm yết giá đêm thứ Bảy, bạn nhắn nhà để được báo trước khi đặt.": "This stay includes a Saturday night. We have not listed a Saturday-night rate, so message us for a quote before booking.",
 }/*END*/;
   const KEY = 'na_lang';
   let lang = 'vi';

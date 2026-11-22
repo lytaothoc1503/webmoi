@@ -5,9 +5,9 @@ const assert = require('assert');
 
 const ROOM = {
   name: 'Phòng Gỗ Ngắm Biển Mây',
-  weekday: 700000,
-  friSun: 900000,
-  sat: 1100000,
+  weekday: 600000,
+  friSun: 700000,
+  sat: null, // đêm thứ Bảy chủ nhà chưa gửi giá
   extraGuestFee: 200000,
   includedGuests: 2,
   maxGuests: 3,
@@ -45,7 +45,9 @@ function quoteCustomer(room, checkin, checkout, guestsText) {
   let base = 0;
   for (let i = 0; i < n; i++) {
     const day = dow(checkin, i);
-    base += day === 6 ? ROOM.sat : (day === 5 || day === 0) ? ROOM.friSun : ROOM.weekday;
+    const amt = day === 6 ? ROOM.sat : (day === 5 || day === 0) ? ROOM.friSun : ROOM.weekday;
+    if (!(Number(amt) > 0)) return null;
+    base += amt;
   }
   const extra = Math.max(0, g - ROOM.includedGuests) * ROOM.extraGuestFee * n;
   const combo = hasCombo ? COMBO_SUM * g * n : 0;
@@ -72,13 +74,15 @@ function run() {
   const bao = (m) => loi.push(m);
   const eq = (a, b, m) => { if (a !== b) bao(m + ' (nhận ' + a + ', mong ' + b + ')'); };
 
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '2 người'), 700000, 'T2 2 khách');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-13', '2026-11-16', '2'), 2900000, 'T6+T7+CN');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-14', '2026-11-15', '3 người'), 1300000, 'T7 khách thứ 3');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây + Combo Săn Mây', '2026-11-16', '2026-11-17', '3'), 1410000, 'combo 3 khách');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '1'), 700000, '1 khách vẫn giá 2 người');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', ''), 700000, 'thiếu số khách');
-  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '10 người'), 900000, 'vượt tối đa thì tính 3');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '2 người'), 600000, 'T2 2 khách');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-13', '2026-11-14', '2'), 700000, 'T6');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-15', '2026-11-16', '2'), 700000, 'CN');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-13', '2026-11-16', '2'), null, 'có T7 thì chưa báo giá');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-14', '2026-11-15', '3 người'), null, 'T7 chưa có giá');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây + Combo Săn Mây', '2026-11-16', '2026-11-17', '3'), 1310000, 'combo 3 khách');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '1'), 600000, '1 khách vẫn giá 2 người');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', ''), 600000, 'thiếu số khách');
+  eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-17', '10 người'), 800000, 'vượt tối đa thì tính 3');
   eq(quoteCustomer('Phòng không có', '2026-11-16', '2026-11-17', '2'), null, 'hạng lạ phải từ chối');
   eq(quoteCustomer('Phòng Gỗ Ngắm Biển Mây', '2026-11-16', '2026-11-16', '2'), null, '0 đêm từ chối');
 
@@ -103,6 +107,10 @@ function run() {
   const sql = fs.readFileSync(path.join(root, 'supabase/migrations/20261116000000_booking_server_price.sql'), 'utf8');
   for (const n of ['700000', '900000', '1100000', '200000', '70000', '100000']) {
     if (!sql.includes(n)) bao('migration giá thiếu mức ' + n);
+  }
+  const sqlMoi = fs.readFileSync(path.join(root, 'supabase/migrations/20261122000000_room_rates_600_700.sql'), 'utf8');
+  for (const n of ['600000', '700000', '200000']) {
+    if (!sqlMoi.includes(n)) bao('migration giá mới thiếu mức ' + n);
   }
   if (!/ON CONFLICT \(kind, name\) DO NOTHING/.test(sql)) bao('migration giá không được ghi đè khi chạy lại');
   const cors = fs.readFileSync(path.join(root, 'supabase/functions/_shared/cors.ts'), 'utf8');
