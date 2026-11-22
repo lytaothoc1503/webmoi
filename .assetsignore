@@ -1,0 +1,7 @@
+# Bản xem trước Cloudflare đọc cả thư mục gốc. Không đưa thư viện cài bằng npm (file workerd ~129MB, vượt 25MB).
+node_modules
+.git
+.wrangler
+.env
+**/.dev.vars
+**/.dev.vars.*
