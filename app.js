@@ -215,7 +215,7 @@ function renderPriceBoard() {
     if (rates) {
       rows.push(['Thứ 2 – thứ 5', rateMoney(rates.weekday), 'Mỗi đêm, cho 2 khách']);
       rows.push(['Thứ 6 và Chủ nhật', rateMoney(rates.friSun), 'Mỗi đêm, cho 2 khách']);
-      rows.push(['Thứ 7', rateMoney(rates.sat), Number(rates.sat) > 0 ? '' : 'Nhà chưa gửi giá đêm thứ Bảy']);
+      rows.push(['Thứ 7', rateMoney(rates.sat), Number(rates.sat) > 0 ? 'Mỗi đêm, cho 2 khách' : 'Nhà chưa gửi giá đêm thứ Bảy']);
       rows.push(['Ngày lễ', rates.holiday > 0 ? money(rates.holiday) : 'Liên hệ', 'Nhà chưa niêm yết giá ngày lễ']);
     } else rows.push(['Giá phòng', Number(r.price) > 0 ? money(r.price) : 'Liên hệ', '']);
     if (Number(r.extraGuestFee) > 0) rows.push(['Khách thứ 3', '+' + money(r.extraGuestFee), 'Mỗi đêm, từ khách thứ 3']);
@@ -621,7 +621,7 @@ function calculateTotal() {
   let n = Math.ceil((new Date($('bk-checkout').value) - new Date($('bk-checkin').value)) / 864e5);
   if (isNaN(n) || n < 1) n = 1;
   if (currentItem.rates) {
-    // Giá theo từng đêm: T2-T5, T6 và CN; T7 chỉ tính khi đã có giá. Khách thứ 3 phụ thu; combo ăn uống tính theo đầu người.
+    // Giá theo từng đêm: T2-T5, T6 và CN, T7. Khách thứ 3 phụ thu; combo ăn uống tính theo đầu người.
     const a = new Date($('bk-checkin').value + 'T00:00:00'), R = currentItem.rates, valid = !isNaN(a.getTime());
     let base = 0, missing = false;
     for (let i = 0; i < n; i++) {

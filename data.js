@@ -17,7 +17,7 @@ window.SITE_DATA = {
   offers: [],
   rooms: [
     { name: 'Phòng Gỗ Ngắm Biển Mây', price: 600000, // price = giá thấp nhất (T2-T5) để hiện "Từ"
-      rates: { weekday: 600000, friSun: 700000, sat: null }, holiday: null, extraGuestFee: 200000, maxGuests: 3, // T2-T5 600k, T6 và CN 700k, cho 2 khách; người thứ 3 phụ thu 200k. sat null = chủ nhà chưa gửi giá đêm thứ Bảy. holiday null = chưa có giá ngày lễ. Đổi số này thì chạy migration giá mới, không thì máy chủ còn giữ giá cũ.
+      rates: { weekday: 600000, friSun: 700000, sat: 750000 }, holiday: null, extraGuestFee: 200000, maxGuests: 3, // T2-T5 600k, T6 và CN 700k, T7 750k, cho 2 khách; người thứ 3 phụ thu 200k. holiday null = chưa có giá ngày lễ. Đổi số này thì chạy migration giá mới, không thì máy chủ còn giữ giá cũ.
       image_url: 'images/phong-an-1.webp', images: ['images/phong-an-2.webp', 'images/phong-an-3.webp', 'images/phong-an-4.webp', 'images/phong-an-5.webp', 'images/phong-an-6.webp', 'images/phong-an-7.webp', 'images/phong-an-8.webp', 'images/phong-an-9.webp'],
       description: 'Phòng gỗ khép kín, cửa kính lớn nhìn thẳng ra biển mây và thung lũng. Các căn thiết kế giống nhau. Có nóng lạnh, bình siêu tốc, máy sấy; khăn tắm, bàn chải, kem đánh răng.',
       guests: '2 khách (tối đa 3)', bed: '1 giường đôi', view: 'Biển mây, thung lũng',

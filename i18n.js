@@ -936,7 +936,7 @@
 "Dân trí": "Dan Tri",
 "Báo Nhân Dân": "Nhan Dan",
 "Đêm trời quang trên núi Tà Xùa": "A clear night in the mountains of Ta Xua",
-"Một hạng phòng, các căn giống nhau. Giá cho 2 khách một đêm, chưa gồm ăn sáng. Trẻ dưới 6 tuổi miễn phí. Thứ 2 đến thứ 5 một giá, thứ 6 và Chủ nhật một giá.": "One room type; the rooms are the same. The rate is for 2 guests per night and does not include breakfast. Children under 6 stay free. Monday to Thursday is one rate, Friday and Sunday another.",
+"Một hạng phòng, các căn giống nhau. Giá cho 2 khách một đêm, chưa gồm ăn sáng. Trẻ dưới 6 tuổi miễn phí. Thứ 2 đến thứ 5 một giá, thứ 6 và Chủ nhật một giá, thứ 7 một giá riêng.": "One room type; the rooms are the same. The rate is for 2 guests per night and does not include breakfast. Children under 6 stay free. Monday to Thursday is one rate, Friday and Sunday another, and Saturday its own rate.",
 "Thứ 2–5": "Mon–Thu",
 "Thứ 6 và CN": "Fri & Sun",
 "Thứ 2 – thứ 5": "Monday–Thursday",
