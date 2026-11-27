@@ -657,6 +657,20 @@ function showStep(which) {
 }
 function backToStep1() { showStep(1); }
 const bankOn = () => S.bank.bankId && S.bank.accountNo;
+const transferBase = () => String((S.bank && S.bank.transferBase) || 'AL0IO721');
+function transferQrContent() {
+  const n = new Uint32Array(1);
+  (window.crypto || window.msCrypto).getRandomValues(n);
+  return transferBase() + String(n[0] % 1000).padStart(3, '0');
+}
+function bookingQrUrl(addInfo, amount) {
+  const parts = [];
+  if (amount > 0) parts.push('amount=' + encodeURIComponent(String(Math.round(amount))));
+  if (addInfo) parts.push('addInfo=' + encodeURIComponent(addInfo));
+  if (S.bank.accountName) parts.push('accountName=' + encodeURIComponent(S.bank.accountName));
+  const q = parts.join('&');
+  return 'https://api.vietqr.io/image/' + encodeURIComponent(S.bank.bankId) + '-' + encodeURIComponent(S.bank.accountNo) + '-compact2.png' + (q ? '?' + q : '');
+}
 
 /* ===== TRẠNG THÁI ĐƠN: Chờ thanh toán -> Đã thanh toán, chờ xác nhận -> Đặt phòng thành công -> Hoàn thành (hoặc Hủy) ===== */
 const ST = { WAIT: 'Chờ thanh toán', PAID: 'Đã thanh toán - chờ xác nhận', OK: 'Đặt phòng thành công', DONE: 'Hoàn thành', CANCEL: 'Hủy đơn', INVALID: 'Sai nội dung chuyển khoản', CONTACT: 'Cần liên hệ nhà' };
@@ -674,7 +688,7 @@ const STMSG = {
   [ST.INVALID]: 'Nhà nhận được một giao dịch chuyển khoản nhưng nội dung ghi chưa đúng mã đơn, nên chưa đối chiếu được đây có phải khoản thanh toán cho đơn này không. Bạn vui lòng nhắn Facebook của nhà kèm mã đơn và ảnh chụp giao dịch chuyển khoản để được kiểm tra, xác nhận lại.',
 };
 const NEXT = {
-  [ST.WAIT]: 'Chuyển khoản đúng số tiền và nội dung là mã đơn, rồi bấm "Tôi đã chuyển khoản". Chưa sẵn sàng, bạn cứ nhắn nhà, chưa mất phí gì.',
+  [ST.WAIT]: 'Chuyển khoản đúng số tiền và đúng nội dung chuyển khoản đang hiện, rồi bấm "Tôi đã chuyển khoản". Chưa sẵn sàng, bạn cứ nhắn nhà, chưa mất phí gì.',
   [ST.PAID]: 'Chờ nhà đối chiếu giao dịch. Gửi ảnh chụp giao dịch kèm mã đơn qua Facebook để nhà xác nhận nhanh hơn.',
   [ST.OK]: 'Lưu hoặc in Phiếu xác nhận bên dưới. Ngày đến, người đại diện đặt phòng mang CCCD hoặc VNeID để nhà làm thủ tục lưu trú (khách nước ngoài mang hộ chiếu). Cần hỏi đường đi, đổi lịch hay hủy, bạn nhắn nhà kèm mã đơn.',
   [ST.DONE]: 'Bạn có thể viết đánh giá để giúp khách sau chọn phòng dễ hơn.',
@@ -693,7 +707,7 @@ function newCode() {
 function fbSlug() { const m = (C.facebook || '').match(/facebook\.com\/(?:profile\.php\?id=)?([^/?#]+)/); return m && !['share', 'profile.php', 'people', 'groups'].includes(m[1]) ? m[1] : ''; } // link dạng /share/... không có tên trang nên dùng thẳng link Facebook
 function messengerHref() { return C.messenger || (fbSlug() ? 'https://m.me/' + fbSlug() : chref('facebook')); }
 function orderText(o) {
-  return [`ĐƠN ĐẶT PHÒNG - ${S.name}`, `Mã đơn: ${o.code}`, `Dịch vụ: ${o.room}`, `Khách: ${o.name} - ${o.phone}`, `Nhận phòng: ${vdate(o.checkin)} | Trả phòng: ${vdate(o.checkout)}`, `Số khách: ${o.guests || ''}`, `Tổng tiền: ${o.total > 0 ? o.total.toLocaleString('vi-VN') + ' đ' : 'Chờ nhà báo giá'}`, `Nội dung chuyển khoản: ${o.tcode || o.code}`, `Ghi chú: ${o.notes || 'Không có'}`].join('\n');
+  return [`ĐƠN ĐẶT PHÒNG - ${S.name}`, `Mã đơn: ${o.code}`, `Dịch vụ: ${o.room}`, `Khách: ${o.name} - ${o.phone}`, `Nhận phòng: ${vdate(o.checkin)} | Trả phòng: ${vdate(o.checkout)}`, `Số khách: ${o.guests || ''}`, `Tổng tiền: ${o.total > 0 ? o.total.toLocaleString('vi-VN') + ' đ' : 'Chờ nhà báo giá'}`, `Nội dung chuyển khoản: ${o.qrNote || transferBase()}`, `Ghi chú: ${o.notes || 'Không có'}`].join('\n');
 }
 async function copyText(t) {
   try { await navigator.clipboard.writeText(t); return true; } catch (e) {
@@ -772,10 +786,9 @@ function renderOrderView() {
   let body = '';
   if (st === ST.WAIT) {
     if (hasQR) {
-      const qr = `https://api.vietqr.io/image/${encodeURIComponent(S.bank.bankId)}-${encodeURIComponent(S.bank.accountNo)}-compact2.png?amount=${total}&addInfo=${encodeURIComponent(o.tcode || o.code)}${S.bank.accountName ? '&accountName=' + encodeURIComponent(S.bank.accountName) : ''}`;
       body = `<h4 class="ov-h">QUÉT MÃ QR ĐỂ HOÀN TẤT ĐẶT PHÒNG</h4><p class="ov-sub">Vui lòng quét mã QR chuyển khoản giữ chỗ qua tài khoản nhà:</p>
-        <div class="qr-container"><img src="${esc(qr)}" alt="VietQR" /></div>
-        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr>${S.bank.accountName ? `<tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr>` : ''}<tr><td>Số tiền:</td><td style="font-weight:bold;color:#059669">${money2(total)}</td></tr><tr><td>Cú pháp:</td><td style="font-family:monospace;font-weight:bold">${esc(o.tcode || o.code)}</td></tr></table>
+        <button type="button" class="btn-submit-booking" data-ov="qr">Tạo mã QR đặt phòng</button>
+        <table class="bank-info-table"><tr><td>Ngân hàng:</td><td>${esc(S.bank.bankName || S.bank.bankId)}</td></tr><tr><td>Số tài khoản:</td><td style="color:var(--accent-orange);font-size:16px;letter-spacing:1px">${esc(S.bank.accountNo)}</td></tr>${S.bank.accountName ? `<tr><td>Chủ tài khoản:</td><td style="font-weight:bold">${esc(S.bank.accountName)}</td></tr>` : ''}<tr><td>Số tiền:</td><td style="font-weight:bold;color:#059669">${money2(total)}</td></tr><tr><td>Cú pháp:</td><td id="ov-qr-note" style="font-family:monospace;font-weight:bold">${esc(transferBase())}</td></tr></table>
         <button type="button" class="btn-submit-booking" data-ov="paid">TÔI ĐÃ CHUYỂN KHOẢN XONG</button>
         <div class="ov-card"><strong>Chưa muốn thanh toán ngay?</strong><p>Đơn đã được lưu vào lịch sử của bạn. Bạn có thể xem lại, thanh toán sau hoặc trao đổi thêm với nhà trước khi chuyển khoản.</p>
           <div class="ov-row"><button type="button" class="oc-btn" data-ov="later">Lưu vào lịch sử, thanh toán sau</button><button type="button" class="oc-btn" data-ov="fb">Trao đổi với nhà qua Messenger</button></div></div>`;
@@ -805,6 +818,23 @@ $('order-view').addEventListener('click', async (e) => {
   const o = currentOrder; if (!o) return;
   const act = b.dataset.ov;
   if (act === 'fb') sendViaFacebook(o);
+  else if (act === 'qr') {
+    const content = transferQrContent();
+    o.qrNote = content;
+    const note = document.getElementById('ov-qr-note');
+    if (note) note.textContent = content;
+    let box = document.getElementById('ov-qr');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'ov-qr';
+      box.className = 'qr-container';
+      b.parentNode.insertBefore(box, b);
+    }
+    const img = document.createElement('img');
+    img.alt = 'VietQR';
+    img.src = bookingQrUrl(content, Number(o.total) || 0);
+    box.replaceChildren(img);
+  }
   else if (act === 'later') { closeBookingModal(); toast('Đã lưu đơn ' + o.code + ' vào lịch sử. Bạn có thể thanh toán sau.'); $('tra-cuu-don').scrollIntoView(); }
   else if (act === 'copy') { toast((await copyText(orderText(o))) ? 'Đã sao chép nội dung đơn' : 'Không sao chép được'); }
   else if (act === 'track') { closeBookingModal(); $('tra-cuu-don').scrollIntoView(); refreshHistory(); }
@@ -847,7 +877,7 @@ function lookupExtras(o) {
     '<a class="oc-btn" href="#faq">❓ Câu hỏi thường gặp</a>'
   ].filter(Boolean).join('');
   const tips = {
-    [ST.WAIT]: 'Chuyển khoản đúng số tiền và ghi nội dung đúng mã đơn để nhà nhận ra giao dịch của bạn ngay.',
+    [ST.WAIT]: 'Chuyển khoản đúng số tiền và ghi đúng nội dung chuyển khoản đang hiện để nhà nhận ra giao dịch của bạn ngay.',
     [ST.PAID]: 'Gửi ảnh chụp giao dịch kèm mã đơn qua Messenger để nhà xác nhận nhanh hơn.',
     [ST.INVALID]: 'Gửi ảnh chụp biên lai chuyển khoản thành công (thấy rõ ngày giờ, số tiền, nội dung) kèm mã đơn để nhà đối chiếu với sao kê.',
     [ST.OK]: 'Lưu ảnh phiếu trong điện thoại. Ngày đến, người đặt phòng mang CCCD hoặc VNeID; khách đi cùng gửi trước họ tên và số định danh.',

@@ -108,7 +108,9 @@
     const overridingBank = !!(bName || bNo || bHolder); // có ghi đè thì không tự tạo QR (VietQR cần mã ngân hàng, không phải tên) — bắt buộc tự tải ảnh QR
     const useBankName = bName || B.bankName || B.bankId, useAccountNo = bNo || B.accountNo, useAccountName = bHolder || B.accountName;
     const bankOn = (useAccountNo || d.qrImage) && remain > 0 && total > 0 && d.hideBank !== true; // chỉ hiện khi còn tiền phải thu
-    const qr = d.qrImage ? d.qrImage : (!overridingBank && bankOn && remain > 0 && B.bankId && B.accountNo ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''); // không tích hợp sẵn số tiền/nội dung CK — khách tự ghi; d.qrImage (ảnh tự tải lên) luôn ưu tiên
+    const transferBase = String(B.transferBase || 'AL0IO721');
+    const transferNote = overridingBank ? (d.tcode || d.code || '') : transferBase;
+    const qr = d.qrImage ? d.qrImage : (!overridingBank && bankOn && remain > 0 && B.bankId && B.accountNo ? `https://api.vietqr.io/image/${encodeURIComponent(B.bankId)}-${encodeURIComponent(B.accountNo)}-compact2.png${B.accountName ? '?accountName=' + encodeURIComponent(B.accountName) : ''}` : ''); // không gắn số tiền/nội dung CK vào ảnh QR lúc vẽ phiếu; d.qrImage (ảnh tự tải lên) luôn ưu tiên
     // Tên đơn vị/logo có thể ghi đè riêng cho từng phiếu (d.orgName/orgTag/orgLogo/orgAddress/orgPhone) — dùng khi làm phiếu cho đơn vị khác; để trống thì giữ đúng như phiếu Nhà của An
     const orgName = d.orgName ? String(d.orgName).trim() : 'Nhà của An Homestay Tà Xùa';
     const sideName = d.orgName ? String(d.orgName).trim().toUpperCase() : 'NHÀ CỦA AN';
@@ -132,7 +134,7 @@
       </table></div>`;
     const bankBox = bankOn ? `<div class="ns-sec"><h4>04 THÔNG TIN CHUYỂN KHOẢN</h4><table>
       <tr><td>Ngân hàng</td><td>${esc(useBankName)}</td></tr>${useAccountName ? `<tr><td>Chủ tài khoản</td><td>${esc(useAccountName)}</td></tr>` : ''}
-      <tr><td>Số tài khoản</td><td><b>${esc(useAccountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b class="ns-warn" style="font-size:14px">${esc(d.tcode || d.code || '')}</b></td></tr></table>
+      <tr><td>Số tài khoản</td><td><b>${esc(useAccountNo)}</b></td></tr><tr><td>Nội dung CK</td><td><b class="ns-warn" style="font-size:14px">${esc(transferNote)}</b></td></tr></table>
       <div class="ns-note" style="margin-top:6px"><b>⚠️ Ghi ĐÚNG nội dung chuyển khoản ở trên, không thêm/bớt chữ.</b> Nhà đối chiếu giao dịch theo đúng nội dung này; ghi sai hoặc thiếu, nhà sẽ không nhận ra được đây là đơn của bạn, cần thời gian kiểm tra thủ công và có thể chậm xác nhận phòng. Nhắn nhà kèm mã <b>${esc(d.code || '')}</b> nếu bạn lỡ ghi sai.</div>
       </div>
       <div class="ns-qr">${qr ? `<img src="${esc(qr)}" alt="QR chuyển khoản" />` : (remain > 0 ? 'Mã QR' : 'Đã thanh toán đủ')}</div>`
