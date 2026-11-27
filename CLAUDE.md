@@ -24,7 +24,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## File chính
 | File | Vai trò |
 | --- | --- |
-| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (`bank`: MB, bankId 970422, STK và tên chủ tài khoản đã điền trong file này; `transferBase` là nội dung gốc `AL0IO721`; để trống `accountName` thì vẫn hiện QR nhưng không ghi dòng Chủ tài khoản), video, khóa công khai Supabase, `turnstileSiteKey` |
+| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (`bank`: NCB, bankId 970419, STK và tên chủ tài khoản đã điền trong file này; `transferBase` là nội dung gốc `AL0IO721`; để trống `accountName` thì vẫn hiện QR nhưng không ghi dòng Chủ tài khoản), video, khóa công khai Supabase, `turnstileSiteKey` |
 | `data.js` | Phòng, tour, dịch vụ, câu chuyện, chính sách hoàn hủy, FAQ, đánh giá, thư viện ảnh |
 | `index.html`, `app.js`, `account.js` | Trang chủ, đặt phòng, tra cứu đơn, đăng ký/đăng nhập |
 | `i18n.js` | Dịch Việt ↔ Anh |
@@ -161,7 +161,7 @@ Chỉ giữ 1 quy trình `kiem-tra.yml` (đã bỏ `jekyll-docker.yml` vì web l
 `.github/workflows/kiem-tra.yml` chạy `node scripts/kiem-tra.js` mỗi lần đẩy lên `main`: cú pháp JS, ảnh trong `data.js` có file thật, cờ "mẫu" = false, không có khóa bí mật. Chỉ báo lỗi, không chặn đưa web lên GitHub Pages. Chạy tay: `node scripts/kiem-tra.js`.
 
 ## Việc đang làm (cập nhật 13/10)
-**Đã xong:** bỏ nhãn "mẫu"; ảnh và giao diện sáng; rà soát điện thoại/máy tính; khóa admin PIN + 2 bước; hoàn trả + thẻ tiến độ (SQL đã chạy); số thực nhận (SQL đã chạy); phiếu `phieu.html?ma=`; STK MB + QR chỉ hiện đúng chỗ; chống cache `?v=`; link Messenger (`contacts.messenger`); chính sách hoàn hủy (chủ dự án đã đồng ý bản trên web); 1 hạng phòng + ảnh từ Drive của chủ nhà; Cloudflare Web Analytics (`analyticsToken` đã điền); cấu hình VS Code + Claude Code; tài khoản nhận tiền cọc (số tài khoản và tên chủ tài khoản) đã điền trong `config.js` (24/11). Danh sách tiến độ cũ hiện trong VS Code ("Đang làm phần B") là bản cũ, bỏ qua.
+**Đã xong:** bỏ nhãn "mẫu"; ảnh và giao diện sáng; rà soát điện thoại/máy tính; khóa admin PIN + 2 bước; hoàn trả + thẻ tiến độ (SQL đã chạy); số thực nhận (SQL đã chạy); phiếu `phieu.html?ma=`; STK MB + QR chỉ hiện đúng chỗ; chống cache `?v=`; link Messenger (`contacts.messenger`); chính sách hoàn hủy (chủ dự án đã đồng ý bản trên web); 1 hạng phòng + ảnh từ Drive của chủ nhà; Cloudflare Web Analytics (`analyticsToken` đã điền); cấu hình VS Code + Claude Code; tài khoản nhận tiền cọc (NCB, số tài khoản và tên chủ tài khoản) đã điền trong `config.js` (27/11). Danh sách tiến độ cũ hiện trong VS Code ("Đang làm phần B") là bản cũ, bỏ qua.
 **Không còn việc nào chờ trợ lý** ngoài những mục cần thông tin từ chủ dự án bên dưới. Mục nào có link/khóa thì chủ dự án gửi, trợ lý làm tiếp.
 
 ## Việc còn lại (xếp theo ưu tiên, nhắc chủ dự án khi phù hợp)
