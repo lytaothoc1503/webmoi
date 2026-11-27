@@ -94,6 +94,15 @@
     .home-hero .hh-eyebrow { font-size: 11px; letter-spacing: .18em; color: var(--gold-light); margin-bottom: 6px; }
     .home-hero h1 { font-family: 'Noto Serif', serif; font-size: 25px; margin: 0 0 6px; }
     .home-hero p { font-size: 13px; color: #f0dcae; margin: 0; line-height: 1.55; }
+    .home-hero .hh-ask { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(233,200,119,.35); font-size: 13.5px; color: #fdf3df; line-height: 1.55; }
+    .announce { background: linear-gradient(135deg, rgba(122,14,28,.94), rgba(61,8,16,.97)); border: 1px solid var(--gold); border-radius: 16px; padding: 16px 18px 14px; margin: 0 0 14px; color: #fdf3df; box-shadow: 0 10px 28px rgba(30,4,9,.28); }
+    .announce .an-kicker { font-size: 11px; letter-spacing: .18em; color: var(--gold-light); font-weight: 700; margin-bottom: 6px; }
+    .announce p { margin: 0; font-size: 14px; line-height: 1.55; color: #fdf3df; }
+    .announce .an-sub { margin-top: 10px; font-size: 12px; line-height: 1.5; color: #f0dcae; }
+    .tg-chip { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: var(--red-deep); font-weight: 800; font-size: 13px; text-decoration: none; border-radius: 999px; padding: 8px 14px; }
+    .tg-chip:hover { filter: brightness(1.06); }
+    .tg-chip svg { display: block; flex: 0 0 auto; }
+    @media (max-width: 680px) { .announce { padding: 14px; } .announce p, .home-hero .hh-ask { font-size: 13px; } .home-hero h1 { font-size: 22px; } }
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 16px; }
     .stat-card { background: rgba(255,250,240,.92); border: 1px solid var(--border); border-radius: 12px; padding: 14px; text-align: center; }
     .stat-card b { display: block; font-size: 26px; color: var(--red-dark); font-family: 'Noto Serif', serif; }
@@ -132,7 +141,7 @@
         <button type="submit" id="pl-btn">Đăng nhập</button>
         <div class="auth-msg" id="pl-msg"></div>
       </form>
-      <div class="auth-foot">Chưa có tài khoản? Nhắn Telegram <a id="fl-telegram-link" href="https://t.me/Xmagic09" target="_blank" rel="noopener">@Xmagic09</a><span id="af-email-wrap"></span> để được cấp quyền.</div>
+      <div class="auth-foot">Cần tài khoản hay muốn thêm mẫu phiếu booking? Nhắn Telegram <a id="fl-telegram-link" class="fl-telegram-link" href="https://t.me/Xmagic09" target="_blank" rel="noopener"><span class="fl-tg-name">X Magic</span> <span class="fl-tg-handle">@Xmagic09</span></a><span id="af-email-wrap"></span>.</div>
     </div>
   </div>
 </div>
@@ -154,6 +163,8 @@
         <div class="hh-eyebrow">ĐỐI TÁC &amp; SALE</div>
         <h1 id="hh-title">Xin chào!</h1>
         <p id="fl-home-welcome">Đây là nơi bạn xem nhanh các đơn đang được giao và lập đủ loại giấy tờ (phiếu xác nhận, hoàn trả, ủy quyền...) cho khách của mình. Mọi thông tin điền thêm chỉ nằm trong trình duyệt, không lưu lại.</p>
+        <p class="hh-ask">Anh em cần tài khoản hay muốn thêm mẫu phiếu booking của ae thì ae nhắn Telegram cho em thêm mẫu vào nhé:</p>
+        <a class="tg-chip fl-telegram-link" href="https://t.me/Xmagic09" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M21 4 3.2 11.1l5.1 1.7L18.8 7.4 10.6 14.6l.2 4.2 2.3-3.1 4.2 3.1L21 4z"/></svg><span class="fl-tg-name">X Magic</span> <span class="fl-tg-handle">@Xmagic09</span></a>
       </div>
       <div class="stat-grid" id="hh-stats"></div>
       <div class="home-actions">
@@ -164,7 +175,12 @@
 
     <div id="view-forms" hidden>
       <div class="top-bar no-print"><h2>Biểu Mẫu</h2><div><button class="btn-add" onclick="printForm()">In / Lưu PDF</button> <button class="btn-export" onclick="exportFormImage()">🖼️ Xuất ảnh (PNG)</button></div></div>
-      <p class="fin-note no-print">Chỉ thấy đúng đơn được giao cho email này. Thông tin điền thêm trên mẫu chỉ nằm trong trình duyệt, không lưu lại. Xuất ảnh/in trên điện thoại vẫn giữ đúng bố cục như trên máy tính.</p>
+      <div class="announce no-print">
+        <div class="an-kicker">THÔNG BÁO</div>
+        <p>Anh em cần tài khoản hay muốn thêm mẫu phiếu booking của ae thì ae nhắn Telegram cho em thêm mẫu vào nhé:</p>
+        <a class="tg-chip fl-telegram-link" href="https://t.me/Xmagic09" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M21 4 3.2 11.1l5.1 1.7L18.8 7.4 10.6 14.6l.2 4.2 2.3-3.1 4.2 3.1L21 4z"/></svg><span class="fl-tg-name">X Magic</span> <span class="fl-tg-handle">@Xmagic09</span></a>
+        <p class="an-sub">Chỉ thấy đúng đơn được giao cho email này. Thông tin điền thêm trên mẫu chỉ nằm trong trình duyệt, không lưu lại. Xuất ảnh/in trên điện thoại vẫn giữ đúng bố cục như trên máy tính.</p>
+      </div>
       <div class="section-card no-print">
         <div class="fm-bar"><select id="fm-tpl"></select><select id="fm-booking"></select></div>
         <p class="fin-note" id="fm-note" style="margin-bottom:0"></p>
@@ -220,7 +236,11 @@
     if (v.partner_tagline) $('fl-tagline').textContent = v.partner_tagline;
     if (v.partner_login_sub) $('fl-login-sub').textContent = v.partner_login_sub;
     if (v.partner_home_welcome) $('fl-home-welcome').textContent = v.partner_home_welcome;
-    if (v.partner_telegram) { const t = v.partner_telegram.replace(/^@/, ''); $('fl-telegram-link').href = 'https://t.me/' + t; $('fl-telegram-link').textContent = '@' + t; }
+    if (v.partner_telegram) {
+      const t = String(v.partner_telegram).replace(/^@/, '');
+      document.querySelectorAll('a.fl-telegram-link').forEach((a) => { a.href = 'https://t.me/' + t; });
+      document.querySelectorAll('.fl-tg-handle').forEach((el) => { el.textContent = '@' + t; });
+    }
     if (v.partner_logo_img) { $('fl-logo-1').src = v.partner_logo_img; $('fl-logo-2').src = v.partner_logo_img; }
     if (v.partner_bg_img) $('fl-bg-img').src = v.partner_bg_img;
   })();
