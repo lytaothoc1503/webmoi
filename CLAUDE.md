@@ -24,7 +24,7 @@ Chủ dự án: **Thóc** (người Việt, mới học code). Dự án: web **N
 ## File chính
 | File | Vai trò |
 | --- | --- |
-| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (`bank`: NCB, bankId 970419, STK và tên chủ tài khoản đã điền trong file này; `transferBase` là nội dung gốc `AL0IO721`; để trống `accountName` thì vẫn hiện QR nhưng không ghi dòng Chủ tài khoản), video, khóa công khai Supabase, `turnstileSiteKey` |
+| `config.js` | Liên hệ, giờ nhận/trả phòng, ngân hàng (`bank`: MB, bankId 970422, STK và tên chủ tài khoản đã điền trong file này; `transferBase` là nội dung gốc `AL0IO721`; để trống `accountName` thì vẫn hiện QR nhưng không ghi dòng Chủ tài khoản), video, khóa công khai Supabase, `turnstileSiteKey` |
 | `data.js` | Phòng, tour, dịch vụ, câu chuyện, chính sách hoàn hủy, FAQ, đánh giá, thư viện ảnh |
 | `index.html`, `app.js`, `account.js` | Trang chủ, đặt phòng, tra cứu đơn, đăng ký/đăng nhập |
 | `i18n.js` | Dịch Việt ↔ Anh |

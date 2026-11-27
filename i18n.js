@@ -707,6 +707,7 @@
 "Nhà của An Homestay Tà Xùa – Tà Xùa, Bắc Yên, Sơn La. Facebook:": "Nha cua An Homestay Ta Xua – Ta Xua, Bac Yen, Son La. Facebook:",
 "Đây là bản chính sách mẫu cơ bản. Chủ homestay nên rà soát và chỉnh cho đúng thực tế vận hành.": "This is a basic sample policy. The homestay owner should review and adjust it to match actual operations.",
 "MB Bank (Quân Đội)": "MB Bank (Military Commercial Joint Stock Bank)",
+"MB Bank (Ngân hàng TMCP Quân đội)": "MB Bank (Military Commercial Joint Stock Bank)",
 "NCB - Ngân hàng TMCP Quốc Dân": "NCB - National Citizen Commercial Joint Stock Bank",
 "Đã ghi nhận thanh toán của bạn": "Your payment has been recorded",
 "Bạn thử lại hoặc nhắn Facebook của nhà nhé.": "Please try again or message us on Facebook.",
