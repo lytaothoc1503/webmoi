@@ -15,7 +15,7 @@ Trên VS Code gõ (PowerShell): `git pull --rebase`. Trên điện thoại (gith
 | Thêm ảnh | Bỏ ảnh vào thư mục `images/`, rồi ghi `'images/ten-anh.jpg'` ở ô `image_url` |
 | Thêm ảnh khách hàng | `data.js`, mục `coffee`, ô `guestPhotos` |
 | Đổi giờ mở cửa, thông tin quán | `data.js`, mục `coffee`, ô `facts` |
-| Điền tài khoản ngân hàng (hiện mã QR) | `config.js`, mục `bank`, điền đủ 4 ô |
+| Điền tài khoản ngân hàng (hiện mã QR) | `config.js`, mục `bank`: tên ngân hàng, mã BIN, số tài khoản, chủ tài khoản. Nội dung QR chỉ tạo khi khách bấm "Tạo mã QR đặt phòng" |
 | Điền email nhận đơn | `config.js`, ô `email` trong `contacts` |
 
 ## Lưu ý để web không lỗi
