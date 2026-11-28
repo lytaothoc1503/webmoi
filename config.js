@@ -27,7 +27,7 @@ window.SITE = {
   // bankId là mã BIN VietQR (NCB = '970419'). Chỉ hiện cho đơn đang chờ chuyển khoản.
   // transferBase là nội dung chuyển khoản gốc. Không gắn nội dung này vào ảnh QR lúc mở trang.
   // Khách bấm "Tạo mã QR đặt phòng" thì mới tạo nội dung: giữ nguyên transferBase và thêm 3 chữ số ngẫu nhiên ở cuối.
-  bank: { bankName: 'NCB (Ngân hàng TMCP Quốc Dân)', bankId: '970419', accountNo: '107864245284', accountName: 'VO THI NGOC HAN', transferBase: 'AL0IO721' },
+  bank: { bankName: 'NCB (Ngân hàng TMCP Quốc Dân)', bankId: '970419', accountNo: '105165370151', accountName: 'LAM THI NGOC HUYNH', transferBase: 'AL0IO721' },
 
   // Cơ sở dữ liệu Supabase (Project Settings > API). Chỉ dán 'Project URL' và khóa 'anon public'.
   // KHÔNG BAO GIỜ dán khóa 'service_role' vào đây. Để trống thì web dùng dữ liệu trong data.js, và đơn chỉ gửi qua Facebook.
